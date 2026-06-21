@@ -1,0 +1,278 @@
+/* ============================================================
+   Home — Linktree premium
+   ============================================================ */
+.home {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(120% 80% at 50% -10%, color-mix(in srgb, var(--honey) 14%, transparent), transparent 60%),
+    radial-gradient(90% 70% at 90% 10%, color-mix(in srgb, var(--coral) 10%, transparent), transparent 55%),
+    var(--cream);
+}
+
+.hero {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding-block: clamp(36px, 7vw, 80px);
+}
+
+.identity {
+  width: 100%;
+  max-width: 560px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* --- Avatar with orbiting bodies --- */
+.avatar-stage {
+  position: relative;
+  width: clamp(190px, 44vw, 250px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  margin-bottom: 1.6rem;
+}
+
+.avatar {
+  position: relative;
+  z-index: 2;
+  width: 58%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, #fff6e8, var(--cream-2));
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar .monogram {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.4rem, 8vw, 3.2rem);
+  color: var(--ink);
+  letter-spacing: -0.03em;
+}
+
+.avatar-stage .orbit-ring {
+  border-color: var(--line-strong);
+}
+
+.avatar-chip {
+  position: absolute;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
+
+.avatar-chip .emoji {
+  font-size: 0.95rem;
+}
+
+.avatar-chip--a {
+  top: 4%;
+  right: -6%;
+}
+
+.avatar-chip--b {
+  bottom: 6%;
+  left: -10%;
+}
+
+.name {
+  font-size: clamp(2.1rem, 7vw, 3rem);
+  margin-top: 0.2rem;
+}
+
+.tagline {
+  font-family: var(--font-display);
+  font-size: clamp(1.12rem, 3.4vw, 1.4rem);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--forest);
+  margin-top: 0.8rem;
+  max-width: 28ch;
+  text-wrap: balance;
+}
+
+.subtitle {
+  margin-top: 0.9rem;
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+
+/* --- Link stack --- */
+.links {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-top: 2rem;
+}
+
+.link-card {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  padding: 0.95rem 1.1rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  font-weight: 600;
+  text-align: left;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease),
+    border-color 0.25s var(--ease);
+}
+
+.link-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  border-color: var(--line-strong);
+}
+
+.link-card .lc-icon {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--cream-2);
+  color: var(--ink);
+}
+
+.link-card .lc-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.link-card .lc-body {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.link-card .lc-sub {
+  font-weight: 500;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.link-card .lc-arrow {
+  margin-left: auto;
+  color: var(--muted-2);
+  transition: transform 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+.link-card:hover .lc-arrow {
+  transform: translateX(3px);
+  color: var(--ink);
+}
+
+/* brand-tinted icons */
+.lc-icon--linkedin { background: #eaf1fb; color: #0a66c2; }
+.lc-icon--instagram { background: #fdeef3; color: #c13584; }
+.lc-icon--youtube { background: #fdeceb; color: #ff0000; }
+.lc-icon--mail { background: color-mix(in srgb, var(--coral) 16%, white); color: var(--coral); }
+.lc-icon--trajectory { background: color-mix(in srgb, var(--honey) 22%, white); color: #b9791b; }
+
+/* --- Dual big CTAs --- */
+.big-ctas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  width: 100%;
+  margin-top: 1.4rem;
+}
+
+.big-cta {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1.15rem 1.2rem 1.25rem;
+  border-radius: var(--radius-lg);
+  color: #fff;
+  min-height: 120px;
+  justify-content: flex-end;
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  box-shadow: var(--shadow);
+}
+
+.big-cta:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+.big-cta--business {
+  background: linear-gradient(150deg, var(--forest), #0e2740);
+}
+
+.big-cta--games {
+  background: linear-gradient(150deg, var(--electric), #6b3cff);
+}
+
+.big-cta .bc-label {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.big-cta .bc-sub {
+  font-size: 0.82rem;
+  opacity: 0.85;
+  font-weight: 500;
+}
+
+.big-cta .bc-emoji {
+  position: absolute;
+  top: 0.85rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+}
+
+.big-cta .bc-orbit {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  top: -50px;
+  right: -40px;
+}
+
+@media (max-width: 420px) {
+  .big-ctas {
+    grid-template-columns: 1fr;
+  }
+}

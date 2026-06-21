@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "redirects": [
+    { "source": "/trajectory.html", "destination": "/business", "permanent": true },
+    { "source": "/trajectory", "destination": "/business", "permanent": true }
+  ]
+}

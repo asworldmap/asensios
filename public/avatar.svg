@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="Asensio Sabater">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff6e8"/>
+      <stop offset="1" stop-color="#f4ede1"/>
+    </linearGradient>
+    <linearGradient id="ink" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1c3a33"/>
+      <stop offset="1" stop-color="#0e2740"/>
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" fill="url(#bg)"/>
+  <!-- soft mediterranean sun -->
+  <circle cx="118" cy="44" r="20" fill="#f2b13c" opacity="0.9"/>
+  <!-- horizon / sea -->
+  <path d="M0 104 q40 -16 80 0 t80 0 V160 H0 Z" fill="#0e2740" opacity="0.92"/>
+  <path d="M0 116 q40 -14 80 0 t80 0 V160 H0 Z" fill="#1c3a33"/>
+  <!-- orbit trace -->
+  <ellipse cx="80" cy="80" rx="62" ry="40" fill="none" stroke="#ef6f53" stroke-width="1.6" opacity="0.5" transform="rotate(-18 80 80)"/>
+  <circle cx="26" cy="64" r="3.4" fill="#ef6f53"/>
+  <!-- monogram -->
+  <text x="80" y="92" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="58" font-weight="600" fill="url(#ink)">AS</text>
+</svg>

@@ -1,0 +1,4 @@
+# Netlify-style redirects (also harmless on other hosts)
+# Legacy route kept alive -> new trajectory page
+/trajectory.html   /business   301
+/trajectory        /business   301
