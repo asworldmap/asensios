@@ -1,0 +1,48 @@
+name: Deploy to Hostinger VPS
+
+# Builds the site and rsyncs the production output (dist/) to the VPS over SSH.
+# Runs on every push to main, and can be triggered manually.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      # Deploys via rsync over SSH. Requires the repository secrets listed below.
+      - name: Deploy dist/ to VPS
+        uses: easingthemes/ssh-deploy@v5.1.0
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+          # Local build output (note the trailing slash: copies contents, not the folder)
+          SOURCE: "dist/"
+          # Absolute path to the site's document root on the VPS
+          TARGET: ${{ secrets.REMOTE_TARGET }}
+          # Mirror the build: delete remote files no longer present locally.
+          # Excludes are protected so nothing outside the build is touched.
+          ARGS: "-rltgoDzvO --delete"
+          EXCLUDE: ".git/, .github/, node_modules/"
