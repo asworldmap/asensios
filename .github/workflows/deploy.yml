@@ -30,11 +30,23 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Prepare SSH key
+        run: |
+          KEY=$(echo "${{ secrets.SSH_PRIVATE_KEY_B64 }}" | base64 -d)
+          echo "$KEY" > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+          ssh-keygen -y -f /tmp/deploy_key >/dev/null
+          {
+            echo 'SSH_PRIVATE_KEY<<EOF'
+            echo "$KEY"
+            echo 'EOF'
+          } >> $GITHUB_ENV
+
       # Deploys via rsync over SSH. Requires the repository secrets listed below.
       - name: Deploy dist/ to VPS
         uses: easingthemes/ssh-deploy@v5.1.0
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY: ${{ env.SSH_PRIVATE_KEY }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
