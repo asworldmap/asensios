@@ -1,7 +1,9 @@
 /* ============================================================
    Editorial photo system — figure.ph
-   Purely additive: a chapter with no photo (file missing, or not yet
-   uploaded) renders exactly as it did before this file existed.
+   Photographic evidence, not portfolio thumbnails: no card border,
+   no shadow, no gradient caption overlay. A chapter with no photo
+   (file missing, or not yet uploaded) renders exactly as it did
+   before this file existed.
    ============================================================ */
 
 .chapter-body {
@@ -12,31 +14,21 @@
   margin-top: 1.4rem;
 }
 
-.ph {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow-sm);
-  background: var(--cream-2);
-}
-
 .ph img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
 .ph figcaption {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 0.5rem 0.85rem;
-  font-size: 0.76rem;
-  font-weight: 500;
-  color: #fff;
-  background: linear-gradient(to top, rgba(14, 39, 64, 0.55), transparent);
+  margin-top: 0.65rem;
+  font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .ph-4x5 {
@@ -82,3 +74,16 @@
 /* A chapter that lost its photo (missing file, failed load) reverts to the
    plain single-column layout with no extra rule needed — .no-media simply
    never receives the grid above. */
+
+/* --- Editorial interruption: a landscape photo between chapters, not a
+   chapter itself. Quiet top/bottom rule instead of a card boundary. --- */
+.story-band {
+  margin-block: clamp(8px, 2vw, 20px);
+  padding-block: clamp(20px, 4vw, 32px);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.story-band figcaption {
+  text-align: center;
+}
