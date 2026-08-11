@@ -1,0 +1,84 @@
+/* ============================================================
+   Editorial photo system — figure.ph
+   Purely additive: a chapter with no photo (file missing, or not yet
+   uploaded) renders exactly as it did before this file existed.
+   ============================================================ */
+
+.chapter-body {
+  min-width: 0;
+}
+
+.chapter.has-media .ph {
+  margin-top: 1.4rem;
+}
+
+.ph {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+  background: var(--cream-2);
+}
+
+.ph img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ph figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: #fff;
+  background: linear-gradient(to top, rgba(14, 39, 64, 0.55), transparent);
+}
+
+.ph-4x5 {
+  aspect-ratio: 4 / 5;
+}
+
+.ph-3x2 {
+  aspect-ratio: 3 / 2;
+}
+
+.ph-16x9 {
+  aspect-ratio: 16 / 9;
+}
+
+@media (min-width: 760px) {
+  .chapter.has-media {
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    gap: clamp(20px, 3vw, 36px);
+    align-items: start;
+  }
+
+  .chapter.has-media .ph {
+    margin-top: 0;
+  }
+
+  /* Alternate sides so the story spine doesn't read as a single column of
+     right-aligned thumbnails. Declared on the markup (.flip), not inferred
+     from position, so it can't drift if a chapter loses its photo. */
+  .chapter.has-media.flip {
+    grid-template-columns: 240px 1fr;
+  }
+
+  .chapter.has-media.flip .chapter-body {
+    order: 2;
+  }
+
+  .chapter.has-media.flip .ph {
+    order: 1;
+  }
+}
+
+/* A chapter that lost its photo (missing file, failed load) reverts to the
+   plain single-column layout with no extra rule needed — .no-media simply
+   never receives the grid above. */

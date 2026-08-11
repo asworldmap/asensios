@@ -30,10 +30,16 @@ import {
   drawSphere,
   makeLabelSpace,
 } from './globe.js';
+import { createCinema, drawCover } from './cinema.js';
 
 const CREAM = '#fbf7f0';
 const CORAL = '#ef6f53';
 const HONEY = '#f2b13c';
+const DEEP_SPACE = '#050d18';
+
+// Optional atmosphere for the Earth-limb moment of the departure. Requested
+// on pointerenter/focus of the trajectory link, same as this whole module.
+const { primeCinema, cinemaFrame } = createCinema();
 
 // Destinations shown during the departure, ordered so they rotate into view.
 const DEPARTURE_IDS = ['berlin', 'helsinki', 'seoul', 'tokyo'];
@@ -54,6 +60,7 @@ let running = false;
 export function playTransition(href, mode = 'orbit') {
   if (running) return;
   running = true;
+  if (mode === 'orbit') primeCinema('earth-limb');
 
   const tier = deviceTier();
   const duration =
@@ -206,6 +213,25 @@ function drawOrbit(ctx, size, p, stars, places, tier) {
 
   const starA = range(p, 0.4, 0.68);
   if (starA > 0.01) drawStars(ctx, size, stars, starA * 0.9, p);
+
+  // Optional atmosphere: gives the "Tierra" moment matter and depth. Sits
+  // BELOW the procedural sphere, so the real footage's framing can never
+  // desync the graticule, routes or labels drawn on top of it. A no-op
+  // until public/cinematic/earth-limb.* exists.
+  const limb = range(p, 0.4, 0.58) * (1 - range(p, 0.76, 0.88));
+  if (limb > 0.01) {
+    const lv = cinemaFrame('earth-limb');
+    if (lv) {
+      ctx.save();
+      ctx.globalAlpha = limb * 0.45;
+      drawCover(ctx, lv, 0, 0, w, h);
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.globalAlpha = limb * 0.2;
+      ctx.fillStyle = DEEP_SPACE;
+      ctx.fillRect(0, 0, w, h);
+      ctx.restore();
+    }
+  }
 
   drawSphere(ctx, cam);
   drawGraticule(ctx, cam, range(p, 0.1, 0.55), tier === 'mobile' ? 45 : 30);

@@ -11,14 +11,21 @@
 
 import { clamp, deviceTier, easeOut, fitCanvas, lerp, range } from './motion.js';
 import { ORIGIN, PLACES, drawGraticule, drawNode, drawRoute, makeLabelSpace } from './globe.js';
+import { createCinema, drawCover } from './cinema.js';
 
 const INK = '14,39,64';
+
+// Optional atmosphere for the Santiago arrival — the Pacific crossing that
+// closes the route sequence. Requested once, when the worldmap section
+// comes on desktop; a no-op until public/cinematic/pacific-andes.* exists.
+const { primeCinema, cinemaFrame } = createCinema();
 
 export function initWorldmap(sectionSelector = '.story') {
   const section = document.querySelector(sectionSelector);
   if (!section) return;
 
   const tier = deviceTier();
+  if (tier === 'desktop') primeCinema('pacific-andes');
   const host = document.createElement('div');
   host.className = 'worldmap';
   host.setAttribute('aria-hidden', 'true');
@@ -117,6 +124,25 @@ export function initWorldmap(sectionSelector = '.story') {
       lat: lerp(40, -18, range(progress, 0.1, 1)),
     };
     const space = makeLabelSpace(w, h);
+
+    // Optional atmosphere for the Santiago arrival: Pacific crossing into
+    // the Andes, clipped to the globe circle and painted BELOW the
+    // graticule, routes and nodes so they always read on top of it.
+    if (tier === 'desktop') {
+      const arrive = range(progress, 0.74, 0.84) * (1 - range(progress, 0.93, 0.99));
+      if (arrive > 0.01) {
+        const av = cinemaFrame('pacific-andes');
+        if (av) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(cam.cx, cam.cy, cam.r, 0, Math.PI * 2);
+          ctx.clip();
+          ctx.globalAlpha = alpha * arrive * 0.85;
+          drawCover(ctx, av, cam.cx - cam.r, cam.cy - cam.r, cam.r * 2, cam.r * 2);
+          ctx.restore();
+        }
+      }
+    }
 
     ctx.strokeStyle = `rgba(${INK},0.16)`;
     ctx.lineWidth = 1;
