@@ -6,9 +6,10 @@
     <meta name="theme-color" content="#f7f4ec" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0e120d" media="(prefers-color-scheme: dark)" />
 
-    <title>Asensio Sabater</title>
+    <title data-i18n="home.meta.title">Asensio Sabater</title>
     <meta
       name="description"
+      data-i18n-attr="content:home.meta.description"
       content="Asensio Sabater. Santiago de Chile · Delegación de la Unión Europea. Relaciones internacionales, comercio y cooperación entre Europa y América Latina."
     />
     <link rel="canonical" href="https://asensios.com/" />
@@ -58,18 +59,24 @@
       <span class="dot" aria-hidden="true"></span>
       <span data-theme-label>Día</span>
     </button>
+    <button
+      class="lang-toggle"
+      data-lang-toggle
+      type="button"
+      aria-label="Switch language / Cambiar idioma"
+    ><span data-lang-label>EN</span></button>
 
     <div class="page home">
       <main class="home-main">
         <div class="wrap home-inner">
           <p class="mono home-place" data-reveal>
             <span class="rule" aria-hidden="true"></span>
-            Santiago de Chile · Delegación de la Unión Europea
+            <span data-i18n="home.place">Santiago de Chile · Delegación de la Unión Europea</span>
           </p>
 
           <h1 class="home-name display" data-reveal data-reveal-delay="60">Asensio Sabater</h1>
 
-          <p class="lead home-lead" data-reveal data-reveal-delay="120">
+          <p class="lead home-lead" data-reveal data-reveal-delay="120" data-i18n="home.lead">
             Relaciones internacionales, comercio y cooperación entre Europa y América Latina.
             Construyo conexiones entre culturas; la tecnología es solo la herramienta.
           </p>
@@ -122,11 +129,11 @@
 
           <nav class="home-exits" aria-label="Secciones" data-reveal data-reveal-delay="240">
             <a class="home-exit" href="/trajectory/" data-cine-orbit>
-              Mi trayectoria
+              <span data-i18n="nav.trajectory">Mi trayectoria</span>
               <span class="arrow" aria-hidden="true">→</span>
             </a>
             <a class="home-play" href="/games/" data-cine-warp>
-              <span class="pin" aria-hidden="true">◕</span> Playroom
+              <span class="pin" aria-hidden="true">◕</span> <span data-i18n="nav.games">Playroom</span>
             </a>
           </nav>
         </div>

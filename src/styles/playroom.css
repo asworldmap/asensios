@@ -52,59 +52,132 @@
   max-width: 44ch;
 }
 
-/* --- The three slots ---------------------------------------------- */
-.pr-list {
-  list-style: none;
-  padding: 0;
-  border-top: 1px solid var(--line-soft);
-  max-width: 680px;
+/* --- The three games ------------------------------------------------
+   A live slot is a real playable card: canvas, overlay, score. Kept in
+   the same mono/numbered rhythm as the rest of the site rather than a
+   portfolio-style card grid. --- */
+.pr-games {
+  display: grid;
+  gap: clamp(28px, 4vh, 44px);
+  max-width: 720px;
 }
 
-.pr-item {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+.pr-game {
+  border-top: 1px solid var(--line-soft);
+  padding-top: clamp(18px, 3vh, 26px);
+}
+
+.pr-game-head {
+  display: flex;
   align-items: baseline;
-  gap: clamp(14px, 3vw, 26px);
-  padding-block: clamp(18px, 3vh, 26px);
-  border-bottom: 1px solid var(--line-soft);
+  gap: clamp(10px, 2vw, 18px);
+  margin-bottom: 0.4rem;
 }
 
 .pr-num {
   font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: 0.12em;
-  color: var(--ink-soft);
-}
-
-.pr-name {
-  font-size: clamp(1.15rem, 2.8vw, 1.6rem);
-  font-weight: 300;
-  letter-spacing: -0.015em;
-  color: var(--ink-soft);
-}
-
-.pr-state {
-  font-size: 0.62rem;
-  color: var(--ink-soft);
-  white-space: nowrap;
-}
-
-/* A slot that is ready to play reads as live: full-strength name, a signal
-   dot, and it moves under the cursor. Nothing is live in this iteration. */
-.pr-item.is-ready .pr-name {
-  color: var(--ink);
-}
-
-.pr-item.is-ready .pr-state {
   color: var(--signal-ink);
 }
 
-.pr-item.is-ready:hover .pr-name {
-  transform: translateX(5px);
+.pr-name {
+  font-size: clamp(1.15rem, 2.8vw, 1.5rem);
+  font-weight: 300;
+  letter-spacing: -0.015em;
+  color: var(--ink);
 }
 
-.pr-item .pr-name {
-  transition: transform 0.35s var(--ease), color 0.3s var(--ease);
+.pr-score {
+  margin-left: auto;
+  font-size: 0.68rem;
+  color: var(--mono-ink);
+}
+
+.pr-tag {
+  color: var(--ink-soft);
+  margin-bottom: 0.9rem;
+}
+
+.pr-canvas-wrap {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  max-height: 360px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.pr-canvas-wrap canvas {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.pr-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(3px);
+}
+
+.pr-overlay h2 {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: 1.3rem;
+  color: var(--ink);
+}
+
+.pr-big-score {
+  font-family: var(--font-mono);
+  font-size: 2.2rem;
+  color: var(--signal-ink);
+  margin-block: 0.3rem;
+}
+
+.pr-overlay p {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  max-width: 32ch;
+  margin-block: 0.6rem 1rem;
+}
+
+.pr-play {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.65em 1.4em;
+  border: 1px solid var(--signal-ink);
+  color: var(--signal-ink);
+  background: transparent;
+  border-radius: 999px;
+  transition: background 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+.pr-play:hover {
+  background: var(--signal-ink);
+  color: var(--bg);
+}
+
+.pr-controls {
+  margin-top: 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  color: var(--ink-faint);
+  font-size: 0.66rem;
+}
+
+.pr-controls kbd {
+  font-family: var(--font-mono);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0.05em 0.4em;
 }
 
 .pr-foot {

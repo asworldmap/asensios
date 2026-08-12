@@ -6,8 +6,8 @@
     <meta name="theme-color" content="#f7f4ec" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0e120d" media="(prefers-color-scheme: dark)" />
 
-    <title>Playroom — Asensio Sabater</title>
-    <meta name="description" content="El patio pequeño de asensios.com." />
+    <title data-i18n="games.meta.title">Playroom — Asensio Sabater</title>
+    <meta name="description" data-i18n-attr="content:games.meta.description" content="El patio pequeño de asensios.com: tres minijuegos hechos a mano." />
     <link rel="canonical" href="https://asensios.com/games" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="robots" content="noindex" />
@@ -25,11 +25,17 @@
       <span class="dot" aria-hidden="true"></span>
       <span data-theme-label>Día</span>
     </button>
+    <button
+      class="lang-toggle"
+      data-lang-toggle
+      type="button"
+      aria-label="Switch language / Cambiar idioma"
+    ><span data-lang-label>EN</span></button>
 
     <div class="page pr">
       <header class="pr-top">
         <div class="wrap">
-          <a class="mono ln" href="/">← Asensio Sabater</a>
+          <a class="mono ln" href="/" data-i18n="traj.back">← Asensio Sabater</a>
         </div>
       </header>
 
@@ -37,44 +43,100 @@
         <div class="wrap pr-inner">
           <p class="mono pr-kicker" data-reveal>
             <span class="rule" aria-hidden="true"></span>
-            Playroom
+            <span data-i18n="games.kicker">Playroom</span>
           </p>
 
-          <h1 class="pr-title display" data-reveal data-reveal-delay="60">
-            Has encontrado<br />el patio.
+          <h1 class="pr-title display" data-reveal data-reveal-delay="60" data-i18n="games.title">
+            Has encontrado el patio.
           </h1>
 
-          <p class="lead pr-lead" data-reveal data-reveal-delay="120">
+          <p class="lead pr-lead" data-reveal data-reveal-delay="120" data-i18n="games.lead">
             Si la Tierra es un patio de juegos, este es el rincón pequeño: tres juegos
             hechos a mano, en canvas, sin librerías y sin motivo alguno.
           </p>
 
-          <!-- Slots, ready for the games to mount into. Each keeps its
-               data-game hook so restoring one is a matter of importing it and
-               marking the item .is-ready — no markup surgery. -->
-          <ul class="pr-list" data-reveal data-reveal-delay="180">
-            <li class="pr-item" data-game="fruit-dash">
-              <span class="pr-num">01</span>
-              <span class="pr-name">Fruit Dash</span>
-              <span class="mono pr-state">En camino</span>
-            </li>
-            <li class="pr-item" data-game="fruit-catch">
-              <span class="pr-num">02</span>
-              <span class="pr-name">Fruit Catch</span>
-              <span class="mono pr-state">En camino</span>
-            </li>
-            <li class="pr-item" data-game="vuelta-al-mundo">
-              <span class="pr-num">03</span>
-              <span class="pr-name">La Vuelta al Mundo</span>
-              <span class="mono pr-state">En camino</span>
-            </li>
-          </ul>
+          <div class="pr-games" data-reveal data-reveal-delay="180">
+            <!-- Fruit Dash -->
+            <article class="pr-game is-ready" data-game="fruit-dash">
+              <div class="pr-game-head">
+                <span class="pr-num">01</span>
+                <span class="pr-name">Fruit Dash</span>
+                <span class="mono pr-score"><span data-score>0</span> · <span data-best>0</span></span>
+              </div>
+              <p class="mono pr-tag" data-i18n="games.dash.tag">Corre, salta y atrapa fruta.</p>
+              <div class="pr-canvas-wrap">
+                <canvas></canvas>
+                <div class="pr-overlay" data-overlay>
+                  <div>
+                    <h2 data-ov-title>Fruit Dash</h2>
+                    <div class="pr-big-score" data-ov-score hidden>0</div>
+                    <p data-ov-text data-i18n="games.dash.intro">Salta los obstáculos y recoge fruta. ¡No te choques!</p>
+                    <button class="pr-play" data-ov-btn data-i18n="games.play">Jugar</button>
+                  </div>
+                </div>
+              </div>
+              <p class="mono pr-controls">
+                <span data-i18n="games.dash.touch">Saltar: toca la pantalla</span>
+                <span>· <kbd>Espacio</kbd> / <kbd>↑</kbd> <span data-i18n="games.jump">saltar</span></span>
+              </p>
+            </article>
+
+            <!-- Fruit Catch -->
+            <article class="pr-game is-ready" data-game="fruit-catch">
+              <div class="pr-game-head">
+                <span class="pr-num">02</span>
+                <span class="pr-name">Fruit Catch</span>
+                <span class="mono pr-score"><span data-score>0</span> · <span data-best>0</span></span>
+              </div>
+              <p class="mono pr-tag" data-i18n="games.catch.tag">Recoge fruta, esquiva bombas.</p>
+              <div class="pr-canvas-wrap">
+                <canvas></canvas>
+                <div class="pr-overlay" data-overlay>
+                  <div>
+                    <h2 data-ov-title>Fruit Catch</h2>
+                    <div class="pr-big-score" data-ov-score hidden>0</div>
+                    <p data-ov-text data-i18n="games.catch.intro">Mueve la cesta para atrapar fruta. Evita las bombas.</p>
+                    <button class="pr-play" data-ov-btn data-i18n="games.play">Jugar</button>
+                  </div>
+                </div>
+              </div>
+              <p class="mono pr-controls">
+                <span data-i18n="games.catch.touch">Mueve: arrastra el dedo</span>
+                <span>· <kbd>←</kbd> <kbd>→</kbd> <span data-i18n="games.move">mover</span></span>
+              </p>
+            </article>
+
+            <!-- La Vuelta al Mundo (orbit lane-dodge) -->
+            <article class="pr-game is-ready" data-game="vuelta-al-mundo">
+              <div class="pr-game-head">
+                <span class="pr-num">03</span>
+                <span class="pr-name">La Vuelta al Mundo</span>
+                <span class="mono pr-score"><span data-score>0</span> · <span data-best>0</span></span>
+              </div>
+              <p class="mono pr-tag" data-i18n="games.dodger.tag">Cambia de órbita, esquiva lo que venga.</p>
+              <div class="pr-canvas-wrap">
+                <canvas></canvas>
+                <div class="pr-overlay" data-overlay>
+                  <div>
+                    <h2 data-ov-title>La Vuelta al Mundo</h2>
+                    <div class="pr-big-score" data-ov-score hidden>0</div>
+                    <p data-ov-text data-i18n="games.dodger.intro">Salta entre las dos órbitas y esquiva lo que venga de frente.</p>
+                    <button class="pr-play" data-ov-btn data-i18n="games.play">Jugar</button>
+                  </div>
+                </div>
+              </div>
+              <p class="mono pr-controls">
+                <span data-i18n="games.dodger.touch">Cambiar de órbita: toca la pantalla</span>
+                <span>· <kbd>Espacio</kbd> / <kbd>↑</kbd> <span data-i18n="games.dodger.switch">cambiar</span></span>
+              </p>
+            </article>
+          </div>
         </div>
       </main>
 
       <footer class="pr-foot">
         <div class="wrap">
-          <a class="mono ln" href="/trajectory/">Trayectoria →</a>
+          <a class="mono ln" href="/trajectory/" data-i18n="games.footLink">Trayectoria →</a>
           <span class="mono">The earth is my playground</span>
         </div>
       </footer>

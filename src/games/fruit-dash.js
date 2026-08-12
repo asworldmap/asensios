@@ -158,7 +158,7 @@ export function createFruitDash(root) {
       const dx = px - closeX;
       const dy = py - closeY;
       if (dx * dx + dy * dy < player.r * player.r * 0.7) {
-        burst(px, py, '#ef6f53');
+        burst(px, py, '#6b4f35');
         gameOver();
         return;
       }
@@ -173,7 +173,7 @@ export function createFruitDash(root) {
       if (dx * dx + dy * dy < (f.r + player.r) * (f.r + player.r)) {
         f.got = true;
         score += 10;
-        burst(f.x, f.y, '#f2b13c');
+        burst(f.x, f.y, '#a9884f');
       }
     }
 
@@ -191,7 +191,7 @@ export function createFruitDash(root) {
     ctx.clearRect(0, 0, W, H);
 
     // ground
-    ctx.fillStyle = '#1c3a33';
+    ctx.fillStyle = '#2f5d3a';
     ctx.fillRect(0, groundY, W, H - groundY);
     ctx.fillStyle = 'rgba(255,255,255,0.12)';
     for (let x = (-(score * 2) % 40); x < W; x += 40) {
@@ -199,7 +199,7 @@ export function createFruitDash(root) {
     }
 
     // obstacles (coral spikes)
-    ctx.fillStyle = '#ef6f53';
+    ctx.fillStyle = '#6b4f35';
     for (const o of obstacles) {
       const topY = groundY - o.h;
       ctx.beginPath();
@@ -220,7 +220,7 @@ export function createFruitDash(root) {
     ctx.save();
     ctx.translate(player.x, player.y);
     ctx.rotate(player.rot);
-    ctx.fillStyle = '#2f6bff';
+    ctx.fillStyle = '#3fbf16';
     roundRect(ctx, -player.r, -player.r, player.r * 2, player.r * 2, 8);
     ctx.fill();
     ctx.restore();
@@ -230,7 +230,7 @@ export function createFruitDash(root) {
     ctx.arc(player.x - 5, player.y - 4, 4, 0, Math.PI * 2);
     ctx.arc(player.x + 6, player.y - 4, 4, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = '#0e2740';
+    ctx.fillStyle = '#4a3527';
     ctx.beginPath();
     ctx.arc(player.x - 4, player.y - 4, 2, 0, Math.PI * 2);
     ctx.arc(player.x + 7, player.y - 4, 2, 0, Math.PI * 2);

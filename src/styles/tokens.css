@@ -332,6 +332,32 @@ button {
   background: var(--signal);
 }
 
+.lang-toggle {
+  position: fixed;
+  top: clamp(16px, 3vw, 26px);
+  right: clamp(74px, 11vw, 106px);
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.1em;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  backdrop-filter: blur(8px);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  color: var(--ink-soft);
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+
+.lang-toggle:hover {
+  color: var(--ink);
+  border-color: var(--ink-faint);
+}
+
 /* ------------------------------------------------------------ Footer */
 .site-footer {
   position: relative;

@@ -117,7 +117,7 @@ export function createFruitCatch(root) {
         Math.abs(it.x - basket.x) < basket.w / 2 + it.r * 0.4
       ) {
         if (it.bomb) {
-          burst(it.x, it.y, '#0e2740');
+          burst(it.x, it.y, '#4a3527');
           it.dead = true;
           lives -= 1;
           if (lives <= 0) {
@@ -126,7 +126,7 @@ export function createFruitCatch(root) {
           }
         } else {
           score += 5;
-          burst(it.x, it.y, '#f2b13c');
+          burst(it.x, it.y, '#a9884f');
           it.dead = true;
         }
       } else if (it.y - it.r > H) {
@@ -166,10 +166,10 @@ export function createFruitCatch(root) {
     // basket
     const bx = basket.x;
     const by = H - 52;
-    ctx.fillStyle = '#1c3a33';
+    ctx.fillStyle = '#2f5d3a';
     roundRect(ctx, bx - basket.w / 2, by, basket.w, basket.h, 8);
     ctx.fill();
-    ctx.fillStyle = '#2f6bff';
+    ctx.fillStyle = '#3fbf16';
     roundRect(ctx, bx - basket.w / 2, by, basket.w, 8, 4);
     ctx.fill();
 

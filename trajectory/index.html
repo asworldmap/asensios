@@ -6,26 +6,28 @@
     <meta name="theme-color" content="#f7f4ec" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0e120d" media="(prefers-color-scheme: dark)" />
 
-    <title>Trayectoria — Asensio Sabater</title>
+    <title data-i18n="traj.meta.title">Trayectoria — Asensio Sabater</title>
     <meta
       name="description"
-      content="De Murcia a Santiago de Chile, pasando por Finlandia, Corea, Japón y Europa. Seis momentos de una trayectoria internacional."
+      data-i18n-attr="content:traj.meta.description"
+      content="Diez aprendizajes, no un currículum: de Finlandia a la Delegación de la UE en Chile, pasando por Corea, Japón y las comunidades que Asensio Sabater ha construido por el camino."
     />
     <link rel="canonical" href="https://asensios.com/trajectory" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <meta property="og:type" content="profile" />
     <meta property="og:site_name" content="Asensio Sabater" />
-    <meta property="og:title" content="Trayectoria — Asensio Sabater" />
+    <meta property="og:title" data-i18n-attr="content:traj.meta.title" content="Trayectoria — Asensio Sabater" />
     <meta
       property="og:description"
-      content="De Murcia a Santiago de Chile, pasando por Finlandia, Corea, Japón y Europa."
+      data-i18n-attr="content:traj.meta.ogDescription"
+      content="Diez aprendizajes de una vida internacional: de Finlandia a Santiago de Chile."
     />
     <meta property="og:url" content="https://asensios.com/trajectory" />
     <meta property="og:image" content="https://asensios.com/og.svg" />
     <meta property="og:locale" content="es_ES" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Trayectoria — Asensio Sabater" />
+    <meta name="twitter:title" data-i18n-attr="content:traj.meta.title" content="Trayectoria — Asensio Sabater" />
     <meta name="twitter:image" content="https://asensios.com/og.svg" />
 
     <script>
@@ -41,11 +43,17 @@
       <span class="dot" aria-hidden="true"></span>
       <span data-theme-label>Día</span>
     </button>
+    <button
+      class="lang-toggle"
+      data-lang-toggle
+      type="button"
+      aria-label="Switch language / Cambiar idioma"
+    ><span data-lang-label>EN</span></button>
 
     <div class="page tj">
       <header class="tj-top">
         <div class="wrap">
-          <a class="mono ln" href="/">← Asensio Sabater</a>
+          <a class="mono ln" href="/" data-i18n="traj.back">← Asensio Sabater</a>
         </div>
       </header>
 
@@ -54,14 +62,14 @@
         <div class="wrap">
           <p class="mono tj-kicker" data-reveal>
             <span class="rule" aria-hidden="true"></span>
-            Trayectoria
+            <span data-i18n="traj.hero.eyebrow">Trayectoria</span>
           </p>
-          <h1 class="tj-title display" data-reveal data-reveal-delay="60">
-            De Murcia al otro<br />lado del <em>mundo</em>.
+          <h1 class="tj-title display" data-reveal data-reveal-delay="60" data-i18n="traj.hero.title">
+            Diez aprendizajes, no un currículum.
           </h1>
-          <p class="lead" data-reveal data-reveal-delay="120">
-            No es un currículum. Seis momentos en los que viajar dejó de ser acumular países
-            para convertirse en comprender personas.
+          <p class="lead" data-reveal data-reveal-delay="120" data-i18n="traj.hero.lead">
+            Los países, los proyectos y las instituciones son la evidencia. Lo que de verdad
+            cambió las cosas fue lo que aprendí en cada uno.
           </p>
         </div>
       </section>
@@ -71,146 +79,268 @@
            the end of the reading. -->
       <section class="tj-route">
         <div class="wrap">
+
+          <!-- 1 · Divulgalo / CienciaClip -->
+          <article class="moment moment--wide has-media" data-reveal>
+            <figure class="ph ph-4x3">
+              <img
+                src="/media/divulgalo-muncyt.webp"
+                alt="Asensio con el equipo de Divulgalo/CienciaClip en el Museo Nacional de Ciencia y Tecnología"
+                width="1600" height="1200" loading="lazy" decoding="async"
+              />
+              <figcaption data-i18n="traj.ch1.caption">Murcia · Divulgalo / CienciaClip</figcaption>
+            </figure>
+            <div class="moment-body">
+              <p class="mono moment-index">
+                <span class="node" aria-hidden="true"></span>
+                <span data-i18n="traj.ch1.meta">Murcia · Divulgalo / CienciaClip</span>
+              </p>
+              <h2 class="moment-title display" data-i18n="traj.ch1.title">
+                La primera vez que convertí una idea en algo real.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch1.text">
+                Con un grupo de amigos convertimos la divulgación científica en algo que se
+                podía tocar: contenido, formato, público real. No sabíamos que eso también
+                era emprender.
+              </p>
+            </div>
+          </article>
+
+          <!-- 2 · Finland -->
           <article class="moment has-media" data-reveal>
             <div class="moment-body">
               <p class="mono moment-index">
-                <span class="node" aria-hidden="true"></span> 01 · Finlandia
+                <span class="node" aria-hidden="true"></span>
+                <span data-i18n="traj.ch2.meta">Finlandia · 2018</span>
               </p>
-              <h2 class="moment-title display">Elegir lo distinto a los 18</h2>
-              <p class="moment-text">
-                A los 18 elegí una experiencia internacional en lugar del camino típico.
-                Trabajo sencillo, voluntariado, un idioma imposible. La primera vez que
-                entendí que viajar no consiste en acumular países.
+              <h2 class="moment-title display" data-i18n="traj.ch2.title">
+                Hacer bien lo sencillo también importa.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch2.text">
+                Elegí una experiencia internacional en lugar del camino esperado a los 18.
+                Cortar césped y llevar un casco de protección enseña lo mismo que cualquier
+                proyecto grande: hazlo bien, aunque nadie mire.
               </p>
             </div>
             <figure class="ph ph-4x5">
               <img
                 src="/media/finland-2018.webp"
                 alt="Asensio con casco de protección y desbrozadora, delante de una caseta de madera roja en Finlandia"
-                width="1000"
-                height="1250"
-                loading="lazy"
-                decoding="async"
+                width="1200" height="1500" loading="lazy" decoding="async"
                 style="object-position: 50% 38%"
               />
-              <figcaption>Finlandia</figcaption>
+              <figcaption data-i18n="traj.ch2.caption">Finlandia</figcaption>
             </figure>
           </article>
 
+          <!-- 3 · LEINN / KEIKOA (no photo) -->
+          <article class="moment" data-reveal>
+            <div class="moment-body">
+              <p class="mono moment-index">
+                <span class="node" aria-hidden="true"></span>
+                <span data-i18n="traj.ch3.meta">País Vasco · LEINN / KEIKOA · 2019–2022</span>
+              </p>
+              <h2 class="moment-title display" data-i18n="traj.ch3.title">
+                Aprendí a fallar sin dejar de construir.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch3.text">
+                Cuatro años formando una empresa real con un equipo, desde cero, aprendiendo
+                haciendo. KEIKOA no siempre funcionó — y ahí es exactamente donde aprendí
+                más.
+              </p>
+            </div>
+          </article>
+
+          <!-- 4 · Korea / Erasmus+ -->
           <article class="moment has-media flip" data-reveal>
             <div class="moment-body">
               <p class="mono moment-index">
-                <span class="node" aria-hidden="true"></span> 02 · Corea del Sur
+                <span class="node" aria-hidden="true"></span>
+                <span data-i18n="traj.ch4.meta">Corea del Sur · Erasmus+</span>
               </p>
-              <h2 class="moment-title display">Adaptarse a otros códigos</h2>
-              <p class="moment-text">
-                Vivir y estudiar en Asia me obligó a moverme en códigos culturales
-                completamente distintos, y a colaborar con personas cuyas referencias no
-                compartía.
+              <h2 class="moment-title display" data-i18n="traj.ch4.title">
+                El mundo dejó de parecerme lejano.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch4.text">
+                Vivir fuera de Europa cambió algo que ya venía moviéndose con Erasmus+: dejar
+                de tratar "el extranjero" como algo excepcional y empezar a tratarlo como
+                parte normal de vivir.
               </p>
             </div>
             <figure class="ph ph-4x5">
               <img
                 src="/media/korea-cherry-signpost.webp"
                 alt="Asensio sobre un poste indicador de madera con carteles en coreano, cerezos en flor y el mar al fondo"
-                width="1000"
-                height="1250"
-                loading="lazy"
-                decoding="async"
+                width="1080" height="1350" loading="lazy" decoding="async"
                 style="object-position: 50% 34%"
               />
-              <figcaption>Corea del Sur</figcaption>
+              <figcaption data-i18n="traj.ch4.caption">Corea del Sur</figcaption>
             </figure>
           </article>
 
+          <!-- 5 · Alpadia -->
+          <article class="moment moment--wide has-media" data-reveal>
+            <figure class="ph ph-16x9">
+              <img
+                src="/media/alpadia-field.webp"
+                alt="Asensio facilitando una actividad de campo con un grupo internacional de adolescentes en Alpadia"
+                width="1280" height="720" loading="lazy" decoding="async"
+              />
+              <figcaption data-i18n="traj.ch5.caption">Friburgo, Alemania · Alpadia</figcaption>
+            </figure>
+            <div class="moment-body">
+              <p class="mono moment-index">
+                <span class="node" aria-hidden="true"></span>
+                <span data-i18n="traj.ch5.meta">Friburgo, Alemania · Alpadia · 2023</span>
+              </p>
+              <h2 class="moment-title display" data-i18n="traj.ch5.title">
+                A veces se lidera con el cuerpo antes que con las palabras.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch5.text">
+                Cien adolescentes, un entorno multilingüe y ninguna instrucción perfecta que
+                sirviera para todos. A veces el grupo se mueve antes de que encuentres las
+                palabras correctas.
+              </p>
+            </div>
+          </article>
+
+          <!-- 6 · Murcia Welcomes You -->
           <article class="moment has-media" data-reveal>
             <div class="moment-body">
               <p class="mono moment-index">
-                <span class="node" aria-hidden="true"></span> 03 · Japón
+                <span class="node" aria-hidden="true"></span>
+                <span data-i18n="traj.ch6.meta">Murcia · Murcia Welcomes You · 2024–2026</span>
               </p>
-              <h2 class="moment-title display">Cooperar más allá de las fronteras</h2>
-              <p class="moment-text">
-                Iniciativas internacionales de liderazgo y cooperación intercultural, con
-                jóvenes de decenas de países a la vez. El mundo deja de ser un mapa y se
-                vuelve gente con nombre.
+              <h2 class="moment-title display" data-i18n="traj.ch6.title">
+                Una comunidad no aparece. Se construye.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch6.text">
+                Empezó sin presupuesto y sin garantías. Hoy son más de 1.000 personas y 30
+                nacionalidades — no porque apareciera, sino porque se construyó evento a
+                evento.
+              </p>
+              <p class="mono moment-meta">
+                <span data-i18n="traj.ch6.stat1">1000+ participantes</span>
+                <span data-i18n="traj.ch6.stat2">60+ eventos</span>
+                <span data-i18n="traj.ch6.stat3">30+ nacionalidades</span>
               </p>
             </div>
-            <figure class="ph ph-4x5">
+            <figure class="ph ph-9x16">
               <img
-                src="/media/japan-torii-swy.webp"
-                alt="Asensio en solitario bajo un torii en Japón, durante el programa Ship for World Youth"
-                width="1152"
-                height="1440"
-                loading="lazy"
-                decoding="async"
+                src="/media/mwy-founder-tourism.webp"
+                alt="Asensio como fundador de Murcia Welcomes You, en un contexto turístico de la ciudad"
+                width="1153" height="2048" loading="lazy" decoding="async"
               />
-              <figcaption>Japón · Ship for World Youth</figcaption>
+              <figcaption data-i18n="traj.ch6.caption">Murcia Welcomes You</figcaption>
             </figure>
           </article>
 
-          <article class="moment" data-reveal>
-            <div class="moment-body">
-              <p class="mono moment-index">
-                <span class="node" aria-hidden="true"></span> 04 · Construir
-              </p>
-              <h2 class="moment-title display">De aprender a construir</h2>
-              <p class="moment-text">
-                Convertí ese aprendizaje en cosas que existen: comunidades, eventos y
-                experiencias donde personas de orígenes distintos se encuentran de verdad.
-              </p>
-              <p class="mono moment-meta">
-                <span>Murcia Welcomes You</span>
-                <span>1000+ participantes</span>
-                <span>60+ eventos</span>
-              </p>
-            </div>
-          </article>
-
+          <!-- 7 · European institutional -->
           <article class="moment moment--wide has-media" data-reveal>
             <figure class="ph ph-16x9">
               <img
                 src="/media/eu-parliament.webp"
                 alt="Asensio en el hemiciclo del Parlamento Europeo, con las banderas de los Estados miembros al fondo"
-                width="1600"
-                height="899"
-                loading="lazy"
-                decoding="async"
+                width="1600" height="899" loading="lazy" decoding="async"
               />
-              <figcaption>Parlamento Europeo</figcaption>
+              <figcaption data-i18n="traj.ch7.caption">Parlamento Europeo</figcaption>
             </figure>
             <div class="moment-body">
               <p class="mono moment-index">
-                <span class="node" aria-hidden="true"></span> 05 · Europa
+                <span class="node" aria-hidden="true"></span>
+                <span data-i18n="traj.ch7.meta">Murcia · Oficina de Proyectos Europeos, Ayto. de Murcia · 2025</span>
               </p>
-              <h2 class="moment-title display">Europa, como estructura</h2>
-              <p class="moment-text">
-                El punto en el que una trayectoria internacional se cruza con la capa
-                institucional europea: la cooperación entre países convertida en programas,
-                reglas y salas concretas.
+              <h2 class="moment-title display" data-i18n="traj.ch7.title">
+                Las instituciones también son sistemas.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch7.text">
+                Analizar convocatorias europeas y ayudar a redactar propuestas me enseñó que
+                una institución también es un sistema: reglas, incentivos, personas
+                intentando que algo funcione.
+              </p>
+            </div>
+          </article>
+
+          <!-- 8 · Ship for World Youth -->
+          <article class="moment has-media flip" data-reveal>
+            <div class="moment-body">
+              <p class="mono moment-index">
+                <span class="node" aria-hidden="true"></span>
+                <span data-i18n="traj.ch8.meta">Japón · Ship for World Youth 37 · 2026</span>
+              </p>
+              <h2 class="moment-title display" data-i18n="traj.ch8.title">
+                Escuchar puede ser una forma de liderar.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch8.text">
+                Cuarenta días, delegados de once países, un barco. Representar a España
+                enseña rápido que escuchar bien es más difícil — y más útil — que hablar
+                bien.
+              </p>
+            </div>
+            <figure class="ph ph-4x5">
+              <img
+                src="/media/japan-swy.webp"
+                alt="Asensio en solitario bajo un torii en Japón, durante el programa Ship for World Youth"
+                width="1152" height="1440" loading="lazy" decoding="async"
+              />
+              <figcaption data-i18n="traj.ch8.caption">Japón · Ship for World Youth</figcaption>
+            </figure>
+          </article>
+
+          <!-- 9 · BeeMoney / BYG -->
+          <article class="moment moment--wide has-media" data-reveal>
+            <figure class="ph ph-3x2">
+              <img
+                src="/media/beemoney-byg-stage.webp"
+                alt="El equipo de BeeMoney en el escenario del BYG Social Challenge"
+                width="1600" height="1066" loading="lazy" decoding="async"
+              />
+              <figcaption data-i18n="traj.ch9.caption">BeeMoney · BYG Social Challenge</figcaption>
+            </figure>
+            <div class="moment-body">
+              <p class="mono moment-index">
+                <span class="node" aria-hidden="true"></span>
+                <span data-i18n="traj.ch9.meta">Murcia · BeeMoney / BYG Social Challenge</span>
+              </p>
+              <h2 class="moment-title display" data-i18n="traj.ch9.title">
+                Si algo es complejo, que al menos sea usable.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch9.text">
+                Un reto social, un prototipo, un equipo tratando de convertir una idea
+                compleja en algo que alguien pudiera usar de verdad.
               </p>
             </div>
           </article>
 
           <!-- The present. Inside the route section on purpose: the Pacific
                crossing and the Santiago node land exactly here. -->
-          <article class="moment tj-now" data-reveal>
+          <article class="moment tj-now has-media" data-reveal>
             <div class="moment-body">
               <p class="mono moment-index mono--signal">
-                <span class="node" aria-hidden="true"></span> 06 · Ahora
+                <span class="node" aria-hidden="true"></span>
+                <span data-i18n="traj.ch10.meta">Santiago de Chile · Delegación de la Unión Europea · Ahora</span>
               </p>
-              <h2 class="tj-now-title display">
-                Al otro lado<br />del <strong>Pacífico</strong>.
+              <h2 class="tj-now-title display" data-i18n="traj.ch10.title">
+                Aprendiendo a conectar mundos distintos.
               </h2>
-              <p class="tj-now-text">
-                Santiago de Chile, en la Delegación de la Unión Europea. Relaciones
-                internacionales, comercio y cooperación entre Europa y América Latina.
-                Una llegada, no un final.
+              <p class="tj-now-text" data-i18n="traj.ch10.text">
+                Ahora, en Santiago, aprendo a mover información y personas entre dos mundos
+                que no siempre se entienden a la primera. Sigue siendo el mismo oficio:
+                conectar.
               </p>
               <p class="mono tj-now-coords">
                 <span class="dot" aria-hidden="true"></span>
                 33.45° S · 70.67° O
               </p>
             </div>
+            <figure class="ph ph-9x16">
+              <img
+                src="/media/eu-delegation-now.webp"
+                alt="Asensio en su etapa actual en la Delegación de la Unión Europea en Chile"
+                width="1152" height="2048" loading="lazy" decoding="async"
+              />
+              <figcaption data-i18n="traj.ch10.caption">Santiago de Chile · ahora</figcaption>
+            </figure>
           </article>
         </div>
       </section>
@@ -222,8 +352,8 @@
           <a class="tj-exit-primary ln ln--signal" href="mailto:hola@asensios.com">
             hola@asensios.com
           </a>
-          <a class="mono ln" href="/games/" data-cine-warp>◕ Playroom</a>
-          <a class="mono ln" href="/">Inicio</a>
+          <a class="mono ln" href="/games/" data-cine-warp><span data-i18n="traj.exit.games">◕ Playroom</span></a>
+          <a class="mono ln" href="/" data-i18n="traj.exit.home">Inicio</a>
         </div>
       </section>
 
