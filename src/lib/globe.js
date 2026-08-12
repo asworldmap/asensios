@@ -5,18 +5,17 @@
 import { RAD, clamp } from './motion.js';
 
 /**
- * Places that make up the visual universe. Order matters: routes reveal in
- * this sequence, so Santiago (the present) lands last.
+ * The route language, and nothing more: Murcia → Finlandia → Corea → Japón
+ * → Europa → Santiago. Order matters — routes reveal in this sequence, so
+ * Santiago (the present) always lands last.
  */
 export const ORIGIN = { id: 'murcia', name: 'Murcia', lat: 37.99, lon: -1.13 };
 
 export const PLACES = [
-  { id: 'valencia', name: 'Valencia', lat: 39.47, lon: -0.38 },
-  { id: 'berlin', name: 'Berlín', lat: 52.52, lon: 13.4 },
-  { id: 'helsinki', name: 'Helsinki', lat: 60.17, lon: 24.94 },
-  { id: 'seoul', name: 'Seúl', lat: 37.57, lon: 126.98 },
+  { id: 'helsinki', name: 'Finlandia', lat: 60.17, lon: 24.94 },
+  { id: 'seoul', name: 'Corea', lat: 37.57, lon: 126.98 },
   { id: 'tokyo', name: 'Japón', lat: 35.68, lon: 139.65 },
-  { id: 'sanjose', name: 'Costa Rica', lat: 9.93, lon: -84.08 },
+  { id: 'brussels', name: 'Europa', lat: 50.85, lon: 4.35 },
   { id: 'santiago', name: 'Santiago', lat: -33.45, lon: -70.67 },
 ];
 
@@ -70,38 +69,32 @@ export function slerp(a, b, t) {
 /** Soft atmospheric halo + globe body. */
 export function drawSphere(ctx, cam, opts = {}) {
   const { cx, cy, r } = cam;
+  // Atmosphere: deep vegetation seen from orbit, never a blue marble.
   const halo = ctx.createRadialGradient(cx, cy, r * 0.86, cx, cy, r * 1.14);
-  halo.addColorStop(0, opts.haloInner || 'rgba(47,107,255,0.20)');
-  halo.addColorStop(1, 'rgba(47,107,255,0)');
+  halo.addColorStop(0, opts.haloInner || 'rgba(63,191,22,0.16)');
+  halo.addColorStop(1, 'rgba(63,191,22,0)');
   ctx.fillStyle = halo;
   ctx.beginPath();
   ctx.arc(cx, cy, r * 1.14, 0, Math.PI * 2);
   ctx.fill();
 
   // Body, lit from the upper left so the sphere reads as a solid.
-  const body = ctx.createRadialGradient(
-    cx - r * 0.36,
-    cy - r * 0.4,
-    r * 0.05,
-    cx,
-    cy,
-    r * 1.02
-  );
-  body.addColorStop(0, opts.bodyInner || '#123253');
-  body.addColorStop(0.62, opts.bodyMid || '#0e2740');
-  body.addColorStop(1, opts.bodyOuter || '#07182a');
+  const body = ctx.createRadialGradient(cx - r * 0.36, cy - r * 0.4, r * 0.05, cx, cy, r * 1.02);
+  body.addColorStop(0, opts.bodyInner || '#1d3d27');
+  body.addColorStop(0.62, opts.bodyMid || '#101d14');
+  body.addColorStop(1, opts.bodyOuter || '#070d09');
   ctx.fillStyle = body;
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.strokeStyle = opts.rim || 'rgba(150,190,255,0.35)';
+  ctx.strokeStyle = opts.rim || 'rgba(147,247,90,0.26)';
   ctx.lineWidth = Math.max(0.6, r * 0.004);
   ctx.stroke();
 }
 
 /** Meridians and parallels — the cartographic texture of the globe. */
-export function drawGraticule(ctx, cam, alpha = 1, step = 30, rgb = '158,196,240') {
+export function drawGraticule(ctx, cam, alpha = 1, step = 30, rgb = '200,171,124') {
   if (alpha <= 0.01) return;
   ctx.save();
   ctx.lineWidth = Math.max(0.5, cam.r * 0.0022);
@@ -213,7 +206,7 @@ export function drawNode(ctx, cam, place, t, opts = {}) {
   const p = project(toVec(place.lat, place.lon), cam);
   if (!p.visible) return;
   const a = clamp(t);
-  const color = opts.color || '#ef6f53';
+  const color = opts.color || '#93f75a';
   const rad = (opts.radius || 3.2) * (0.6 + 0.4 * a);
 
   ctx.save();
@@ -235,7 +228,7 @@ export function drawNode(ctx, cam, place, t, opts = {}) {
 
   if (opts.label !== false) {
     const size = opts.labelSize || 11;
-    ctx.font = `600 ${size}px Inter, system-ui, sans-serif`;
+    ctx.font = `500 ${size}px 'IBM Plex Mono', ui-monospace, monospace`;
     const text = place.name.toUpperCase();
     const tw = ctx.measureText(text).width;
     const space = opts.space;
@@ -259,7 +252,7 @@ export function drawNode(ctx, cam, place, t, opts = {}) {
 
     if (ly !== null) {
       ctx.globalAlpha = a * 0.92;
-      ctx.fillStyle = opts.labelColor || 'rgba(251,247,240,0.92)';
+      ctx.fillStyle = opts.labelColor || 'rgba(236,231,219,0.92)';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
       ctx.fillText(text, lx, ly);

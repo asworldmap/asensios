@@ -1,6 +1,6 @@
 /* ============================================================
-   Motion layer — cinematic transitions + worldmap
-   Purely additive: nothing here restyles existing content.
+   Motion layer — departure overlay, arrival veil, worldmap.
+   Purely additive: nothing here restyles page content.
    ============================================================ */
 
 /* ---------------------------------------------------- Departure overlay */
@@ -8,7 +8,7 @@
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: #050d18;
+  background: #070b07; /* space, one step deeper than the night surface */
   cursor: pointer;
   animation: cine-in 180ms ease both;
 }
@@ -34,22 +34,24 @@
   bottom: clamp(14px, 3vw, 28px);
   display: inline-flex;
   align-items: center;
-  gap: 0.4em;
-  padding: 0.5rem 0.9rem;
-  border: 1px solid rgba(251, 247, 240, 0.28);
+  gap: 0.5em;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid rgba(236, 231, 219, 0.24);
   border-radius: 999px;
-  background: rgba(251, 247, 240, 0.06);
-  color: rgba(251, 247, 240, 0.82);
-  font: 600 0.78rem/1 Inter, system-ui, sans-serif;
-  letter-spacing: 0.04em;
+  background: rgba(236, 231, 219, 0.05);
+  color: rgba(236, 231, 219, 0.78);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   backdrop-filter: blur(4px);
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .cine-skip:hover {
-  background: rgba(251, 247, 240, 0.14);
-  border-color: rgba(251, 247, 240, 0.5);
-  color: #fff;
+  background: rgba(236, 231, 219, 0.12);
+  border-color: rgba(147, 247, 90, 0.5);
+  color: #eef7e6;
 }
 
 /* Freeze and recede the page we are leaving. */
@@ -72,7 +74,7 @@ html.cine-depart body > .page {
   position: fixed;
   inset: 0;
   z-index: 9998;
-  background: var(--cream, #fbf7f0);
+  background: var(--bg);
   pointer-events: none;
   opacity: 1;
   transition: opacity 620ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -89,7 +91,7 @@ html.cine-arriving body > .page {
 
 @keyframes cine-land {
   from {
-    transform: scale(1.035);
+    transform: scale(1.03);
   }
   to {
     transform: none;
@@ -100,7 +102,7 @@ html.cine-arriving body > .page {
 .worldmap {
   position: fixed;
   inset: 0;
-  z-index: 1;
+  z-index: 0;
   pointer-events: none;
   contain: layout paint;
 }

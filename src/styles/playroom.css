@@ -1,0 +1,120 @@
+/* ============================================================
+   Playroom — the small courtyard.
+
+   A hidden corner, not a section of the site: quieter, more mono, a
+   little playful. This iteration is the entrance and the three slots;
+   the games themselves mount here later.
+   ============================================================ */
+
+.pr {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.pr-top {
+  padding-top: clamp(22px, 4vw, 34px);
+}
+
+.pr-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding-block: clamp(72px, 14vh, 150px);
+}
+
+.pr-inner {
+  width: 100%;
+}
+
+.pr-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  margin-bottom: clamp(18px, 3vh, 26px);
+}
+
+.pr-kicker .rule {
+  display: inline-block;
+  width: clamp(24px, 5vw, 54px);
+  height: 1px;
+  background: var(--signal);
+  opacity: 0.55;
+}
+
+.pr-title {
+  font-size: clamp(1.9rem, 6vw, 3.6rem);
+  margin-bottom: clamp(18px, 3vh, 28px);
+}
+
+.pr-lead {
+  margin-bottom: clamp(42px, 8vh, 76px);
+  max-width: 44ch;
+}
+
+/* --- The three slots ---------------------------------------------- */
+.pr-list {
+  list-style: none;
+  padding: 0;
+  border-top: 1px solid var(--line-soft);
+  max-width: 680px;
+}
+
+.pr-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: clamp(14px, 3vw, 26px);
+  padding-block: clamp(18px, 3vh, 26px);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.pr-num {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: var(--ink-faint);
+}
+
+.pr-name {
+  font-size: clamp(1.15rem, 2.8vw, 1.6rem);
+  font-weight: 300;
+  letter-spacing: -0.015em;
+  color: var(--ink-soft);
+}
+
+.pr-state {
+  font-size: 0.62rem;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+/* A slot that is ready to play reads as live: full-strength name, a signal
+   dot, and it moves under the cursor. Nothing is live in this iteration. */
+.pr-item.is-ready .pr-name {
+  color: var(--ink);
+}
+
+.pr-item.is-ready .pr-state {
+  color: var(--signal);
+}
+
+.pr-item.is-ready:hover .pr-name {
+  transform: translateX(5px);
+}
+
+.pr-item .pr-name {
+  transition: transform 0.35s var(--ease), color 0.3s var(--ease);
+}
+
+.pr-foot {
+  padding-bottom: clamp(24px, 4vh, 40px);
+}
+
+.pr-foot .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  justify-content: space-between;
+  align-items: baseline;
+}

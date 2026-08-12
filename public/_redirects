@@ -1,4 +1,6 @@
-# Netlify-style redirects (also harmless on other hosts)
-# Legacy route kept alive -> new trajectory page
-/trajectory.html   /business   301
-/trajectory        /business   301
+# Netlify-style redirects (harmless on other hosts).
+# Legacy routes -> the canonical trajectory route. No catch-all: an unknown
+# URL must 404 rather than render the homepage.
+/trajectory.html   /trajectory   301
+/business          /trajectory   301
+/business/*        /trajectory   301
