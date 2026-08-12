@@ -1,17 +1,17 @@
 /* Self-hosted, latin subset, only the weights actually used. Bundled with the
    site rather than fetched from Google: one less third party, no FOUT from a
-   host we don't control, and the type is guaranteed to be there. */
-@import '@fontsource/ibm-plex-sans/latin-300.css';
-@import '@fontsource/ibm-plex-sans/latin-400.css';
-@import '@fontsource/ibm-plex-sans/latin-500.css';
+   host we don't control, and the type is guaranteed to be there.
+
+   Two families, not three: Lora carries both the headline and body voice —
+   warm, confident, genuinely legible at paragraph sizes, not just a display
+   face borrowed for the wrong job — and IBM Plex Mono stays reserved for
+   metadata/signals, so the titles/body/mono contrast the system was built
+   around still holds even with one fewer typeface in the stack. */
+@import '@fontsource/lora/latin-400.css';
+@import '@fontsource/lora/latin-400-italic.css';
+@import '@fontsource/lora/latin-500.css';
 @import '@fontsource/ibm-plex-mono/latin-400.css';
 @import '@fontsource/ibm-plex-mono/latin-500.css';
-/* Fraunces carries the display voice: a soft, warm editorial serif for
-   headlines only. Body copy and metadata stay on Plex, so the three-tier
-   contrast (titles / body / mono) the system was built around still holds. */
-@import '@fontsource/fraunces/latin-300.css';
-@import '@fontsource/fraunces/latin-300-italic.css';
-@import '@fontsource/fraunces/latin-500.css';
 
 /* ============================================================
    asensios.com — Design System V2
@@ -20,7 +20,7 @@
    Light = warm paper · bamboo · field notebook, not a flat white screen.
    Dark  = planet at night · deep vegetation · a neon signal on the horizon.
 
-   Fraunces (headlines) + IBM Plex Sans (voice) + IBM Plex Mono (signals).
+   Lora (voice — headlines and body both) + IBM Plex Mono (signals).
    Six identity colours. Zero orange. Neon green is a signal, never a fill.
    ============================================================ */
 
@@ -64,12 +64,13 @@
   --atmo-b: rgba(var(--nature-rgb), 0.08);
 
   /* --- Type -------------------------------------------------------- */
-  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* One voice for both roles — Lora reads as confident and legible at
+     paragraph sizes, not just borrowed from a display face. --font-display
+     and --font-sans stay as separate tokens (headline vs. body call sites
+     don't change), they just resolve to the same family now. */
+  --font-sans: 'Lora', Georgia, 'Times New Roman', serif;
+  --font-display: 'Lora', Georgia, 'Times New Roman', serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  /* Headlines only — a warm, soft-serif voice with real character instead of
-     another geometric sans. Falls back to the same Plex used for body text
-     so a slow font load never breaks the rhythm. */
-  --font-display: 'Fraunces', 'IBM Plex Sans', system-ui, serif;
 
   /* Read by canvas code that must know which surface it is painting on. */
   --is-dark: 0;
@@ -270,14 +271,14 @@ button {
 
 /* ------------------------------------------------------------ Type roles */
 
-/* Editorial display: the warm serif voice, light weight, big. Fraunces reads
-   generously at large sizes on its own — the tight tracking tuned for a
-   geometric sans would just fight the serif details. */
+/* Editorial display: the warm serif voice, regular weight, big. Lora has no
+   lighter cut than 400, but a text serif doesn't need one to read as
+   elegant at size — the stroke contrast does that work on its own. */
 .display {
   font-family: var(--font-display);
-  font-weight: 300;
-  line-height: 1.05;
-  letter-spacing: -0.01em;
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.006em;
 }
 
 .display em {

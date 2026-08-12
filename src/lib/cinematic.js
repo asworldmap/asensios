@@ -317,7 +317,7 @@ function drawScaleLabels(ctx, size, p) {
     const y = h * 0.5 + min * 0.02 * (1 - a);
     ctx.globalAlpha = a;
     ctx.fillStyle = PAPER;
-    ctx.font = `300 ${Math.max(30, min * 0.105)}px 'IBM Plex Sans', system-ui, sans-serif`;
+    ctx.font = `400 ${Math.max(30, min * 0.105)}px 'Lora', Georgia, serif`;
     ctx.fillText(l.text, w / 2, y);
     if (l.sub) {
       ctx.globalAlpha = a * 0.55;

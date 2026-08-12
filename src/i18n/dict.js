@@ -41,7 +41,7 @@ export const dict = {
     'traj.ch3.meta': 'País Vasco · LEINN / KEIKOA · 2019–2022',
     'traj.ch3.title': 'Aprendí a fallar sin dejar de construir.',
     'traj.ch3.text':
-      'Tres años montando una empresa real, en equipo, desde cero, aprendiendo sobre la marcha. KEIKOA no siempre salió bien, y ahí aprendí lo que nadie te cuenta antes de empezar: fallar en equipo también se entrena, y lo difícil de verdad es seguir construyendo después de un mal trimestre.',
+      'Tres años montando una empresa real, en equipo, desde cero, aprendiendo sobre la marcha. KEIKOA no siempre salió bien. Ahí aprendí que fallar en equipo también se entrena, y que lo duro de verdad es volver a currar al día siguiente de un trimestre malo.',
     'traj.ch3.caption': 'País Vasco · KEIKOA',
 
     'traj.ch4.meta': 'Corea del Sur · Erasmus+',
@@ -59,7 +59,7 @@ export const dict = {
     'traj.ch6.meta': 'Murcia · Murcia Welcomes You · 2024–2026',
     'traj.ch6.title': 'Una comunidad no aparece. Se construye.',
     'traj.ch6.text':
-      'Empezó sin presupuesto, sin garantías y con una hoja de cálculo. Hoy son más de 1.000 personas y 30 nacionalidades, y ninguna de esas cifras apareció sola: se construyeron evento a evento, uno detrás de otro.',
+      'Empezó sin presupuesto, sin garantías y con una hoja de cálculo. Hoy son más de 1.000 personas y 30 nacionalidades, construidas evento a evento, uno detrás de otro, durante casi dos años.',
     'traj.ch6.stat1': '1000+ participantes',
     'traj.ch6.stat2': '60+ eventos',
     'traj.ch6.stat3': '30+ nacionalidades',
@@ -166,7 +166,7 @@ export const dict = {
     'traj.ch3.meta': 'Basque Country · LEINN / KEIKOA · 2019–2022',
     'traj.ch3.title': 'I learned to fail without stopping building.',
     'traj.ch3.text':
-      "Three years building a real company, as a team, from zero, learning as we went. KEIKOA didn't always go well, and that taught me something nobody tells you going in: failing as a team is a skill you build too, and the hard part is showing up again after a bad quarter.",
+      "Three years building a real company, as a team, from zero, learning as we went. KEIKOA didn't always go well. I learned that failing as a team is a skill you build too, and that the real work is showing up again the day after a bad quarter.",
     'traj.ch3.caption': 'Basque Country · KEIKOA',
 
     'traj.ch4.meta': 'South Korea · Erasmus+',
@@ -184,7 +184,7 @@ export const dict = {
     'traj.ch6.meta': 'Murcia · Murcia Welcomes You · 2024–2026',
     'traj.ch6.title': "A community doesn't appear. It's built.",
     'traj.ch6.text':
-      "It started with no budget, no guarantees and a spreadsheet. Today it's 1,000+ people and 30+ nationalities, and none of those numbers showed up on their own — they were built event by event, one after another.",
+      "It started with no budget, no guarantees and a spreadsheet. Today it's 1,000+ people and 30+ nationalities, built event by event, one after another, over almost two years.",
     'traj.ch6.stat1': '1,000+ participants',
     'traj.ch6.stat2': '60+ events',
     'traj.ch6.stat3': '30+ nationalities',
