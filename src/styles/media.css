@@ -1,17 +1,17 @@
 /* ============================================================
-   Editorial photo system — figure.ph
-   Photographic evidence, not portfolio thumbnails: no card border,
-   no shadow, no gradient caption overlay. A chapter with no photo
-   (file missing, or not yet uploaded) renders exactly as it did
-   before this file existed.
+   Photographic evidence — figure.ph
+
+   Evidence of a life, not portfolio thumbnails: no card, no border,
+   no rounded corner, no shadow, no caption overlay. Just the image and
+   a mono field note under it.
+
+   The class names here (figure.ph, .has-media/.no-media) are the contract
+   src/lib/media.js works against, so they stay stable.
    ============================================================ */
 
-.chapter-body {
+.ph {
+  position: relative;
   min-width: 0;
-}
-
-.chapter.has-media .ph {
-  margin-top: 1.4rem;
 }
 
 .ph img {
@@ -19,16 +19,29 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Light: paper absorbs a little contrast. Dark: night swallows the edges. */
+  filter: saturate(0.94);
+}
+
+:root[data-theme='dark'] .ph img {
+  filter: saturate(0.88) brightness(0.86);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .ph img {
+    filter: saturate(0.88) brightness(0.86);
+  }
 }
 
 .ph figcaption {
-  margin-top: 0.65rem;
-  font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
-  font-size: 0.7rem;
+  margin-top: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
   font-weight: 400;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--muted);
+  /* Soft, not faint: a caption is content and has to clear AA at 0.66rem. */
+  color: var(--ink-soft);
 }
 
 .ph-4x5 {
@@ -41,49 +54,4 @@
 
 .ph-16x9 {
   aspect-ratio: 16 / 9;
-}
-
-@media (min-width: 760px) {
-  .chapter.has-media {
-    display: grid;
-    grid-template-columns: 1fr 240px;
-    gap: clamp(20px, 3vw, 36px);
-    align-items: start;
-  }
-
-  .chapter.has-media .ph {
-    margin-top: 0;
-  }
-
-  /* Alternate sides so the story spine doesn't read as a single column of
-     right-aligned thumbnails. Declared on the markup (.flip), not inferred
-     from position, so it can't drift if a chapter loses its photo. */
-  .chapter.has-media.flip {
-    grid-template-columns: 240px 1fr;
-  }
-
-  .chapter.has-media.flip .chapter-body {
-    order: 2;
-  }
-
-  .chapter.has-media.flip .ph {
-    order: 1;
-  }
-}
-
-/* A chapter that lost its photo (missing file, failed load) reverts to the
-   plain single-column layout with no extra rule needed — .no-media simply
-   never receives the grid above. */
-
-/* --- Editorial interruption: a landscape photo between chapters, not a
-   chapter itself. Quiet top/bottom rule instead of a card boundary. --- */
-.story-band {
-  margin-block: clamp(8px, 2vw, 20px);
-  padding-block: clamp(20px, 4vw, 32px);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-
-.story-band figcaption {
-  text-align: center;
 }

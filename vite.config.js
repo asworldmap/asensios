@@ -1,11 +1,12 @@
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 
-// Multi-page setup. Each entry becomes a clean route on static hosts:
-//   index.html          -> /
-//   business/index.html -> /business
-//   games/index.html    -> /games
-//   trajectory.html     -> /trajectory.html (legacy redirect, kept for backwards compat)
+// Multi-page, no router, no SPA fallback. Each entry is a real file on disk, so
+// every route resolves on a plain static host and a wrong URL 404s instead of
+// silently rendering the homepage:
+//   index.html            -> /
+//   trajectory/index.html -> /trajectory
+//   games/index.html      -> /games
 export default defineConfig({
   appType: 'mpa',
   build: {
@@ -14,9 +15,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         home: resolve(__dirname, 'index.html'),
-        business: resolve(__dirname, 'business/index.html'),
+        trajectory: resolve(__dirname, 'trajectory/index.html'),
         games: resolve(__dirname, 'games/index.html'),
-        trajectory: resolve(__dirname, 'trajectory.html'),
       },
     },
   },

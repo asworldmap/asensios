@@ -1,23 +1,27 @@
 # ── asensios.com · Apache / LiteSpeed (Hostinger) ───────────────────────────
+#
+# Canonical routes: /  ·  /trajectory  ·  /games
+# There is deliberately NO catch-all rewrite to index.html — an unknown URL
+# must 404, not quietly render the homepage.
 
-# Legacy route preserved -> new equivalent page
-Redirect 301 /trajectory.html /business/
-Redirect 301 /trajectory     /business/
+# ── Legacy routes ───────────────────────────────────────────────────────────
+# Anchored patterns so /trajectory itself is never caught (that would loop).
+RedirectMatch 301 ^/trajectory\.html$ /trajectory/
+RedirectMatch 301 ^/business/?$ /trajectory/
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # If the request maps to an existing file or directory, serve it as-is
+  # Existing file or directory wins, untouched.
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # Allow /business and /games (without trailing slash) to resolve
-  RewriteRule ^business/?$ /business/index.html [L]
-  RewriteRule ^games/?$    /games/index.html    [L]
+  # Extensionless routes resolve to their index.html.
+  RewriteRule ^trajectory/?$ /trajectory/index.html [L]
+  RewriteRule ^games/?$      /games/index.html      [L]
 </IfModule>
 
-# Default document
 DirectoryIndex index.html
 
 # ── Compression ─────────────────────────────────────────────────────────────
@@ -28,12 +32,14 @@ DirectoryIndex index.html
 # ── Caching ─────────────────────────────────────────────────────────────────
 <IfModule mod_expires.c>
   ExpiresActive On
-  # Hashed build assets — cache hard
   ExpiresByType text/css "access plus 1 year"
   ExpiresByType application/javascript "access plus 1 year"
   ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 month"
   ExpiresByType image/jpeg "access plus 1 month"
-  # HTML — always revalidate so new deploys show up immediately
+  ExpiresByType video/webm "access plus 1 month"
+  ExpiresByType video/mp4 "access plus 1 month"
+  # HTML always revalidates so a new deploy shows up immediately.
   ExpiresByType text/html "access plus 0 seconds"
 </IfModule>
 

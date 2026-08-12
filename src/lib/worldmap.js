@@ -1,31 +1,65 @@
-// Asensio Worldmap — a scroll-linked constellation behind the story.
+// Asensio Worldmap — a scroll-linked route behind the trajectory.
 //
 // Editorial rather than cartographic: a thin wireframe planet on the page's
-// own cream, with routes that draw themselves as you read and retreat as you
+// own surface, with routes that draw themselves as you read and retreat as you
 // scroll back up. The globe turns east through Europe and Asia, then west
 // across the Pacific into South America, so Santiago — the present — is the
 // last node to arrive.
 //
 // The loop is demand-driven: it renders on scroll/resize and while fading,
-// then parks itself. A globe sitting still costs nothing.
+// then parks itself. A globe sitting still costs nothing, which also means
+// nothing here may depend on a clock — no pulsing, no idle animation.
 
 import { clamp, deviceTier, easeOut, fitCanvas, lerp, range } from './motion.js';
 import { ORIGIN, PLACES, drawGraticule, drawNode, drawRoute, makeLabelSpace } from './globe.js';
 import { createCinema, drawCover } from './cinema.js';
 
-const INK = '14,39,64';
-
 // Optional atmosphere for the Santiago arrival — the Pacific crossing that
-// closes the route sequence. Requested once, when the worldmap section
-// comes on desktop; a no-op until public/cinematic/pacific-andes.* exists.
+// closes the route sequence. Requested once, on desktop, when the section
+// comes into view; a no-op until public/cinematic/pacific-andes.* exists.
 const { primeCinema, cinemaFrame } = createCinema();
 
-export function initWorldmap(sectionSelector = '.story') {
+/**
+ * Theme colours, read from the design tokens rather than duplicated here, so
+ * the globe follows light/dark without a second source of truth. Cached until
+ * the caller invalidates it on a theme change.
+ */
+function makePalette() {
+  let cache = null;
+
+  const read = () => {
+    const cs = getComputedStyle(document.documentElement);
+    const get = (name, fallback) => (cs.getPropertyValue(name) || fallback).trim();
+    return {
+      ink: get('--ink-rgb', '74, 53, 39').replace(/\s/g, ''),
+      signal: get('--signal', '#3fbf16'),
+      bamboo: get('--bamboo', '#a9884f'),
+      // Footage carries much better on the night surface than on paper, so the
+      // Pacific crossing is allowed to be stronger in dark mode.
+      footage: get('--is-dark', '0') === '1' ? 0.62 : 0.42,
+    };
+  };
+
+  return {
+    get: () => (cache = cache || read()),
+    invalidate: () => {
+      cache = null;
+    },
+  };
+}
+
+export function initWorldmap(sectionSelector = '.tj-route') {
   const section = document.querySelector(sectionSelector);
   if (!section) return;
 
   const tier = deviceTier();
-  if (tier === 'desktop') primeCinema('pacific-andes');
+
+  // Everything except mobile gets the Pacific crossing. Gating it on the
+  // 'desktop' tier alone would drop it on any four-core laptop, which is a lot
+  // of real machines; the bandwidth argument only genuinely applies to phones.
+  const wantsFootage = tier !== 'mobile';
+  if (wantsFootage) primeCinema('pacific-andes');
+
   const host = document.createElement('div');
   host.className = 'worldmap';
   host.setAttribute('aria-hidden', 'true');
@@ -39,6 +73,7 @@ export function initWorldmap(sectionSelector = '.story') {
     return;
   }
 
+  const palette = makePalette();
   const dpr = tier === 'mobile' ? 1.5 : 2;
   let size = fitCanvas(canvas, ctx, dpr);
   let visible = false;
@@ -47,7 +82,8 @@ export function initWorldmap(sectionSelector = '.story') {
   let progress = 0;
   let shown = 0;
 
-  const maxOpacity = tier === 'mobile' ? 0.3 : tier === 'tablet' ? 0.4 : 0.5;
+  // Atmosphere, not illustration: it must never compete with the type.
+  const maxOpacity = tier === 'mobile' ? 0.26 : tier === 'tablet' ? 0.34 : 0.42;
   const step = tier === 'mobile' ? 45 : 30;
 
   const request = () => {
@@ -74,6 +110,19 @@ export function initWorldmap(sectionSelector = '.story') {
     },
     { passive: true }
   );
+
+  // Repaint when the theme flips, otherwise the globe keeps the old ink until
+  // the next scroll event.
+  const onTheme = () => {
+    palette.invalidate();
+    force = true;
+    request();
+  };
+  new MutationObserver(onTheme).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', onTheme);
 
   /** Single layout read per frame, never interleaved with writes. */
   function measure() {
@@ -104,10 +153,15 @@ export function initWorldmap(sectionSelector = '.story') {
     ctx.clearRect(0, 0, w, h);
     const min = Math.min(w, h);
 
-    // Fade in at the start of the section and out at the very end.
+    // Fade in at the start of the section, out at the very end, and stay
+    // deliberately faint through the middle: while the photographs are doing
+    // the work the globe is only atmosphere. It comes back up for the arrival.
     const envelope = Math.min(range(progress, 0.02, 0.18), 1 - range(progress, 0.9, 1));
-    const alpha = maxOpacity * envelope * shown;
+    const emphasis = 0.52 + 0.48 * range(progress, 0.58, 0.78);
+    const alpha = maxOpacity * envelope * emphasis * shown;
     if (alpha <= 0.01) return;
+
+    const { ink, signal, bamboo, footage } = palette.get();
 
     ctx.save();
     ctx.globalAlpha = alpha;
@@ -125,11 +179,13 @@ export function initWorldmap(sectionSelector = '.story') {
     };
     const space = makeLabelSpace(w, h);
 
-    // Optional atmosphere for the Santiago arrival: Pacific crossing into
-    // the Andes, clipped to the globe circle and painted BELOW the
-    // graticule, routes and nodes so they always read on top of it.
-    if (tier === 'desktop') {
-      const arrive = range(progress, 0.74, 0.84) * (1 - range(progress, 0.93, 0.99));
+    // Optional atmosphere for the Santiago arrival: the Pacific crossing into
+    // the Andes, clipped to the globe circle and painted BELOW the graticule,
+    // routes and nodes so the information always reads on top of it.
+    // Timed so the footage is at full strength exactly while the Santiago node
+    // and its route land (progress ~0.70–0.86), not ramping through it.
+    if (wantsFootage) {
+      const arrive = range(progress, 0.66, 0.75) * (1 - range(progress, 0.9, 0.99));
       if (arrive > 0.01) {
         const av = cinemaFrame('pacific-andes');
         if (av) {
@@ -137,51 +193,75 @@ export function initWorldmap(sectionSelector = '.story') {
           ctx.beginPath();
           ctx.arc(cam.cx, cam.cy, cam.r, 0, Math.PI * 2);
           ctx.clip();
-          ctx.globalAlpha = alpha * arrive * 0.85;
+
+          // Set absolutely, not multiplied by the wireframe's alpha: the
+          // footage is the atmosphere and needs to actually register.
+          ctx.globalAlpha = footage * arrive * shown;
           drawCover(ctx, av, cam.cx - cam.r, cam.cy - cam.r, cam.r * 2, cam.r * 2);
+
+          // Feather the rim away so it reads as a planet dissolving into the
+          // page, not as a video clipped to a circle.
+          ctx.globalCompositeOperation = 'destination-out';
+          ctx.globalAlpha = 1;
+          const fade = ctx.createRadialGradient(
+            cam.cx,
+            cam.cy,
+            cam.r * 0.45,
+            cam.cx,
+            cam.cy,
+            cam.r
+          );
+          fade.addColorStop(0, 'rgba(0,0,0,0)');
+          fade.addColorStop(1, 'rgba(0,0,0,1)');
+          ctx.fillStyle = fade;
+          ctx.fillRect(cam.cx - cam.r, cam.cy - cam.r, cam.r * 2, cam.r * 2);
           ctx.restore();
         }
       }
     }
 
-    ctx.strokeStyle = `rgba(${INK},0.16)`;
+    ctx.strokeStyle = `rgba(${ink},0.16)`;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(cam.cx, cam.cy, cam.r, 0, Math.PI * 2);
     ctx.stroke();
 
-    drawGraticule(ctx, cam, 1, step, INK);
+    drawGraticule(ctx, cam, 1, step, ink);
 
     drawNode(ctx, cam, ORIGIN, 1, {
-      color: '#f2b13c',
-      radius: 3.6,
-      labelColor: `rgba(${INK},0.75)`,
+      color: bamboo,
+      radius: 3.4,
+      labelColor: `rgba(${ink},0.72)`,
       labelSize: 10,
       space,
     });
 
-    // Routes reveal across the reading of the story; Santiago lands last.
+    // Routes reveal across the reading of the story; Santiago lands last and
+    // is the only node allowed to be slightly larger.
     PLACES.forEach((place, i) => {
       const start = 0.12 + (i / PLACES.length) * 0.72;
       const t = easeOut(range(progress, start, start + 0.16));
       if (t <= 0) return;
-      drawRoute(ctx, cam, ORIGIN, place, t, `rgba(239,111,83,${0.7 * t})`, 1.3);
+      const here = place.id === 'santiago';
+
+      drawRoute(ctx, cam, ORIGIN, place, t, hexToRgba(signal, 0.62 * t), here ? 1.5 : 1.2);
       drawNode(ctx, cam, place, range(progress, start + 0.06, start + 0.16), {
-        color: '#ef6f53',
-        radius: 2.6,
-        labelColor: `rgba(${INK},0.7)`,
+        color: signal,
+        radius: here ? 3.8 : 2.4,
+        labelColor: `rgba(${ink},${here ? 0.85 : 0.66})`,
         labelSize: 10,
         space,
       });
     });
 
-    // Quiet signature so the piece is named.
-    ctx.globalAlpha = alpha * 0.5;
-    ctx.fillStyle = `rgba(${INK},0.9)`;
-    ctx.font = '600 9px Inter, system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('ASENSIO WORLDMAP', cam.cx, cam.cy + cam.r + 26);
-
     ctx.restore();
   }
+}
+
+/** #rrggbb → rgba(). The tokens are hex; canvas strokes need alpha. */
+function hexToRgba(hex, a) {
+  const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex.trim());
+  if (!m) return `rgba(63,191,22,${a})`;
+  const [r, g, b] = [m[1], m[2], m[3]].map((p) => parseInt(p, 16));
+  return `rgba(${r},${g},${b},${a})`;
 }

@@ -32,26 +32,45 @@ import {
 } from './globe.js';
 import { createCinema, drawCover } from './cinema.js';
 
-const CREAM = '#fbf7f0';
-const CORAL = '#ef6f53';
-const HONEY = '#f2b13c';
-const DEEP_SPACE = '#050d18';
+// The canvas is always space, whatever the page theme, so the type on it is
+// always warm paper. Only the final landing wash follows the destination.
+const PAPER = '#ece7db';
+const SIGNAL = '#93f75a';
+const BAMBOO = '#c8ab7c';
+const DEEP_SPACE = '#070b07';
 
 // Optional atmosphere for the Earth-limb moment of the departure. Requested
 // on pointerenter/focus of the trajectory link, same as this whole module.
 const { primeCinema, cinemaFrame } = createCinema();
 
-// Destinations shown during the departure, ordered so they rotate into view.
-const DEPARTURE_IDS = ['berlin', 'helsinki', 'seoul', 'tokyo'];
+// Destinations shown during the departure, ordered so they rotate into view
+// and the present (Santiago) is the last route to draw itself.
+const DEPARTURE_IDS = ['helsinki', 'seoul', 'tokyo', 'santiago'];
 
+// Windows are strictly sequential — each one's fade-out ends exactly where the
+// next begins. They all render at the same point on screen, so any overlap
+// would superimpose two words instead of crossfading between them.
 const SCALE_LABELS = [
   { text: 'Murcia', sub: '37.99° N · 1.13° O', from: 0.04, to: 0.3 },
-  { text: 'España', sub: null, from: 0.28, to: 0.45 },
-  { text: 'Europa', sub: null, from: 0.43, to: 0.6 },
-  { text: 'Tierra', sub: null, from: 0.58, to: 0.74 },
+  { text: 'España', sub: null, from: 0.3, to: 0.46 },
+  { text: 'Europa', sub: null, from: 0.46, to: 0.62 },
+  { text: 'Tierra', sub: null, from: 0.62, to: 0.78 },
 ];
 
 let running = false;
+
+// The surface we land on — read from the live theme so a departure into dark
+// mode never flashes paper white.
+let surface = '#f7f4ec';
+
+function readSurface() {
+  try {
+    const v = getComputedStyle(document.documentElement).getPropertyValue('--bg');
+    return v.trim() || '#f7f4ec';
+  } catch {
+    return '#f7f4ec';
+  }
+}
 
 /**
  * Play a transition and then navigate. Always resolves to a navigation, even
@@ -60,6 +79,7 @@ let running = false;
 export function playTransition(href, mode = 'orbit') {
   if (running) return;
   running = true;
+  surface = readSurface();
   if (mode === 'orbit') primeCinema('earth-limb');
 
   const tier = deviceTier();
@@ -191,9 +211,8 @@ function drawOrbit(ctx, size, p, stars, places, tier) {
   const cx = w / 2;
   const cy = h * 0.5;
 
-  // Deep space, warming towards cream as we land.
   const land = easeIn(range(p, 0.88, 1));
-  ctx.fillStyle = '#050d18';
+  ctx.fillStyle = DEEP_SPACE;
   ctx.fillRect(0, 0, w, h);
 
   // Exponential zoom keeps the perceived rate of scale constant.
@@ -238,7 +257,7 @@ function drawOrbit(ctx, size, p, stars, places, tier) {
 
   // Origin marker is present from the first frame — Murcia is where it starts.
   drawNode(ctx, cam, ORIGIN, range(p, 0.06, 0.2), {
-    color: HONEY,
+    color: BAMBOO,
     radius: 4,
     ring: true,
     label: p > 0.3,
@@ -251,9 +270,9 @@ function drawOrbit(ctx, size, p, stars, places, tier) {
     const start = 0.62 + i * 0.055;
     const t = easeOut(range(p, start, start + 0.17));
     if (t <= 0) return;
-    drawRoute(ctx, cam, ORIGIN, place, t, `rgba(239,111,83,${0.85 * t})`, 1.5);
+    drawRoute(ctx, cam, ORIGIN, place, t, `rgba(147,247,90,${0.8 * t})`, 1.5);
     drawNode(ctx, cam, place, range(p, start + 0.1, start + 0.2), {
-      color: CORAL,
+      color: SIGNAL,
       radius: 3,
       labelSize: tier === 'mobile' ? 9 : 11,
       space,
@@ -262,22 +281,26 @@ function drawOrbit(ctx, size, p, stars, places, tier) {
 
   drawScaleLabels(ctx, size, p);
 
-  // Signature line, once the constellation exists.
+  // The core idea, stated once, at the moment the whole planet is visible.
   const sig = range(p, 0.7, 0.84) * (1 - range(p, 0.93, 1));
   if (sig > 0.01) {
     ctx.save();
-    ctx.globalAlpha = sig * 0.85;
-    ctx.fillStyle = 'rgba(251,247,240,0.9)';
-    ctx.font = `600 ${Math.max(9, min * 0.014)}px Inter, system-ui, sans-serif`;
+    ctx.globalAlpha = sig * 0.8;
+    ctx.fillStyle = PAPER;
+    ctx.font = `400 ${Math.max(9, min * 0.013)}px 'IBM Plex Mono', ui-monospace, monospace`;
     ctx.textAlign = 'center';
-    ctx.letterSpacing = '0.28em';
-    ctx.fillText('A LIFE IN MOTION', cx, h - Math.max(34, h * 0.08));
+    ctx.letterSpacing = '0.3em';
+    ctx.fillText('THE EARTH IS MY PLAYGROUND', cx, h - Math.max(34, h * 0.08));
     ctx.restore();
   }
 
+  // Land on the destination's own surface, not a hardcoded white.
   if (land > 0.01) {
-    ctx.fillStyle = `rgba(251,247,240,${land})`;
+    ctx.save();
+    ctx.globalAlpha = land;
+    ctx.fillStyle = surface;
     ctx.fillRect(0, 0, w, h);
+    ctx.restore();
   }
 }
 
@@ -293,12 +316,12 @@ function drawScaleLabels(ctx, size, p) {
     if (a <= 0.01) continue;
     const y = h * 0.5 + min * 0.02 * (1 - a);
     ctx.globalAlpha = a;
-    ctx.fillStyle = CREAM;
-    ctx.font = `500 ${Math.max(30, min * 0.11)}px Fraunces, Georgia, serif`;
+    ctx.fillStyle = PAPER;
+    ctx.font = `300 ${Math.max(30, min * 0.105)}px 'IBM Plex Sans', system-ui, sans-serif`;
     ctx.fillText(l.text, w / 2, y);
     if (l.sub) {
-      ctx.globalAlpha = a * 0.6;
-      ctx.font = `500 ${Math.max(9, min * 0.016)}px Inter, system-ui, sans-serif`;
+      ctx.globalAlpha = a * 0.55;
+      ctx.font = `400 ${Math.max(9, min * 0.015)}px 'IBM Plex Mono', ui-monospace, monospace`;
       ctx.fillText(l.sub, w / 2, y + min * 0.055);
     }
   }
@@ -311,7 +334,7 @@ function drawWarp(ctx, size, p, stars) {
   const { w, h } = size;
   const cx = w / 2;
   const cy = h / 2;
-  ctx.fillStyle = '#050d18';
+  ctx.fillStyle = DEEP_SPACE;
   ctx.fillRect(0, 0, w, h);
 
   const speed = easeIn(range(p, 0, 0.72));
@@ -328,7 +351,7 @@ function drawWarp(ctx, size, p, stars) {
     const y1 = cy + Math.sin(s.a) * dist;
     const x2 = cx + Math.cos(s.a) * (dist + len);
     const y2 = cy + Math.sin(s.a) * (dist + len);
-    ctx.strokeStyle = `rgba(${s.warm ? '242,177,60' : '190,215,255'},${0.25 + 0.6 * s.z})`;
+    ctx.strokeStyle = `rgba(${s.warm ? '200,171,124' : '215,228,205'},${0.25 + 0.6 * s.z})`;
     ctx.lineWidth = 0.6 + s.z * 1.5;
     ctx.beginPath();
     ctx.moveTo(x1, y1);
@@ -338,8 +361,11 @@ function drawWarp(ctx, size, p, stars) {
   ctx.restore();
 
   if (fade > 0.01) {
-    ctx.fillStyle = `rgba(251,247,240,${fade})`;
+    ctx.save();
+    ctx.globalAlpha = fade;
+    ctx.fillStyle = surface;
     ctx.fillRect(0, 0, w, h);
+    ctx.restore();
   }
 }
 
@@ -368,7 +394,7 @@ function drawStars(ctx, size, stars, alpha, p) {
     const x = (s.x * w + drift) % w;
     const y = s.y * h;
     ctx.globalAlpha = alpha * (0.25 + 0.75 * s.z);
-    ctx.fillStyle = s.warm ? HONEY : '#dce9ff';
+    ctx.fillStyle = s.warm ? BAMBOO : '#dfe8d8';
     const r = 0.5 + s.z * 1.3;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
