@@ -93,7 +93,8 @@
   margin-bottom: clamp(12px, 2vh, 18px);
 }
 
-/* The node on the spine. */
+/* The node on the spine. Pops to size as its chapter arrives, rather than
+   sitting there pre-drawn — one small beat, not a loop. */
 .moment-index .node {
   flex: none;
   width: 5px;
@@ -101,6 +102,19 @@
   border-radius: 50%;
   background: var(--bamboo);
   opacity: 0.7;
+  transform: scale(0.3);
+  transition: transform 0.5s var(--ease-spring) 0.15s;
+}
+
+.moment.is-visible .moment-index .node {
+  transform: scale(1);
+}
+
+/* The live signal: the only node that keeps moving once it has arrived. */
+.moment-index.mono--signal .node {
+  background: var(--signal);
+  opacity: 1;
+  animation: signal-pulse 2.6s var(--ease) infinite;
 }
 
 .moment-title {
@@ -206,6 +220,7 @@
   height: 6px;
   border-radius: 50%;
   background: var(--signal);
+  animation: signal-pulse 2.6s var(--ease) infinite;
 }
 
 /* ---------------------------------------------------------- Exit ---- */

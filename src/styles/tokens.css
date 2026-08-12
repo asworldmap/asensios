@@ -66,6 +66,7 @@
 
   /* --- Motion ------------------------------------------------------ */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   color-scheme: light;
 }
@@ -296,6 +297,33 @@ button {
 [data-reveal].is-visible {
   opacity: 1;
   transform: none;
+}
+
+/* The short rule beside every page's kicker draws in from the left rather
+   than fading with the rest of the line — a small, one-shot beat that
+   reads as a line being ruled, not decoration switching on. */
+[data-reveal] .rule {
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.8s var(--ease) 0.1s;
+}
+
+[data-reveal].is-visible .rule {
+  transform: scaleX(1);
+}
+
+/* The one continuous ambient movement in the whole site: a slow pulse
+   reserved for the signal colour where it marks something genuinely
+   current (the "now" chapter, its coordinates). Everything else that
+   moves is scroll- or hover-triggered, not constant. */
+@keyframes signal-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 24%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--signal) 7%, transparent);
+  }
 }
 
 /* ------------------------------------------------------------ Theme toggle */

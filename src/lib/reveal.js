@@ -1,4 +1,4 @@
-// Lightweight scroll reveal + count-up. No dependencies.
+// Lightweight scroll reveal + count-up + parallax. No dependencies.
 
 export function initReveal() {
   const items = document.querySelectorAll('[data-reveal]');
@@ -66,4 +66,40 @@ export function initCountUp() {
     { threshold: 0.5 }
   );
   nums.forEach((el) => io.observe(el));
+}
+
+/**
+ * A restrained depth cue for a handful of marked elements: as one nears the
+ * vertical centre of the viewport it sits at rest, offset a few pixels
+ * either side of that. Not a library — one rAF-throttled scroll listener,
+ * transform only, disabled entirely under reduced motion.
+ */
+export function initParallax(selector = '[data-parallax]') {
+  const items = document.querySelectorAll(selector);
+  if (!items.length) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  let ticking = false;
+  const AMPLITUDE = 16; // px, either direction
+
+  function update() {
+    ticking = false;
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    items.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > vh) return; // off-screen — skip the write
+      const mid = r.top + r.height / 2;
+      const offset = Math.max(-1, Math.min(1, (mid - vh / 2) / (vh / 2)));
+      el.style.transform = `translateY(${(offset * -AMPLITUDE).toFixed(1)}px)`;
+    });
+  }
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  update();
 }

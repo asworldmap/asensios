@@ -3,6 +3,7 @@
 // English is written to feel native, not translated literally.
 export const dict = {
   es: {
+    'coords': '33.45° S · 70.67° O',
     'nav.trajectory': 'Mi trayectoria',
     'nav.games': 'Playroom',
     'traj.back': '← Asensio Sabater',
@@ -99,6 +100,7 @@ export const dict = {
       'Si la Tierra es un patio de juegos, este es el rincón pequeño: tres juegos hechos a mano, en canvas, sin librerías y sin motivo alguno.',
     'games.footLink': 'Trayectoria →',
     'games.play': 'Jugar',
+    'games.space': 'Espacio',
     'games.jump': 'saltar',
     'games.move': 'mover',
 
@@ -117,6 +119,7 @@ export const dict = {
   },
 
   en: {
+    'coords': '33.45° S · 70.67° W',
     'nav.trajectory': 'My trajectory',
     'nav.games': 'Playroom',
     'traj.back': '← Asensio Sabater',
@@ -213,6 +216,7 @@ export const dict = {
       "If Earth is a playground, this is the small corner: three hand-built games, in canvas, no libraries and no particular reason.",
     'games.footLink': 'Trajectory →',
     'games.play': 'Play',
+    'games.space': 'Space',
     'games.jump': 'jump',
     'games.move': 'move',
 
