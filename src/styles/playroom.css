@@ -73,7 +73,7 @@
   font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: 0.12em;
-  color: var(--ink-faint);
+  color: var(--ink-soft);
 }
 
 .pr-name {
@@ -85,7 +85,7 @@
 
 .pr-state {
   font-size: 0.62rem;
-  color: var(--ink-faint);
+  color: var(--ink-soft);
   white-space: nowrap;
 }
 
@@ -96,7 +96,7 @@
 }
 
 .pr-item.is-ready .pr-state {
-  color: var(--signal);
+  color: var(--signal-ink);
 }
 
 .pr-item.is-ready:hover .pr-name {

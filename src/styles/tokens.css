@@ -29,8 +29,17 @@
 
   /* --- Derived neutrals (not identity colours, just legibility) ----- */
   --ink: var(--wood);
-  --ink-soft: rgba(74, 53, 39, 0.66);
-  --ink-faint: rgba(74, 53, 39, 0.42);
+  /* Alphas chosen so body copy clears WCAG AA (4.5:1) on paper: 0.76 -> 5.2:1.
+     The faintest tier is 4.0:1 and is reserved for decorative metadata. */
+  --ink-soft: rgba(74, 53, 39, 0.76);
+  --ink-faint: rgba(74, 53, 39, 0.66);
+
+  /* Small mono text needs a palette colour that survives a light surface:
+     bamboo is only 3.0:1 on paper, earth is 6.8:1. Dark mode keeps bamboo. */
+  --mono-ink: var(--earth);
+  /* Likewise the neon signal is 2.2:1 on paper — fine as a dot or an arrow,
+     not as text. Signal-coloured *text* uses nature (7.0:1) in light. */
+  --signal-ink: var(--nature);
   --line: rgba(74, 53, 39, 0.16);
   --line-soft: rgba(74, 53, 39, 0.09);
   --surface: rgba(255, 255, 255, 0.5);
@@ -46,10 +55,10 @@
   --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* --- Measure / rhythm -------------------------------------------- */
   /* Read by canvas code that must know which surface it is painting on. */
   --is-dark: 0;
 
+  /* --- Measure / rhythm -------------------------------------------- */
   --maxw: 1080px;
   --measure: 62ch;
   --gutter: clamp(22px, 6vw, 64px);
@@ -72,8 +81,12 @@
     --bamboo: #c8ab7c;
 
     --ink: #ece7db; /* warm paper, for legibility on near-black */
-    --ink-soft: rgba(236, 231, 219, 0.62);
-    --ink-faint: rgba(236, 231, 219, 0.38);
+    --ink-soft: rgba(236, 231, 219, 0.7);
+    --ink-faint: rgba(236, 231, 219, 0.5);
+
+    /* On night, both identity colours are already high contrast (8.6:1, 14:1). */
+    --mono-ink: var(--bamboo);
+    --signal-ink: var(--signal);
     --line: rgba(236, 231, 219, 0.14);
     --line-soft: rgba(236, 231, 219, 0.07);
     --surface: rgba(236, 231, 219, 0.04);
@@ -100,8 +113,11 @@
   --bamboo: #c8ab7c;
 
   --ink: #ece7db;
-  --ink-soft: rgba(236, 231, 219, 0.62);
-  --ink-faint: rgba(236, 231, 219, 0.38);
+  --ink-soft: rgba(236, 231, 219, 0.7);
+  --ink-faint: rgba(236, 231, 219, 0.5);
+
+  --mono-ink: var(--bamboo);
+  --signal-ink: var(--signal);
   --line: rgba(236, 231, 219, 0.14);
   --line-soft: rgba(236, 231, 219, 0.07);
   --surface: rgba(236, 231, 219, 0.04);
@@ -187,7 +203,7 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid var(--signal);
+  outline: 2px solid var(--signal-ink);
   outline-offset: 3px;
   border-radius: 2px;
 }
@@ -225,11 +241,11 @@ button {
   font-weight: 400;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--bamboo);
+  color: var(--mono-ink);
 }
 
 .mono--signal {
-  color: var(--signal);
+  color: var(--signal-ink);
 }
 
 .lead {
@@ -267,7 +283,7 @@ button {
 
 /* The one place the neon signal is allowed to move. */
 .ln--signal:hover {
-  color: var(--signal);
+  color: var(--signal-ink);
 }
 
 /* ------------------------------------------------------------ Reveal */

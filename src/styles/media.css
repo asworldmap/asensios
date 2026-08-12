@@ -40,7 +40,8 @@
   font-weight: 400;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  /* Soft, not faint: a caption is content and has to clear AA at 0.66rem. */
+  color: var(--ink-soft);
 }
 
 .ph-4x5 {

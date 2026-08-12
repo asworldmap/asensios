@@ -62,7 +62,7 @@
 }
 
 .home-social a:hover {
-  color: var(--signal);
+  color: var(--signal-ink);
   transform: translateY(-2px);
 }
 
@@ -93,7 +93,7 @@
 
 .home-exit .arrow {
   display: inline-block;
-  color: var(--signal);
+  color: var(--signal-ink);
   transition: transform 0.45s var(--ease);
 }
 
@@ -108,12 +108,13 @@
   font-size: 0.72rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  /* Quiet, but it is still a navigation target — it has to be readable. */
+  color: var(--ink-soft);
   transition: color 0.3s var(--ease);
 }
 
 .home-play:hover {
-  color: var(--signal);
+  color: var(--signal-ink);
 }
 
 .home-play .pin {

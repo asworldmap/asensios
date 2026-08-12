@@ -25,14 +25,39 @@ export function currentTheme() {
   return stored() || (systemDark() ? 'dark' : 'light');
 }
 
+const SURFACE = { light: '#f7f4ec', dark: '#0e120d' };
+
+/**
+ * Keeps the browser chrome in step with the surface.
+ *
+ * The markup ships two media-scoped theme-color metas so the chrome is right
+ * before this module runs. An explicit choice has to beat both, and browsers
+ * honour the FIRST matching meta — so the override is media-less and inserted
+ * ahead of them, then removed again when the visitor returns to following the
+ * system.
+ */
+function applyChrome(theme) {
+  const head = document.head;
+  let override = head.querySelector('meta[name="theme-color"][data-theme-override]');
+
+  if (!theme) {
+    if (override) override.remove();
+    return;
+  }
+  if (!override) {
+    override = document.createElement('meta');
+    override.setAttribute('name', 'theme-color');
+    override.setAttribute('data-theme-override', '');
+    head.insertBefore(override, head.querySelector('meta[name="theme-color"]'));
+  }
+  override.setAttribute('content', SURFACE[theme]);
+}
+
 function apply(theme) {
   const root = document.documentElement;
   if (theme) root.setAttribute('data-theme', theme);
   else root.removeAttribute('data-theme');
-
-  // Keep the browser chrome in step with the surface.
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', currentTheme() === 'dark' ? '#0e120d' : '#f7f4ec');
+  applyChrome(theme);
 }
 
 /**
@@ -50,11 +75,13 @@ export function initTheme() {
   const btn = document.querySelector('[data-theme-toggle]');
   if (!btn) return;
 
+  // The visible word states where you are ("Día"/"Noche"); the accessible name
+  // states what the button does, so the two never contradict each other.
   const label = () => {
-    const next = currentTheme() === 'dark' ? 'light' : 'dark';
-    btn.setAttribute('aria-label', next === 'dark' ? 'Modo oscuro' : 'Modo claro');
+    const dark = currentTheme() === 'dark';
+    btn.setAttribute('aria-label', dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
     const text = btn.querySelector('[data-theme-label]');
-    if (text) text.textContent = currentTheme() === 'dark' ? 'Noche' : 'Día';
+    if (text) text.textContent = dark ? 'Noche' : 'Día';
   };
   label();
 
