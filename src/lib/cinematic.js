@@ -61,14 +61,14 @@ let running = false;
 
 // The surface we land on — read from the live theme so a departure into dark
 // mode never flashes paper white.
-let surface = '#f7f4ec';
+let surface = '#f1e8d6';
 
 function readSurface() {
   try {
     const v = getComputedStyle(document.documentElement).getPropertyValue('--bg');
-    return v.trim() || '#f7f4ec';
+    return v.trim() || '#f1e8d6';
   } catch {
-    return '#f7f4ec';
+    return '#f1e8d6';
   }
 }
 

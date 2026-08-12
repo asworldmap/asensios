@@ -176,7 +176,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.4em;
-  color: var(--ink-faint);
+  /* Real instructional content, not decorative — needs the AA-safe tier. */
+  color: var(--ink-soft);
   font-size: 0.66rem;
 }
 

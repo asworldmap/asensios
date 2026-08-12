@@ -25,7 +25,7 @@ export function currentTheme() {
   return stored() || (systemDark() ? 'dark' : 'light');
 }
 
-const SURFACE = { light: '#f7f4ec', dark: '#0e120d' };
+const SURFACE = { light: '#f1e8d6', dark: '#0e120d' };
 
 /**
  * Keeps the browser chrome in step with the surface.

@@ -29,7 +29,7 @@ export const dict = {
     'traj.ch1.meta': 'Murcia · Divulgalo / CienciaClip',
     'traj.ch1.title': 'La primera vez que convertí una idea en algo real.',
     'traj.ch1.text':
-      'Con un grupo de amigos convertimos la divulgación científica en algo que se podía tocar: contenido, formato, público real. No sabíamos que eso también era emprender.',
+      'Un grupo de amigos y yo convertimos la divulgación científica en algo que se podía tocar: contenido, formato, público real de verdad. En su momento no lo llamamos así, pero aquello ya era emprender.',
     'traj.ch1.caption': 'Murcia · Divulgalo / CienciaClip',
 
     'traj.ch2.meta': 'Finlandia · 2018',
@@ -41,12 +41,13 @@ export const dict = {
     'traj.ch3.meta': 'País Vasco · LEINN / KEIKOA · 2019–2022',
     'traj.ch3.title': 'Aprendí a fallar sin dejar de construir.',
     'traj.ch3.text':
-      'Cuatro años formando una empresa real con un equipo, desde cero, aprendiendo haciendo. KEIKOA no siempre funcionó — y ahí es exactamente donde aprendí más.',
+      'Tres años montando una empresa real, en equipo, desde cero, aprendiendo sobre la marcha. KEIKOA no siempre salió bien, y ahí aprendí lo que nadie te cuenta antes de empezar: fallar en equipo también se entrena, y lo difícil de verdad es seguir construyendo después de un mal trimestre.',
+    'traj.ch3.caption': 'País Vasco · KEIKOA',
 
     'traj.ch4.meta': 'Corea del Sur · Erasmus+',
     'traj.ch4.title': 'El mundo dejó de parecerme lejano.',
     'traj.ch4.text':
-      'Vivir fuera de Europa cambió algo que ya venía moviéndose con Erasmus+: dejar de tratar "el extranjero" como algo excepcional y empezar a tratarlo como parte normal de vivir.',
+      'Erasmus+ ya había abierto la grieta, pero vivir fuera de Europa la terminó de abrir: "el extranjero" dejó de ser una categoría especial y pasó a ser, simplemente, donde tocaba estar ese año.',
     'traj.ch4.caption': 'Corea del Sur',
 
     'traj.ch5.meta': 'Friburgo, Alemania · Alpadia · 2023',
@@ -58,7 +59,7 @@ export const dict = {
     'traj.ch6.meta': 'Murcia · Murcia Welcomes You · 2024–2026',
     'traj.ch6.title': 'Una comunidad no aparece. Se construye.',
     'traj.ch6.text':
-      'Empezó sin presupuesto y sin garantías. Hoy son más de 1.000 personas y 30 nacionalidades — no porque apareciera, sino porque se construyó evento a evento.',
+      'Empezó sin presupuesto, sin garantías y con una hoja de cálculo. Hoy son más de 1.000 personas y 30 nacionalidades, y ninguna de esas cifras apareció sola: se construyeron evento a evento, uno detrás de otro.',
     'traj.ch6.stat1': '1000+ participantes',
     'traj.ch6.stat2': '60+ eventos',
     'traj.ch6.stat3': '30+ nacionalidades',
@@ -67,7 +68,7 @@ export const dict = {
     'traj.ch7.meta': 'Murcia · Oficina de Proyectos Europeos, Ayto. de Murcia · 2025',
     'traj.ch7.title': 'Las instituciones también son sistemas.',
     'traj.ch7.text':
-      'Analizar convocatorias europeas y ayudar a redactar propuestas me enseñó que una institución también es un sistema: reglas, incentivos, personas intentando que algo funcione.',
+      'Analizar convocatorias europeas y ayudar a redactar propuestas me enseñó a mirar una institución como lo que es: reglas, incentivos y gente intentando, con los plazos encima, que algo funcione.',
     'traj.ch7.caption': 'Parlamento Europeo',
 
     'traj.ch8.meta': 'Japón · Ship for World Youth 37 · 2026',
@@ -90,6 +91,14 @@ export const dict = {
 
     'traj.exit.games': '◕ Playroom',
     'traj.exit.home': 'Inicio',
+
+    // Contact — a form that opens the visitor's own mail client. No inbox
+    // to manage, no address printed anywhere on the page.
+    'traj.exit.contactKicker': 'Escríbeme',
+    'contact.name': 'Tu nombre',
+    'contact.message': 'Tu mensaje',
+    'contact.send': 'Enviar →',
+    'contact.sent': 'Abriendo tu correo…',
 
     // Playroom
     'games.meta.title': 'Playroom — Asensio Sabater',
@@ -145,7 +154,7 @@ export const dict = {
     'traj.ch1.meta': 'Murcia · Divulgalo / CienciaClip',
     'traj.ch1.title': 'The first time I turned an idea into something real.',
     'traj.ch1.text':
-      "A group of friends and I turned science outreach into something people could actually engage with — content, format, a real audience. I didn't know yet that this was entrepreneurship too.",
+      "A group of friends and I turned science outreach into something people could actually engage with — content, format, a real audience. We didn't call it that at the time, but it was already entrepreneurship.",
     'traj.ch1.caption': 'Murcia · Divulgalo / CienciaClip',
 
     'traj.ch2.meta': 'Finland · 2018',
@@ -157,12 +166,13 @@ export const dict = {
     'traj.ch3.meta': 'Basque Country · LEINN / KEIKOA · 2019–2022',
     'traj.ch3.title': 'I learned to fail without stopping building.',
     'traj.ch3.text':
-      "Four years building a real company with a team, from zero, learning by doing. KEIKOA didn't always work — and that's exactly where I learned the most.",
+      "Three years building a real company, as a team, from zero, learning as we went. KEIKOA didn't always go well, and that taught me something nobody tells you going in: failing as a team is a skill you build too, and the hard part is showing up again after a bad quarter.",
+    'traj.ch3.caption': 'Basque Country · KEIKOA',
 
     'traj.ch4.meta': 'South Korea · Erasmus+',
     'traj.ch4.title': 'The world stopped feeling far away.',
     'traj.ch4.text':
-      'Living outside Europe shifted something Erasmus+ had already set in motion: I stopped treating "abroad" as exceptional and started treating it as a normal part of living.',
+      "Erasmus+ had already cracked something open, but living outside Europe finished the job: \"abroad\" stopped being a special category and just became wherever I happened to be that year.",
     'traj.ch4.caption': 'South Korea',
 
     'traj.ch5.meta': 'Freiburg, Germany · Alpadia · 2023',
@@ -174,7 +184,7 @@ export const dict = {
     'traj.ch6.meta': 'Murcia · Murcia Welcomes You · 2024–2026',
     'traj.ch6.title': "A community doesn't appear. It's built.",
     'traj.ch6.text':
-      "It started with no budget and no guarantees. Today it's 1,000+ people and 30+ nationalities — not because it appeared, but because it was built event by event.",
+      "It started with no budget, no guarantees and a spreadsheet. Today it's 1,000+ people and 30+ nationalities, and none of those numbers showed up on their own — they were built event by event, one after another.",
     'traj.ch6.stat1': '1,000+ participants',
     'traj.ch6.stat2': '60+ events',
     'traj.ch6.stat3': '30+ nationalities',
@@ -183,7 +193,7 @@ export const dict = {
     'traj.ch7.meta': 'Murcia · European Projects Office, Murcia City Council · 2025',
     'traj.ch7.title': 'Institutions are systems too.',
     'traj.ch7.text':
-      'Analysing European funding calls and helping draft proposals taught me that an institution is a system too — rules, incentives, people trying to make something work.',
+      "Analysing European funding calls and helping draft proposals taught me to see an institution for what it is: rules, incentives, and people trying — with the deadline breathing down their neck — to make something work.",
     'traj.ch7.caption': 'European Parliament',
 
     'traj.ch8.meta': 'Japan · Ship for World Youth 37 · 2026',
@@ -206,6 +216,12 @@ export const dict = {
 
     'traj.exit.games': '◕ Playroom',
     'traj.exit.home': 'Home',
+
+    'traj.exit.contactKicker': 'Get in touch',
+    'contact.name': 'Your name',
+    'contact.message': 'Your message',
+    'contact.send': 'Send →',
+    'contact.sent': 'Opening your mail app…',
 
     // Playroom
     'games.meta.title': 'Playroom — Asensio Sabater',

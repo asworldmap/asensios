@@ -25,3 +25,13 @@ vuelve a una columna sola. No hay huecos rotos ni peticiones repetidas.
 
 WebP calidad ~82, por debajo de 180 KB cada una, sin EXIF ni geolocalización
 (`-strip` / `-metadata none`).
+
+Pendiente — capítulo KEIKOA (v3):
+
+  keikoa-team.webp             País Vasco · KEIKOA         3:2 · sugerido ~1600×1066
+
+El bloque ya está montado en trajectory/index.html como `.moment--wide
+.has-media` apuntando a este nombre exacto. En cuanto el archivo exista aquí,
+la foto aparece sin tocar código; si el aspect ratio real es distinto a 3:2,
+cambia la clase `.ph-3x2` de esa figura por la que corresponda (`.ph-4x5`,
+`.ph-4x3`, `.ph-16x9`, `.ph-9x16`).

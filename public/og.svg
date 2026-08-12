@@ -2,7 +2,7 @@
   <!-- Share card in the V2 language: paper surface, wood type, one green route
        ending in Santiago. Copy matches the homepage verbatim. Font stack names
        IBM Plex first and falls back, since card renderers won't have it. -->
-  <rect width="1200" height="630" fill="#f7f4ec"/>
+  <rect width="1200" height="630" fill="#f1e8d6"/>
 
   <!-- The globe, kept to the right margin as a limb rather than a ball -->
   <g opacity="0.5">

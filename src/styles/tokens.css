@@ -6,21 +6,27 @@
 @import '@fontsource/ibm-plex-sans/latin-500.css';
 @import '@fontsource/ibm-plex-mono/latin-400.css';
 @import '@fontsource/ibm-plex-mono/latin-500.css';
+/* Fraunces carries the display voice: a soft, warm editorial serif for
+   headlines only. Body copy and metadata stay on Plex, so the three-tier
+   contrast (titles / body / mono) the system was built around still holds. */
+@import '@fontsource/fraunces/latin-300.css';
+@import '@fontsource/fraunces/latin-300-italic.css';
+@import '@fontsource/fraunces/latin-500.css';
 
 /* ============================================================
    asensios.com — Design System V2
    The earth is my playground.
 
-   Light = paper · map · field notebook.
-   Dark  = planet at night · deep vegetation.
+   Light = warm paper · bamboo · field notebook, not a flat white screen.
+   Dark  = planet at night · deep vegetation · a neon signal on the horizon.
 
-   Two typefaces only: IBM Plex Sans (voice), IBM Plex Mono (signals).
+   Fraunces (headlines) + IBM Plex Sans (voice) + IBM Plex Mono (signals).
    Six identity colours. Zero orange. Neon green is a signal, never a fill.
    ============================================================ */
 
 :root {
   /* --- Identity palette · light ------------------------------------- */
-  --bg: #f7f4ec; /* paper */
+  --bg: #f1e8d6; /* warm parchment, not flat cream */
   --signal: #3fbf16; /* neon signal — accents only */
   --nature: #2f5d3a; /* deep vegetation */
   --earth: #6b4f35;
@@ -29,10 +35,11 @@
 
   /* --- Derived neutrals (not identity colours, just legibility) ----- */
   --ink: var(--wood);
-  /* Alphas chosen so body copy clears WCAG AA (4.5:1) on paper: 0.76 -> 5.2:1.
-     The faintest tier is 4.0:1 and is reserved for decorative metadata. */
+  /* Alphas chosen so body copy clears WCAG AA (4.5:1) on the warm paper:
+     0.76 -> 4.9:1. The faintest tier is bumped to 0.70 (4.2:1) to keep the
+     same safety margin as before now that the paper itself is warmer/darker. */
   --ink-soft: rgba(74, 53, 39, 0.76);
-  --ink-faint: rgba(74, 53, 39, 0.66);
+  --ink-faint: rgba(74, 53, 39, 0.7);
 
   /* Small mono text needs a palette colour that survives a light surface:
      bamboo is only 3.0:1 on paper, earth is 6.8:1. Dark mode keeps bamboo. */
@@ -46,14 +53,23 @@
 
   /* Globe / canvas work needs raw channels for rgba() composition. */
   --ink-rgb: 74, 53, 39;
-  --bg-rgb: 247, 244, 236;
+  --bg-rgb: 241, 232, 214;
   --signal-rgb: 63, 191, 22;
   --nature-rgb: 47, 93, 58;
   --bamboo-rgb: 169, 136, 79;
 
+  /* Two very soft atmosphere glows layered under the grain — bamboo warmth
+     top-left, vegetation top-right. Read as light and air, not decoration. */
+  --atmo-a: rgba(var(--bamboo-rgb), 0.12);
+  --atmo-b: rgba(var(--nature-rgb), 0.08);
+
   /* --- Type -------------------------------------------------------- */
   --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Headlines only — a warm, soft-serif voice with real character instead of
+     another geometric sans. Falls back to the same Plex used for body text
+     so a slow font load never breaks the rhythm. */
+  --font-display: 'Fraunces', 'IBM Plex Sans', system-ui, serif;
 
   /* Read by canvas code that must know which surface it is painting on. */
   --is-dark: 0;
@@ -100,6 +116,11 @@
     --nature-rgb: 111, 174, 126;
     --bamboo-rgb: 200, 171, 124;
 
+    /* A faint neon horizon glow above, deep vegetation below — "planet at
+       night", not a UI flooded with green. */
+    --atmo-a: rgba(var(--signal-rgb), 0.05);
+    --atmo-b: rgba(var(--nature-rgb), 0.1);
+
     color-scheme: dark;
   }
 }
@@ -131,6 +152,9 @@
   --nature-rgb: 111, 174, 126;
   --bamboo-rgb: 200, 171, 124;
 
+  --atmo-a: rgba(var(--signal-rgb), 0.05);
+  --atmo-b: rgba(var(--nature-rgb), 0.1);
+
   color-scheme: dark;
 }
 
@@ -153,13 +177,31 @@ body {
   font-family: var(--font-sans);
   font-weight: 400;
   color: var(--ink);
-  background: var(--bg);
+  /* Warm/earthy atmosphere, not a flat fill: two soft glows over the base
+     paper (or the night). Oversized and animated at walking pace so the
+     page reads as alive without anyone consciously noticing it move. */
+  background-image: radial-gradient(ellipse 70% 55% at 12% -8%, var(--atmo-a), transparent 60%),
+    radial-gradient(ellipse 65% 60% at 96% 8%, var(--atmo-b), transparent 62%);
+  background-color: var(--bg);
+  background-repeat: no-repeat;
+  background-size: 140% 140%, 140% 140%;
+  background-position: 0% 0%, 100% 0%;
+  animation: atmosphere-drift 70s ease-in-out infinite alternate;
   line-height: 1.62;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   min-height: 100dvh;
   overflow-x: hidden;
-  transition: background 0.5s var(--ease), color 0.5s var(--ease);
+  transition: background-color 0.5s var(--ease), color 0.5s var(--ease);
+}
+
+@keyframes atmosphere-drift {
+  0% {
+    background-position: 0% 0%, 100% 0%;
+  }
+  100% {
+    background-position: 6% 6%, 92% 10%;
+  }
 }
 
 /* Material: a single fine grain layer over the whole surface. Subtle enough
@@ -228,11 +270,18 @@ button {
 
 /* ------------------------------------------------------------ Type roles */
 
-/* Editorial display: light weight, tight tracking, big. */
+/* Editorial display: the warm serif voice, light weight, big. Fraunces reads
+   generously at large sizes on its own — the tight tracking tuned for a
+   geometric sans would just fight the serif details. */
 .display {
+  font-family: var(--font-display);
   font-weight: 300;
-  line-height: 1.02;
-  letter-spacing: -0.03em;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.display em {
+  font-style: italic;
 }
 
 /* Mono is reserved for signals: coordinates, places, indices, metadata. */
