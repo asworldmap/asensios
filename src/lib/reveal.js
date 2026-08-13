@@ -80,7 +80,7 @@ export function initParallax(selector = '[data-parallax]') {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   let ticking = false;
-  const AMPLITUDE = 16; // px, either direction
+  const AMPLITUDE = 22; // px, either direction
 
   function update() {
     ticking = false;
