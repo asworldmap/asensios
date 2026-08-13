@@ -83,7 +83,7 @@
 
 .pr-name {
   font-size: clamp(1.15rem, 2.8vw, 1.5rem);
-  font-weight: 300;
+  font-weight: 400;
   letter-spacing: -0.015em;
   color: var(--ink);
 }
@@ -134,7 +134,7 @@
 
 .pr-overlay h2 {
   font-family: var(--font-sans);
-  font-weight: 300;
+  font-weight: 400;
   font-size: 1.3rem;
   color: var(--ink);
 }
@@ -176,7 +176,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.4em;
-  color: var(--ink-faint);
+  /* Real instructional content, not decorative — needs the AA-safe tier. */
+  color: var(--ink-soft);
   font-size: 0.66rem;
 }
 

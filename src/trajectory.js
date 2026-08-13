@@ -6,6 +6,7 @@ import { initReveal, initParallax } from './lib/reveal.js';
 import { initTheme } from './lib/theme.js';
 import { initMedia } from './lib/media.js';
 import { initI18n } from './lib/i18n.js';
+import { initContactForm } from './lib/contact.js';
 import { initArrival, prefersReducedMotion, wireCinematicLinks } from './lib/motion.js';
 
 initTheme();
@@ -13,6 +14,7 @@ initArrival();
 initI18n();
 initReveal();
 initParallax();
+initContactForm();
 
 // Any photo that fails to load takes its figure with it and the moment falls
 // back to a single column — never a broken image, never a hole in the layout.

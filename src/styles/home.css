@@ -42,6 +42,18 @@
   margin-bottom: clamp(22px, 4vh, 38px);
 }
 
+/* A whisper of the neon signal behind the name at night — energy, not glow
+   spam. Invisible until dark mode, and even then barely there. */
+:root[data-theme='dark'] .home-name {
+  text-shadow: 0 0 60px rgba(var(--signal-rgb), 0.14);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .home-name {
+    text-shadow: 0 0 60px rgba(var(--signal-rgb), 0.14);
+  }
+}
+
 /* --- Positioning sentence ----------------------------------------- */
 .home-lead {
   max-width: 46ch;
@@ -86,19 +98,24 @@
   align-items: baseline;
   gap: 0.6em;
   font-size: clamp(1.3rem, 3.4vw, 2.05rem);
-  font-weight: 300;
+  font-weight: 400;
   letter-spacing: -0.02em;
   color: var(--ink);
+  transition: color 0.35s var(--ease);
+}
+
+.home-exit:hover {
+  color: var(--signal-ink);
 }
 
 .home-exit .arrow {
   display: inline-block;
   color: var(--signal-ink);
-  transition: transform 0.45s var(--ease);
+  transition: transform 0.5s var(--ease-spring);
 }
 
 .home-exit:hover .arrow {
-  transform: translateX(9px);
+  transform: translateX(11px);
 }
 
 /* Secondary: the playroom. Small, mono, slightly playful — a door you
@@ -120,10 +137,24 @@
 .home-play .pin {
   display: inline-block;
   transition: transform 0.5s var(--ease);
+  animation: pin-idle 5.5s ease-in-out infinite;
 }
 
 .home-play:hover .pin {
+  animation-play-state: paused;
   transform: rotate(-18deg) scale(1.15);
+}
+
+/* A very small idle drift — the "door you notice only if you look" gets a
+   whisper of its own life instead of sitting completely still. */
+@keyframes pin-idle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
 }
 
 /* --- Footer: coordinates, as a field note ------------------------- */

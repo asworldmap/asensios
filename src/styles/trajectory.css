@@ -197,7 +197,7 @@
 }
 
 .tj-now-title strong {
-  font-weight: 300;
+  font-weight: 400;
   color: var(--nature);
 }
 
@@ -229,15 +229,114 @@
   border-top: 1px solid var(--line-soft);
 }
 
-.tj-exit .wrap {
+.tj-exit-inner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(36px, 6vh, 56px);
+}
+
+.tj-exit-links {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: clamp(18px, 4vw, 44px);
 }
 
-.tj-exit-primary {
-  font-size: clamp(1.15rem, 2.6vw, 1.6rem);
-  font-weight: 300;
-  letter-spacing: -0.015em;
+/* --- Contact: a field note, not a corporate form ---------------------
+   Underline-only inputs, no boxes, no fills — reads as an extension of
+   the page's mono/editorial voice rather than a bolted-on widget. */
+.tj-contact {
+  max-width: 46ch;
+}
+
+.tj-contact-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  margin-bottom: clamp(16px, 2.6vh, 24px);
+}
+
+.tj-contact-kicker .rule {
+  display: inline-block;
+  width: clamp(24px, 5vw, 44px);
+  height: 1px;
+  background: var(--bamboo);
+  opacity: 0.5;
+}
+
+.tj-contact-fields {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 3vh, 26px);
+}
+
+.tj-contact-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  padding: 0.5em 0;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--ink);
+  resize: none;
+  transition: border-color 0.3s var(--ease);
+}
+
+.tj-contact-input::placeholder {
+  color: var(--ink-faint);
+}
+
+.tj-contact-input:focus {
+  outline: none;
+  border-color: var(--signal-ink);
+}
+
+.tj-contact-textarea {
+  min-height: 2.6em;
+  line-height: 1.5;
+}
+
+.tj-contact-row {
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+  margin-top: clamp(20px, 3vh, 30px);
+}
+
+.tj-contact-send {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.65em 1.4em;
+  border: 1px solid var(--signal-ink);
+  color: var(--signal-ink);
+  background: transparent;
+  border-radius: 999px;
+  transition: background 0.25s var(--ease), color 0.25s var(--ease), transform 0.25s var(--ease);
+}
+
+.tj-contact-send:hover {
+  background: var(--signal-ink);
+  color: var(--bg);
+  transform: translateY(-1px);
+}
+
+.tj-contact-status {
+  color: var(--ink-faint);
+}
+
+.tj-contact-status.is-visible {
+  animation: signal-pulse-text 1.6s var(--ease) 2;
+}
+
+@keyframes signal-pulse-text {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
 }

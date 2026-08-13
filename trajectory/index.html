@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#f7f4ec" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#f1e8d6" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0e120d" media="(prefers-color-scheme: dark)" />
 
     <title data-i18n="traj.meta.title">Trayectoria — Asensio Sabater</title>
@@ -99,9 +99,9 @@
                 La primera vez que convertí una idea en algo real.
               </h2>
               <p class="moment-text" data-i18n="traj.ch1.text">
-                Con un grupo de amigos convertimos la divulgación científica en algo que se
-                podía tocar: contenido, formato, público real. No sabíamos que eso también
-                era emprender.
+                Un grupo de amigos y yo convertimos la divulgación científica en algo que se
+                podía tocar: contenido, formato, público real de verdad. En su momento no lo
+                llamamos así, pero aquello ya era emprender.
               </p>
             </div>
           </article>
@@ -133,8 +133,8 @@
             </figure>
           </article>
 
-          <!-- 3 · LEINN / KEIKOA (no photo) -->
-          <article class="moment" data-reveal>
+          <!-- 3 · LEINN / KEIKOA -->
+          <article class="moment has-media flip" data-reveal>
             <div class="moment-body">
               <p class="mono moment-index">
                 <span class="node" aria-hidden="true"></span>
@@ -144,11 +144,20 @@
                 Aprendí a fallar sin dejar de construir.
               </h2>
               <p class="moment-text" data-i18n="traj.ch3.text">
-                Cuatro años formando una empresa real con un equipo, desde cero, aprendiendo
-                haciendo. KEIKOA no siempre funcionó — y ahí es exactamente donde aprendí
-                más.
+                Tres años montando una empresa real, en equipo, desde cero, aprendiendo sobre
+                la marcha. KEIKOA no siempre salió bien. Ahí aprendí que fallar en equipo
+                también se entrena, y que lo duro de verdad es volver a currar al día
+                siguiente de un trimestre malo.
               </p>
             </div>
+            <figure class="ph ph-9x16" data-parallax>
+              <img
+                src="/media/keikoa-team.webp"
+                alt="Asensio en la Zona Emprendedora de KEIKOA, en el País Vasco"
+                width="1125" height="2000" loading="lazy" decoding="async"
+              />
+              <figcaption data-i18n="traj.ch3.caption">País Vasco · KEIKOA</figcaption>
+            </figure>
           </article>
 
           <!-- 4 · Korea / Erasmus+ -->
@@ -162,9 +171,9 @@
                 El mundo dejó de parecerme lejano.
               </h2>
               <p class="moment-text" data-i18n="traj.ch4.text">
-                Vivir fuera de Europa cambió algo que ya venía moviéndose con Erasmus+: dejar
-                de tratar "el extranjero" como algo excepcional y empezar a tratarlo como
-                parte normal de vivir.
+                Erasmus+ ya había abierto la grieta, pero vivir fuera de Europa la terminó de
+                abrir: "el extranjero" dejó de ser una categoría especial y pasó a ser,
+                simplemente, donde tocaba estar ese año.
               </p>
             </div>
             <figure class="ph ph-4x5">
@@ -215,9 +224,9 @@
                 Una comunidad no aparece. Se construye.
               </h2>
               <p class="moment-text" data-i18n="traj.ch6.text">
-                Empezó sin presupuesto y sin garantías. Hoy son más de 1.000 personas y 30
-                nacionalidades — no porque apareciera, sino porque se construyó evento a
-                evento.
+                Empezó sin presupuesto, sin garantías y con una hoja de cálculo. Hoy son más
+                de 1.000 personas y 30 nacionalidades, construidas evento a evento, uno detrás
+                de otro, durante casi dos años.
               </p>
               <p class="mono moment-meta">
                 <span data-i18n="traj.ch6.stat1">1000+ participantes</span>
@@ -254,9 +263,9 @@
                 Las instituciones también son sistemas.
               </h2>
               <p class="moment-text" data-i18n="traj.ch7.text">
-                Analizar convocatorias europeas y ayudar a redactar propuestas me enseñó que
-                una institución también es un sistema: reglas, incentivos, personas
-                intentando que algo funcione.
+                Analizar convocatorias europeas y ayudar a redactar propuestas me enseñó a
+                mirar una institución como lo que es: reglas, incentivos y gente intentando,
+                con los plazos encima, que algo funcione.
               </p>
             </div>
           </article>
@@ -277,11 +286,11 @@
                 bien.
               </p>
             </div>
-            <figure class="ph ph-4x5">
+            <figure class="ph ph-9x16" data-parallax>
               <img
-                src="/media/japan-swy.webp"
-                alt="Asensio en solitario bajo un torii en Japón, durante el programa Ship for World Youth"
-                width="1152" height="1440" loading="lazy" decoding="async"
+                src="/media/japan-fuji-swy.webp"
+                alt="Asensio en la cubierta del barco del Ship for World Youth, con el monte Fuji nevado al fondo sobre la bahía"
+                width="1153" height="2048" loading="lazy" decoding="async"
               />
               <figcaption data-i18n="traj.ch8.caption">Japón · Ship for World Youth</figcaption>
             </figure>
@@ -348,12 +357,44 @@
       </main>
 
       <section class="tj-exit">
-        <div class="wrap">
-          <a class="tj-exit-primary ln ln--signal" href="mailto:hola@asensios.com">
-            hola@asensios.com
-          </a>
-          <a class="mono ln" href="/games/" data-cine-warp><span data-i18n="traj.exit.games">◕ Playroom</span></a>
-          <a class="mono ln" href="/" data-i18n="traj.exit.home">Inicio</a>
+        <div class="wrap tj-exit-inner">
+          <form class="tj-contact" data-contact-form novalidate>
+            <p class="mono tj-contact-kicker">
+              <span class="rule" aria-hidden="true"></span>
+              <span data-i18n="traj.exit.contactKicker">Escríbeme</span>
+            </p>
+            <div class="tj-contact-fields">
+              <input
+                class="tj-contact-input"
+                type="text"
+                name="name"
+                data-contact-name
+                data-i18n-attr="placeholder:contact.name"
+                placeholder="Tu nombre"
+                autocomplete="name"
+              />
+              <textarea
+                class="tj-contact-input tj-contact-textarea"
+                name="message"
+                data-contact-message
+                data-i18n-attr="placeholder:contact.message"
+                placeholder="Tu mensaje"
+                rows="2"
+                required
+              ></textarea>
+            </div>
+            <div class="tj-contact-row">
+              <button class="tj-contact-send" type="submit" data-i18n="contact.send">Enviar →</button>
+              <span class="mono tj-contact-status" data-contact-status hidden data-i18n="contact.sent">
+                Abriendo tu correo…
+              </span>
+            </div>
+          </form>
+
+          <nav class="tj-exit-links">
+            <a class="mono ln" href="/games/" data-cine-warp><span data-i18n="traj.exit.games">◕ Playroom</span></a>
+            <a class="mono ln" href="/" data-i18n="traj.exit.home">Inicio</a>
+          </nav>
         </div>
       </section>
 
