@@ -2,74 +2,71 @@
    site rather than fetched from Google: one less third party, no FOUT from a
    host we don't control, and the type is guaranteed to be there.
 
-   Two families, not three: Lora carries both the headline and body voice —
-   warm, confident, genuinely legible at paragraph sizes, not just a display
-   face borrowed for the wrong job — and IBM Plex Mono stays reserved for
-   metadata/signals, so the titles/body/mono contrast the system was built
-   around still holds even with one fewer typeface in the stack. */
-@import '@fontsource/lora/latin-400.css';
-@import '@fontsource/lora/latin-400-italic.css';
-@import '@fontsource/lora/latin-500.css';
+   Instrument Serif carries the display voice — a high-contrast editorial face
+   with real charisma at size and an italic worth using for emphasis. Instrument
+   Sans is its designed companion and takes the body copy, so the two agree
+   about proportion without a third family. IBM Plex Mono stays reserved for
+   metadata and signals. Two families plus mono, nothing else. */
+@import '@fontsource/instrument-serif/latin-400.css';
+@import '@fontsource/instrument-serif/latin-400-italic.css';
+@import '@fontsource/instrument-sans/latin-400.css';
+@import '@fontsource/instrument-sans/latin-500.css';
 @import '@fontsource/ibm-plex-mono/latin-400.css';
 @import '@fontsource/ibm-plex-mono/latin-500.css';
 
 /* ============================================================
-   asensios.com — Design System V2
+   asensios.com — Design System V3
    The earth is my playground.
 
-   Light = warm paper · bamboo · field notebook, not a flat white screen.
+   Light = mineral paper · bamboo · wood — warm and tactile, never pastel.
    Dark  = planet at night · deep vegetation · a neon signal on the horizon.
 
-   Lora (voice — headlines and body both) + IBM Plex Mono (signals).
+   Instrument Serif (display) + Instrument Sans (voice) + IBM Plex Mono.
    Six identity colours. Zero orange. Neon green is a signal, never a fill.
    ============================================================ */
 
 :root {
   /* --- Identity palette · light ------------------------------------- */
-  --bg: #f1e8d6; /* warm parchment, not flat cream */
+  --bg: #e5d6bb; /* warm mineral paper — bamboo and clay, not cream */
   --signal: #3fbf16; /* neon signal — accents only */
-  --nature: #2f5d3a; /* deep vegetation */
-  --earth: #6b4f35;
-  --wood: #4a3527; /* primary text */
+  --nature: #27512f; /* deep vegetation */
+  --earth: #5d4529;
+  --wood: #3a2a1c; /* primary text */
   --bamboo: #a9884f; /* mono labels, metadata */
 
   /* --- Derived neutrals (not identity colours, just legibility) ----- */
   --ink: var(--wood);
-  /* Alphas chosen so body copy clears WCAG AA (4.5:1) on the warm paper:
-     0.76 -> 4.9:1. The faintest tier is bumped to 0.70 (4.2:1) to keep the
-     same safety margin as before now that the paper itself is warmer/darker. */
-  --ink-soft: rgba(74, 53, 39, 0.76);
-  --ink-faint: rgba(74, 53, 39, 0.7);
+  /* Alphas chosen against the deeper paper so every tier still clears WCAG AA:
+     0.78 -> 5.4:1 for body copy, 0.72 -> 4.6:1 for the faintest tier. */
+  --ink-soft: rgba(58, 42, 28, 0.78);
+  --ink-faint: rgba(58, 42, 28, 0.72);
 
   /* Small mono text needs a palette colour that survives a light surface:
-     bamboo is only 3.0:1 on paper, earth is 6.8:1. Dark mode keeps bamboo. */
+     bamboo is only ~2.5:1 on this paper, earth is 6.3:1. Dark keeps bamboo. */
   --mono-ink: var(--earth);
-  /* Likewise the neon signal is 2.2:1 on paper — fine as a dot or an arrow,
-     not as text. Signal-coloured *text* uses nature (7.0:1) in light. */
+  /* Likewise the neon signal is ~2:1 on paper — fine as a dot or an arrow,
+     not as text. Signal-coloured *text* uses nature (6.4:1) in light. */
   --signal-ink: var(--nature);
-  --line: rgba(74, 53, 39, 0.16);
-  --line-soft: rgba(74, 53, 39, 0.09);
-  --surface: rgba(255, 255, 255, 0.5);
+  --line: rgba(58, 42, 28, 0.18);
+  --line-soft: rgba(58, 42, 28, 0.1);
+  --surface: rgba(255, 250, 240, 0.44);
 
   /* Globe / canvas work needs raw channels for rgba() composition. */
-  --ink-rgb: 74, 53, 39;
-  --bg-rgb: 241, 232, 214;
+  --ink-rgb: 58, 42, 28;
+  --bg-rgb: 229, 214, 187;
   --signal-rgb: 63, 191, 22;
-  --nature-rgb: 47, 93, 58;
+  --nature-rgb: 39, 81, 47;
   --bamboo-rgb: 169, 136, 79;
 
-  /* Two very soft atmosphere glows layered under the grain — bamboo warmth
-     top-left, vegetation top-right. Read as light and air, not decoration. */
-  --atmo-a: rgba(var(--bamboo-rgb), 0.12);
-  --atmo-b: rgba(var(--nature-rgb), 0.08);
+  /* Three atmosphere fields layered under the grain: bamboo warmth, a wash of
+     vegetation, and a low clay horizon. Depth and material, not decoration. */
+  --atmo-a: rgba(var(--bamboo-rgb), 0.2);
+  --atmo-b: rgba(var(--nature-rgb), 0.11);
+  --atmo-c: rgba(120, 82, 44, 0.12);
 
   /* --- Type -------------------------------------------------------- */
-  /* One voice for both roles — Lora reads as confident and legible at
-     paragraph sizes, not just borrowed from a display face. --font-display
-     and --font-sans stay as separate tokens (headline vs. body call sites
-     don't change), they just resolve to the same family now. */
-  --font-sans: 'Lora', Georgia, 'Times New Roman', serif;
-  --font-display: 'Lora', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* Read by canvas code that must know which surface it is painting on. */
@@ -91,7 +88,7 @@
 /* Dark by system preference — unless the visitor explicitly chose light. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #0e120d; /* planet at night */
+    --bg: #0a0d0a; /* planet at night, one stop deeper than the old surface */
     --signal: #93f75a;
     --nature: #6fae7e;
     --earth: #a8815a;
@@ -99,28 +96,29 @@
     --bamboo: #c8ab7c;
 
     --ink: #ece7db; /* warm paper, for legibility on near-black */
-    --ink-soft: rgba(236, 231, 219, 0.7);
-    --ink-faint: rgba(236, 231, 219, 0.5);
+    --ink-soft: rgba(236, 231, 219, 0.72);
+    --ink-faint: rgba(236, 231, 219, 0.55);
 
-    /* On night, both identity colours are already high contrast (8.6:1, 14:1). */
+    /* On night, both identity colours are already high contrast (8.9:1, 14.7:1). */
     --mono-ink: var(--bamboo);
     --signal-ink: var(--signal);
-    --line: rgba(236, 231, 219, 0.14);
-    --line-soft: rgba(236, 231, 219, 0.07);
-    --surface: rgba(236, 231, 219, 0.04);
+    --line: rgba(236, 231, 219, 0.15);
+    --line-soft: rgba(236, 231, 219, 0.075);
+    --surface: rgba(236, 231, 219, 0.05);
 
     --is-dark: 1;
 
     --ink-rgb: 236, 231, 219;
-    --bg-rgb: 14, 18, 13;
+    --bg-rgb: 10, 13, 10;
     --signal-rgb: 147, 247, 90;
     --nature-rgb: 111, 174, 126;
     --bamboo-rgb: 200, 171, 124;
 
-    /* A faint neon horizon glow above, deep vegetation below — "planet at
-       night", not a UI flooded with green. */
-    --atmo-a: rgba(var(--signal-rgb), 0.05);
-    --atmo-b: rgba(var(--nature-rgb), 0.1);
+    /* A neon horizon above, deep vegetation across it, and a warm ember low
+       down — depth and energy, never a UI flooded with green. */
+    --atmo-a: rgba(var(--signal-rgb), 0.08);
+    --atmo-b: rgba(var(--nature-rgb), 0.14);
+    --atmo-c: rgba(168, 129, 90, 0.09);
 
     color-scheme: dark;
   }
@@ -128,7 +126,7 @@
 
 /* Explicit choice always wins, in both directions. */
 :root[data-theme='dark'] {
-  --bg: #0e120d;
+  --bg: #0a0d0a;
   --signal: #93f75a;
   --nature: #6fae7e;
   --earth: #a8815a;
@@ -136,25 +134,26 @@
   --bamboo: #c8ab7c;
 
   --ink: #ece7db;
-  --ink-soft: rgba(236, 231, 219, 0.7);
-  --ink-faint: rgba(236, 231, 219, 0.5);
+  --ink-soft: rgba(236, 231, 219, 0.72);
+  --ink-faint: rgba(236, 231, 219, 0.55);
 
   --mono-ink: var(--bamboo);
   --signal-ink: var(--signal);
-  --line: rgba(236, 231, 219, 0.14);
-  --line-soft: rgba(236, 231, 219, 0.07);
-  --surface: rgba(236, 231, 219, 0.04);
+  --line: rgba(236, 231, 219, 0.15);
+  --line-soft: rgba(236, 231, 219, 0.075);
+  --surface: rgba(236, 231, 219, 0.05);
 
   --is-dark: 1;
 
   --ink-rgb: 236, 231, 219;
-  --bg-rgb: 14, 18, 13;
+  --bg-rgb: 10, 13, 10;
   --signal-rgb: 147, 247, 90;
   --nature-rgb: 111, 174, 126;
   --bamboo-rgb: 200, 171, 124;
 
-  --atmo-a: rgba(var(--signal-rgb), 0.05);
-  --atmo-b: rgba(var(--nature-rgb), 0.1);
+  --atmo-a: rgba(var(--signal-rgb), 0.08);
+  --atmo-b: rgba(var(--nature-rgb), 0.14);
+  --atmo-c: rgba(168, 129, 90, 0.09);
 
   color-scheme: dark;
 }
@@ -182,11 +181,12 @@ body {
      paper (or the night). Oversized and animated at walking pace so the
      page reads as alive without anyone consciously noticing it move. */
   background-image: radial-gradient(ellipse 70% 55% at 12% -8%, var(--atmo-a), transparent 60%),
-    radial-gradient(ellipse 65% 60% at 96% 8%, var(--atmo-b), transparent 62%);
+    radial-gradient(ellipse 65% 60% at 96% 8%, var(--atmo-b), transparent 62%),
+    radial-gradient(ellipse 90% 45% at 50% 108%, var(--atmo-c), transparent 66%);
   background-color: var(--bg);
   background-repeat: no-repeat;
-  background-size: 140% 140%, 140% 140%;
-  background-position: 0% 0%, 100% 0%;
+  background-size: 140% 140%, 140% 140%, 150% 130%;
+  background-position: 0% 0%, 100% 0%, 50% 100%;
   animation: atmosphere-drift 70s ease-in-out infinite alternate;
   line-height: 1.62;
   -webkit-font-smoothing: antialiased;
@@ -271,18 +271,22 @@ button {
 
 /* ------------------------------------------------------------ Type roles */
 
-/* Editorial display: the warm serif voice, regular weight, big. Lora has no
-   lighter cut than 400, but a text serif doesn't need one to read as
-   elegant at size — the stroke contrast does that work on its own. */
+/* Editorial display. Instrument Serif is drawn for size: high stroke contrast,
+   a narrow set, and only one weight — which is the point. Tightening the
+   tracking slightly and pulling the leading in lets long headlines stack into
+   a solid block of type instead of drifting apart. */
 .display {
   font-family: var(--font-display);
   font-weight: 400;
-  line-height: 1.08;
-  letter-spacing: -0.006em;
+  line-height: 1.03;
+  letter-spacing: -0.014em;
 }
 
+/* The italic is the emphasis mechanism — no bold cut exists, and none is
+   needed. Used sparingly it carries a single word inside a headline. */
 .display em {
   font-style: italic;
+  color: var(--signal-ink);
 }
 
 /* Mono is reserved for signals: coordinates, places, indices, metadata. */
@@ -340,12 +344,64 @@ button {
 /* ------------------------------------------------------------ Reveal */
 [data-reveal] {
   opacity: 0;
-  transform: translateY(16px);
+  transform: translateY(20px);
   transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
 }
 
 [data-reveal].is-visible {
   opacity: 1;
+  transform: none;
+}
+
+/* --- Choreography inside a revealed block ---------------------------
+   A chapter arriving as one solid rectangle reads as a slide. Staggering
+   its own parts — the mono line, then the headline, then the copy — makes
+   it read as something being composed in front of you. The offsets are
+   small and the whole sequence is under half a second. */
+[data-reveal] .moment-index,
+[data-reveal] .moment-text,
+[data-reveal] .moment-meta,
+[data-reveal] .tj-now-text,
+[data-reveal] .tj-now-coords {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+}
+
+[data-reveal] .moment-index {
+  transition-delay: 0.06s;
+}
+
+[data-reveal] .moment-text,
+[data-reveal] .tj-now-text {
+  transition-delay: 0.26s;
+}
+
+[data-reveal] .moment-meta,
+[data-reveal] .tj-now-coords {
+  transition-delay: 0.34s;
+}
+
+[data-reveal].is-visible .moment-index,
+[data-reveal].is-visible .moment-text,
+[data-reveal].is-visible .moment-meta,
+[data-reveal].is-visible .tj-now-text,
+[data-reveal].is-visible .tj-now-coords {
+  opacity: 1;
+  transform: none;
+}
+
+/* Headlines rise out of their own baseline behind a mask rather than
+   fading in. The negative insets keep descenders — and the dark-mode glow
+   behind the name — outside the clip once it has opened. */
+[data-reveal] .display {
+  clip-path: inset(-30% -20% 106% -20%);
+  transform: translateY(0.14em);
+  transition: clip-path 1s var(--ease) 0.14s, transform 1s var(--ease) 0.14s;
+}
+
+[data-reveal].is-visible .display {
+  clip-path: inset(-30% -20% -22% -20%);
   transform: none;
 }
 
@@ -473,5 +529,36 @@ button {
   [data-reveal] {
     opacity: 1;
     transform: none;
+  }
+
+  /* The staggered children opt out too. Without this they would keep the
+     opacity: 0 they start from and the page would read as empty — the
+     blanket duration override alone does not undo a starting state. */
+  [data-reveal] .moment-index,
+  [data-reveal] .moment-text,
+  [data-reveal] .moment-meta,
+  [data-reveal] .tj-now-text,
+  [data-reveal] .tj-now-coords {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* !important because the .is-visible variants of these rules are more
+     specific than the reset, and because .tj-scroll-arrow is defined in a
+     stylesheet imported after this one. */
+  [data-reveal] .display,
+  [data-reveal].is-visible .display,
+  .home-portrait img,
+  .moment .ph img {
+    clip-path: none !important;
+    transform: none !important;
+  }
+
+  [data-reveal] .rule {
+    transform: none !important;
+  }
+
+  .tj-scroll-arrow {
+    animation: none !important;
   }
 }
