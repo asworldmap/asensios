@@ -1,0 +1,25 @@
+{
+  "_comment": [
+    "Adapter file for 'Mientras tanto, en Santiago…'. Relatos never calls",
+    "Instagram at runtime: media referenced here is served from our own",
+    "/media/, so the page works whether or not Instagram is up and no",
+    "reader request ever reaches Meta.",
+    "",
+    "Populate 'items' by hand today. When the account is eligible for the",
+    "official Instagram Graph API, an ingestion script can write this same",
+    "file server-side and the frontend does not change.",
+    "",
+    "Item schema:",
+    "  thumbnail  (required) path under /media/, e.g. /media/momentos/01.jpg",
+    "  alt        (required) alt text for the image",
+    "  caption    short line shown under the thumbnail",
+    "  location   e.g. 'Providencia'",
+    "  permalink  original Instagram URL, optional — opens in a new context",
+    "  href       internal target instead of permalink, e.g. /momentos/xx.html",
+    "  date       ISO date, optional",
+    "  draft      true to keep it out of the build"
+  ],
+  "source": "manual",
+  "generated": null,
+  "items": []
+}

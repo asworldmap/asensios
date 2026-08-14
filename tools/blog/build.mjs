@@ -1,0 +1,784 @@
+#!/usr/bin/env node
+/**
+ * Relatos desde Santiago — the printing press.
+ *
+ * Reads Markdown + YAML frontmatter from content/ and writes a complete
+ * static site to blog-dist/. Nothing executes at request time.
+ *
+ *   node tools/blog/build.mjs [--drafts]
+ *
+ * Everything a reader can reach is produced here: story pages, the front
+ * page, section pages, the archive, sitemap, RSS, Open Graph, canonicals.
+ * Author-facing artifacts (WhatsApp copy, manifest) are written to
+ * blog-artifacts/ so they never reach the public web root.
+ */
+import { readFile, writeFile, mkdir, readdir, copyFile, rm, stat } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { join, dirname, extname, basename, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { marked } from 'marked';
+import yaml from 'js-yaml';
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(HERE, '..', '..');
+const CONTENT = join(ROOT, 'content');
+const THEME = join(HERE, 'theme');
+const OUT = join(ROOT, 'blog-dist');
+const ARTIFACTS = join(ROOT, 'blog-artifacts');
+
+export const SITE = {
+  name: 'Relatos desde Santiago',
+  tagline: 'Crónicas, postales y otros asuntos escritos desde Santiago de Chile.',
+  origin: 'https://blog.asensios.com',
+  author: 'Asensio Sabater',
+  lang: 'es',
+  whatsappChannel: 'https://whatsapp.com/channel/0029Vb9813y7tkj1bIgcId3n',
+  utm: { source: 'whatsapp', medium: 'channel', campaign: 'relatos_santiago' },
+};
+
+/** Section registry. Order here is the editorial order on the front page. */
+export const SECTIONS = [
+  { id: 'cronicas', label: 'Crónicas', dir: 'relatos', blurb: 'Relatos largos.' },
+  { id: 'postales', label: 'Postales', dir: 'postales', blurb: 'Una imagen y pocas palabras.' },
+  { id: 'despachos', label: 'Despachos', dir: 'despachos', blurb: 'Notas breves de trabajo y ciudad.' },
+  { id: 'en-movimiento', label: 'En movimiento', dir: 'momentos', blurb: 'Vídeo corto y vertical.' },
+];
+
+const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
+  'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+const esc = (s = '') => String(s)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+const fmtDate = (d) => `${d.getUTCDate()} de ${MONTHS[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
+const fmtShort = (d) => `${MONTHS[d.getUTCMonth()].slice(0, 3)}. ${d.getUTCFullYear()}`;
+const isoDate = (d) => d.toISOString().slice(0, 10);
+
+// ---------------------------------------------------------------------------
+// Frontmatter
+// ---------------------------------------------------------------------------
+
+function parseDoc(raw, file) {
+  const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+  if (!m) throw new Error(`${file}: missing YAML frontmatter block`);
+  let data;
+  try {
+    data = yaml.load(m[1]) || {};
+  } catch (err) {
+    throw new Error(`${file}: invalid frontmatter — ${err.message}`);
+  }
+  return { data, body: m[2] };
+}
+
+const REQUIRED = ['title', 'slug', 'date'];
+
+function validate(entry, file) {
+  for (const key of REQUIRED) {
+    if (!entry[key]) throw new Error(`${file}: frontmatter field "${key}" is required`);
+  }
+  if (Number.isNaN(entry.date.getTime())) throw new Error(`${file}: "date" is not a valid date`);
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(entry.slug)) {
+    throw new Error(`${file}: "slug" must be lowercase letters, digits and hyphens`);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Intrinsic image dimensions — read from the file header, no dependency.
+// Prevents layout shift without pulling in an image library.
+// ---------------------------------------------------------------------------
+
+async function imageSize(absPath) {
+  if (!existsSync(absPath)) return null;
+  let buf;
+  try {
+    buf = await readFile(absPath);
+  } catch { return null; }
+  // PNG
+  if (buf.length > 24 && buf.readUInt32BE(0) === 0x89504e47) {
+    return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
+  }
+  // GIF
+  if (buf.length > 10 && buf.toString('ascii', 0, 3) === 'GIF') {
+    return { w: buf.readUInt16LE(6), h: buf.readUInt16LE(8) };
+  }
+  // WebP (VP8X / VP8 / VP8L)
+  if (buf.length > 30 && buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') {
+    const fmt = buf.toString('ascii', 12, 16);
+    if (fmt === 'VP8X') return { w: 1 + buf.readUIntLE(24, 3), h: 1 + buf.readUIntLE(27, 3) };
+    if (fmt === 'VP8 ') return { w: buf.readUInt16LE(26) & 0x3fff, h: buf.readUInt16LE(28) & 0x3fff };
+    if (fmt === 'VP8L') {
+      const b = buf.readUInt32LE(21);
+      return { w: (b & 0x3fff) + 1, h: ((b >> 14) & 0x3fff) + 1 };
+    }
+  }
+  // JPEG — walk the segment markers to the frame header
+  if (buf.length > 4 && buf[0] === 0xff && buf[1] === 0xd8) {
+    let i = 2;
+    while (i < buf.length - 9) {
+      if (buf[i] !== 0xff) { i++; continue; }
+      const marker = buf[i + 1];
+      if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
+        return { h: buf.readUInt16BE(i + 5), w: buf.readUInt16BE(i + 7) };
+      }
+      i += 2 + buf.readUInt16BE(i + 2);
+    }
+  }
+  return null;
+}
+
+/** <picture>/<img> with srcset when sibling variants exist, always with dimensions. */
+async function renderImage(src, { alt = '', caption = '', className = '', eager = false } = {}) {
+  const abs = join(CONTENT, src.replace(/^\//, ''));
+  const dims = await imageSize(abs);
+  const base = src.replace(/\.[^.]+$/, '');
+  const sources = [];
+  for (const [ext, type] of [['avif', 'image/avif'], ['webp', 'image/webp']]) {
+    if (existsSync(join(CONTENT, `${base}.${ext}`.replace(/^\//, '')))) {
+      sources.push(`<source srcset="${esc(base)}.${ext}" type="${type}">`);
+    }
+  }
+  const attrs = [
+    `src="${esc(src)}"`,
+    `alt="${esc(alt)}"`,
+    'loading="' + (eager ? 'eager' : 'lazy') + '"',
+    'decoding="async"',
+    dims ? `width="${dims.w}" height="${dims.h}"` : '',
+  ].filter(Boolean).join(' ');
+  const img = `<img ${attrs}>`;
+  const media = sources.length ? `<picture>${sources.join('')}${img}</picture>` : img;
+  return `<figure class="figure ${className}">${media}${
+    caption ? `<figcaption>${esc(caption)}</figcaption>` : ''
+  }</figure>`;
+}
+
+async function renderVideo(item) {
+  const poster = item.poster ? ` poster="${esc(item.poster)}"` : '';
+  return `<figure class="figure figure--video">
+  <video controls playsinline preload="none"${poster} class="video video--vertical">
+    <source src="${esc(item.src)}" type="${esc(item.mime || 'video/mp4')}">
+    Tu navegador no puede reproducir este vídeo.
+  </video>
+  ${item.caption ? `<figcaption>${esc(item.caption)}</figcaption>` : ''}
+</figure>`;
+}
+
+async function renderMediaList(media = []) {
+  const out = [];
+  for (const raw of media) {
+    const item = typeof raw === 'string' ? { src: raw } : raw;
+    if (!item.src) continue;
+    if (/\.(mp4|webm|mov)$/i.test(item.src)) out.push(await renderVideo(item));
+    else out.push(await renderImage(item.src, item));
+  }
+  return out.join('\n');
+}
+
+// ---------------------------------------------------------------------------
+// Load content
+// ---------------------------------------------------------------------------
+
+async function loadSection(section, includeDrafts) {
+  const dir = join(CONTENT, section.dir);
+  if (!existsSync(dir)) return [];
+  // README.md and _-prefixed files are notes to the author, not content.
+  const files = (await readdir(dir))
+    .filter((f) => f.endsWith('.md') && f !== 'README.md' && !f.startsWith('_'));
+  const entries = [];
+  for (const file of files.sort()) {
+    const abs = join(dir, file);
+    const { data, body } = parseDoc(await readFile(abs, 'utf8'), relative(ROOT, abs));
+    const entry = {
+      ...data,
+      date: new Date(data.date),
+      section: data.section || section.id,
+      type: data.type || 'cronica',
+      dir: section.dir,
+      body,
+      sourceFile: relative(ROOT, abs),
+    };
+    validate(entry, entry.sourceFile);
+    if (entry.draft && !includeDrafts) continue;
+    entry.url = `/${section.dir}/${entry.slug}.html`;
+    entry.absoluteUrl = SITE.origin + entry.url;
+    entries.push(entry);
+  }
+  return entries;
+}
+
+async function loadAll(includeDrafts) {
+  const all = [];
+  for (const section of SECTIONS) all.push(...await loadSection(section, includeDrafts));
+  all.sort((a, b) => b.date - a.date || String(b.slug).localeCompare(String(a.slug)));
+  // Prev/next runs across the whole publication in chronological order, so
+  // the reader can walk the story of the stay rather than one silo.
+  const chrono = [...all].sort((a, b) => a.date - b.date || String(a.slug).localeCompare(String(b.slug)));
+  chrono.forEach((e, i) => {
+    e.number = String(i + 1).padStart(3, '0');
+    e.prev = chrono[i - 1] || null;
+    e.next = chrono[i + 1] || null;
+  });
+  return all;
+}
+
+async function loadSocial() {
+  const file = join(CONTENT, 'social', 'instagram.json');
+  if (!existsSync(file)) return [];
+  try {
+    const parsed = JSON.parse(await readFile(file, 'utf8'));
+    return Array.isArray(parsed.items) ? parsed.items.filter((i) => !i.draft) : [];
+  } catch (err) {
+    console.warn(`  ! content/social/instagram.json ignored — ${err.message}`);
+    return [];
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Templates
+// ---------------------------------------------------------------------------
+
+function whatsappUrl(entry) {
+  const u = new URL(entry.absoluteUrl);
+  u.searchParams.set('utm_source', SITE.utm.source);
+  u.searchParams.set('utm_medium', SITE.utm.medium);
+  u.searchParams.set('utm_campaign', SITE.utm.campaign);
+  u.searchParams.set('utm_content', `${entry.dir.replace(/s$/, '')}_${entry.number}`);
+  return u.toString();
+}
+
+function head({ title, description, canonical, ogType = 'article', image }) {
+  const img = image ? `\n<meta property="og:image" content="${esc(SITE.origin + image)}">` : '';
+  return `<!doctype html>
+<html lang="${SITE.lang}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(description)}">
+<link rel="canonical" href="${esc(canonical)}">
+<link rel="stylesheet" href="/assets/style.css">
+<link rel="alternate" type="application/rss+xml" title="${esc(SITE.name)}" href="/feed.xml">
+<script defer src="/assets/site.js"></script>
+<meta property="og:type" content="${ogType}">
+<meta property="og:site_name" content="${esc(SITE.name)}">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(description)}">
+<meta property="og:url" content="${esc(canonical)}">
+<meta property="og:locale" content="es_ES">${img}
+<meta name="twitter:card" content="${image ? 'summary_large_image' : 'summary'}">
+<meta name="twitter:title" content="${esc(title)}">
+<meta name="twitter:description" content="${esc(description)}">
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>`;
+}
+
+function masthead({ compact = false, edition = '' } = {}) {
+  const tag = compact ? 'p' : 'h1';
+  return `<header class="masthead ${compact ? 'masthead--compact' : ''}">
+  <nav class="utility" aria-label="Secciones">
+    <ul>
+      <li><a href="/">Portada</a></li>
+      <li><a href="/archivo.html">Archivo</a></li>
+      <li><a href="/#whatsapp">WhatsApp</a></li>
+      <li><a href="/#sobre">Sobre estos relatos</a></li>
+    </ul>
+    <p class="utility__note">Sin likes · sin comentarios · con memoria</p>
+  </nav>
+  <div class="masthead__brand">
+    <${tag} class="wordmark"><a href="/">Relatos<span class="wordmark__break"> </span>desde Santiago</a></${tag}>
+    <p class="wordmark__sub">${esc(SITE.tagline)}</p>
+  </div>
+  ${edition ? `<p class="edition">${edition}</p>` : ''}
+</header>`;
+}
+
+function footer() {
+  return `<footer class="site-footer">
+  <p><strong>${esc(SITE.name)}</strong> · ${esc(SITE.author)}</p>
+  <p>Publicación personal. No es una publicación institucional ni representa a ningún empleador.</p>
+  <p class="site-footer__links"><a href="/archivo.html">Archivo</a> · <a href="/feed.xml">RSS</a></p>
+</footer>
+<div class="consent" role="dialog" aria-live="polite" aria-label="Analítica" hidden>
+  <p>Este cuaderno usa analítica solo para saber qué se lee. Sin publicidad ni perfiles.</p>
+  <div class="consent__actions">
+    <button type="button" class="btn btn--primary" data-accept>Aceptar analítica</button>
+    <button type="button" class="btn" data-decline>Seguir sin ella</button>
+  </div>
+</div>
+</body>
+</html>`;
+}
+
+/** Body renderers per editorial type — composable, one shared shell. */
+async function storyBody(entry, html) {
+  const gallery = entry.media?.length ? await renderMediaList(entry.media) : '';
+  const note = entry.note
+    ? `<aside class="side-column"><div class="margin-note">${esc(entry.note)}</div></aside>`
+    : '';
+  switch (entry.type) {
+    case 'postal':
+    case 'fotoensayo':
+      return `<section class="story-body story-body--visual">
+        <div class="gallery">${gallery}</div>
+        <div class="prose prose--short">${html}</div>
+      </section>`;
+    case 'momento':
+      return `<section class="story-body story-body--movement">
+        <div class="movement">${gallery}</div>
+        <div class="prose prose--short">${html}</div>
+      </section>`;
+    case 'despacho':
+      return `<section class="story-body story-body--dispatch">
+        <div class="prose">${html}</div>
+        ${gallery ? `<div class="gallery gallery--inline">${gallery}</div>` : ''}
+      </section>`;
+    default:
+      return `<section class="story-body">
+        <article class="prose">${html}${gallery ? `<div class="gallery gallery--inline">${gallery}</div>` : ''}</article>
+        ${note}
+      </section>`;
+  }
+}
+
+async function storyPage(entry) {
+  const html = marked.parse(entry.body);
+  const label = SECTIONS.find((s) => s.id === entry.section)?.label || 'Relato';
+  const cover = entry.cover
+    ? await renderImage(entry.cover, { alt: entry.coverAlt || entry.title, className: 'figure--cover', eager: true })
+    : '';
+  const nav = `<nav class="story-nav" aria-label="Navegación entre relatos">
+    <div>${entry.prev ? `<a href="${entry.prev.url}"><span>← Anterior</span><b>${esc(entry.prev.title)}</b></a>` : ''}</div>
+    <div class="story-nav__next">${entry.next ? `<a href="${entry.next.url}"><span>Siguiente →</span><b>${esc(entry.next.title)}</b></a>` : ''}</div>
+  </nav>`;
+
+  return `${head({
+    title: `${entry.title} — ${SITE.name}`,
+    description: entry.summary || SITE.tagline,
+    canonical: entry.absoluteUrl,
+    image: entry.cover,
+  })}
+${masthead({ compact: true })}
+<main id="contenido" class="wrap">
+  <article class="story" data-relato="${esc(entry.slug)}" data-numero="${entry.number}">
+    <header class="story-head reveal">
+      <p class="eyebrow"><span class="eyebrow__no">Nº ${entry.number}</span> · ${esc(label)}</p>
+      <h1 class="story-title">${esc(entry.title)}</h1>
+      ${entry.summary ? `<p class="deck">${esc(entry.summary)}</p>` : ''}
+      <p class="story-meta">
+        <time datetime="${isoDate(entry.date)}">${fmtDate(entry.date)}</time>
+        ${entry.location ? ` · <span>${esc(entry.location)}</span>` : ''}
+      </p>
+    </header>
+    ${cover}
+    ${await storyBody(entry, html)}
+    <footer class="story-foot">
+      <button type="button" class="read-toggle" data-read-toggle aria-pressed="false">
+        <span class="read-toggle__mark" aria-hidden="true">○</span>
+        <span class="read-toggle__label">Marcar como leído</span>
+      </button>
+      <p class="story-foot__share">
+        <a class="channel-link" data-event="whatsapp_channel_click" href="${esc(SITE.whatsappChannel)}" rel="noopener">
+          Seguir los relatos por WhatsApp →
+        </a>
+      </p>
+    </footer>
+    ${cartaBlock(entry)}
+  </article>
+  ${nav}
+</main>
+${footer()}`;
+}
+
+function cartaBlock(entry) {
+  if (entry.carta === false) return '';
+  return `<section class="carta" id="carta" data-carta>
+  <div class="carta__intro">
+    <h2>Carta al autor</h2>
+    <p>Si este relato te hizo pensar en algo, puedes dejarme una nota. No se publicará.</p>
+  </div>
+  <form class="carta__form" data-carta-form novalidate>
+    <label for="carta-msg">Mensaje</label>
+    <textarea id="carta-msg" name="message" rows="5" required></textarea>
+    <label for="carta-name">Nombre <span class="opt">(opcional)</span></label>
+    <input id="carta-name" name="name" type="text" autocomplete="name">
+    <input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" class="hp">
+    <input type="hidden" name="t" value="">
+    <input type="hidden" name="relato" value="${esc(entry.slug)}">
+    <button type="submit" class="btn btn--primary">Enviar en privado</button>
+    <p class="carta__status" data-carta-status role="status"></p>
+  </form>
+</section>`;
+}
+
+// --- front page -------------------------------------------------------------
+
+async function frontCard(entry, variant) {
+  const label = SECTIONS.find((s) => s.id === entry.section)?.label || '';
+  const img = entry.cover
+    ? await renderImage(entry.cover, {
+      alt: entry.coverAlt || entry.title,
+      eager: variant === 'lead',
+      className: 'figure--card',
+    })
+    : '';
+  return `<article class="card card--${variant} reveal">
+  ${img}
+  <p class="eyebrow"><span class="eyebrow__no">Nº ${entry.number}</span> · ${esc(label)}</p>
+  <h3 class="card__title"><a href="${entry.url}">${esc(entry.title)}</a></h3>
+  ${entry.summary ? `<p class="card__deck">${esc(entry.summary)}</p>` : ''}
+  <p class="card__meta">
+    <time datetime="${isoDate(entry.date)}">${fmtShort(entry.date)}</time>
+    ${entry.location ? ` · ${esc(entry.location)}` : ''}
+  </p>
+</article>`;
+}
+
+async function meanwhileStrip(moments, social) {
+  const items = [
+    ...moments.map((m) => ({
+      href: m.url, src: m.cover, alt: m.coverAlt || m.title, label: m.title, place: m.location,
+    })),
+    ...social.map((s) => ({
+      href: s.permalink || s.href || '#', src: s.thumbnail, alt: s.alt || s.caption || '',
+      label: s.caption, place: s.location, external: !!s.permalink,
+    })),
+  ].filter((i) => i.src).slice(0, 8);
+  if (items.length < 3) return '';
+  const cells = [];
+  for (const i of items) {
+    const fig = await renderImage(i.src, { alt: i.alt, className: 'figure--strip' });
+    cells.push(`<li class="strip__item">
+      <a href="${esc(i.href)}"${i.external ? ' rel="noopener"' : ''}>
+        ${fig}
+        ${i.label ? `<span class="strip__label">${esc(i.label)}</span>` : ''}
+        ${i.place ? `<span class="strip__place">${esc(i.place)}</span>` : ''}
+      </a>
+    </li>`);
+  }
+  return `<section class="strip reveal" aria-labelledby="strip-h">
+  <div class="section-head"><h2 id="strip-h">Mientras tanto, en Santiago…</h2></div>
+  <ul class="strip__rail">${cells.join('')}</ul>
+</section>`;
+}
+
+async function frontPage(all, social) {
+  const now = new Date();
+  const edition = `Edición del ${fmtDate(now)} · Santiago de Chile · Nº ${all.length ? all[0].number : '000'}`;
+  const featured = all.find((e) => e.featured) || all[0];
+  const rest = all.filter((e) => e !== featured);
+  const bySection = (id) => rest.filter((e) => e.section === id);
+
+  const lead = featured ? await frontCard(featured, 'lead') : '';
+  const secondary = rest[0] ? await frontCard(rest[0], 'secondary') : '';
+  const third = rest[1] ? await frontCard(rest[1], 'tertiary') : '';
+
+  const blocks = [];
+  if (lead || secondary) {
+    blocks.push(`<section class="front-lead">${lead}<div class="front-lead__side">${secondary}${third}</div></section>`);
+  }
+
+  blocks.push(await meanwhileStrip(bySection('en-movimiento'), social));
+
+  for (const s of SECTIONS.filter((s) => s.id !== 'cronicas')) {
+    const items = bySection(s.id).slice(0, 3);
+    if (!items.length) continue;
+    const cards = [];
+    for (const it of items) cards.push(await frontCard(it, s.id === 'despachos' ? 'dispatch' : 'postal'));
+    blocks.push(`<section class="section-block reveal" aria-labelledby="s-${s.id}">
+      <div class="section-head">
+        <h2 id="s-${s.id}"><a href="/secciones/${s.id}.html">${esc(s.label)}</a></h2>
+        <p>${esc(s.blurb)}</p>
+      </div>
+      <div class="section-block__grid section-block__grid--${s.id}">${cards.join('')}</div>
+    </section>`);
+  }
+
+  const recent = all.slice(0, 8).map((e) => `<li>
+    <a href="${e.url}" data-archive-row="${esc(e.slug)}">
+      <span class="row__no">${e.number}</span>
+      <span class="row__title">${esc(e.title)}</span>
+      <span class="row__date">${fmtShort(e.date)}</span>
+      <span class="row__read" data-read-mark aria-hidden="true">○</span>
+    </a></li>`).join('');
+
+  blocks.push(`<section class="section-block reveal" aria-labelledby="s-archivo">
+    <div class="section-head">
+      <h2 id="s-archivo"><a href="/archivo.html">Archivo</a></h2>
+      <p>En orden de aparición.</p>
+    </div>
+    <ol class="rows">${recent}</ol>
+  </section>`);
+
+  blocks.push(`<section class="whatsapp reveal" id="whatsapp">
+    <p class="label">Los próximos relatos</p>
+    <div>
+      <h2>También llegan por WhatsApp.</h2>
+      <p>Cuando aparece un relato nuevo, el canal sirve solo de aviso: unas líneas, el título y un enlace de vuelta a este archivo. Nada de cadenas ni ruido.</p>
+      <a class="channel-link" data-event="whatsapp_channel_click" href="${esc(SITE.whatsappChannel)}" rel="noopener">Abrir el canal ↗</a>
+    </div>
+  </section>
+  <section class="about" id="sobre">
+    <p class="label">Sobre estos relatos</p>
+    <p>Esto no es una publicación institucional. Son relatos personales escritos durante unos meses en Chile: ciudad, trabajo, viajes, personas, pequeñas derrotas y algunas cosas que empiezan a entenderse cuando dejan de ser teoría.</p>
+  </section>`);
+
+  return `${head({
+    title: `${SITE.name} — ${SITE.author}`,
+    description: SITE.tagline,
+    canonical: `${SITE.origin}/`,
+    ogType: 'website',
+    image: featured?.cover,
+  })}
+${masthead({ edition })}
+<main id="contenido" class="wrap">
+${blocks.filter(Boolean).join('\n')}
+</main>
+${footer()}`;
+}
+
+function archivePage(all) {
+  const years = new Map();
+  for (const e of all) {
+    const y = e.date.getUTCFullYear();
+    const m = e.date.getUTCMonth();
+    if (!years.has(y)) years.set(y, new Map());
+    if (!years.get(y).has(m)) years.get(y).set(m, []);
+    years.get(y).get(m).push(e);
+  }
+  const body = [...years.entries()].sort((a, b) => b[0] - a[0]).map(([year, months]) => `
+    <section class="archive-year">
+      <h2>${year}</h2>
+      ${[...months.entries()].sort((a, b) => b[0] - a[0]).map(([m, items]) => `
+        <h3 class="archive-month">${MONTHS[m]}</h3>
+        <ol class="rows">${items.map((e) => `<li>
+          <a href="${e.url}" data-archive-row="${esc(e.slug)}">
+            <span class="row__no">${e.number}</span>
+            <span class="row__title">${esc(e.title)}</span>
+            <span class="row__section">${esc(SECTIONS.find((s) => s.id === e.section)?.label || '')}</span>
+            <span class="row__read" data-read-mark aria-hidden="true">○</span>
+          </a></li>`).join('')}</ol>`).join('')}
+    </section>`).join('');
+
+  return `${head({
+    title: `Archivo — ${SITE.name}`,
+    description: 'Todos los relatos, en orden de aparición.',
+    canonical: `${SITE.origin}/archivo.html`,
+    ogType: 'website',
+  })}
+${masthead({ compact: true })}
+<main id="contenido" class="wrap">
+  <div class="page-head">
+    <h1>Archivo</h1>
+    <p>Todo lo publicado, en orden de aparición. La marca ✓ es solo tuya: se guarda en este navegador.</p>
+    <p><button type="button" class="btn btn--small" data-clear-read>Borrar mis marcas de lectura</button></p>
+  </div>
+  ${body || '<p class="empty">Todavía no hay nada archivado.</p>'}
+</main>
+${footer()}`;
+}
+
+async function sectionPage(section, items) {
+  const cards = [];
+  for (const e of items) cards.push(await frontCard(e, 'postal'));
+  return `${head({
+    title: `${section.label} — ${SITE.name}`,
+    description: section.blurb,
+    canonical: `${SITE.origin}/secciones/${section.id}.html`,
+    ogType: 'website',
+  })}
+${masthead({ compact: true })}
+<main id="contenido" class="wrap">
+  <div class="page-head">
+    <h1>${esc(section.label)}</h1>
+    <p>${esc(section.blurb)}</p>
+  </div>
+  <div class="section-block__grid">${cards.join('')}</div>
+</main>
+${footer()}`;
+}
+
+function notFoundPage() {
+  return `${head({
+    title: `Relato no encontrado — ${SITE.name}`,
+    description: 'Esta página no llegó a Santiago.',
+    canonical: `${SITE.origin}/404.html`,
+    ogType: 'website',
+  }).replace('<link rel="canonical"', '<meta name="robots" content="noindex">\n<link rel="canonical"')}
+${masthead({ compact: true })}
+<main id="contenido" class="wrap">
+  <div class="page-head page-head--404">
+    <p class="eyebrow">Relato extraviado</p>
+    <h1>Esta página no llegó a Santiago.</h1>
+    <p>Puede que el enlace haya cambiado o que el relato todavía no exista.</p>
+    <p><a class="channel-link" href="/">Volver a la portada →</a></p>
+  </div>
+</main>
+${footer()}`;
+}
+
+// --- feeds and machine files ------------------------------------------------
+
+const sitemap = (all) => `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>${SITE.origin}/</loc><lastmod>${isoDate(all[0]?.date || new Date())}</lastmod></url>
+  <url><loc>${SITE.origin}/archivo.html</loc><lastmod>${isoDate(all[0]?.date || new Date())}</lastmod></url>
+${all.map((e) => `  <url><loc>${e.absoluteUrl}</loc><lastmod>${isoDate(e.date)}</lastmod></url>`).join('\n')}
+</urlset>`;
+
+const feed = (all) => `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel>
+<title>${esc(SITE.name)}</title>
+<link>${SITE.origin}/</link>
+<description>${esc(SITE.tagline)}</description>
+<language>es</language>
+<lastBuildDate>${(all[0]?.date || new Date()).toUTCString()}</lastBuildDate>
+${all.slice(0, 30).map((e) => `<item>
+  <title>${esc(e.title)}</title>
+  <link>${e.absoluteUrl}</link>
+  <guid isPermaLink="true">${e.absoluteUrl}</guid>
+  <pubDate>${e.date.toUTCString()}</pubDate>
+  <description>${esc(e.summary || '')}</description>
+</item>`).join('\n')}
+</channel></rss>`;
+
+const robots = () => `User-agent: *\nAllow: /\n\nSitemap: ${SITE.origin}/sitemap.xml\n`;
+
+function whatsappCopy(all) {
+  return all.slice(0, 12).map((e) => {
+    const label = e.dir === 'relatos' ? 'Relato' : SECTIONS.find((s) => s.id === e.section)?.label || 'Nota';
+    return `🇨🇱 ${label} nº ${e.number}\n\n${e.title}\n\n${e.summary || ''}\n\n${whatsappUrl(e)}`;
+  }).join('\n\n---\n\n');
+}
+
+// ---------------------------------------------------------------------------
+// Asset + media copying
+// ---------------------------------------------------------------------------
+
+/** Author notes never reach the public web root. */
+const isAuthorNote = (name) => name === 'README.md' || name.startsWith('_') || name === '.gitkeep';
+
+async function copyDir(from, to) {
+  if (!existsSync(from)) return 0;
+  let n = 0;
+  for (const item of await readdir(from, { withFileTypes: true })) {
+    if (isAuthorNote(item.name)) continue;
+    const src = join(from, item.name);
+    const dst = join(to, item.name);
+    if (item.isDirectory()) { n += await copyDir(src, dst); continue; }
+    await mkdir(dirname(dst), { recursive: true });
+    await copyFile(src, dst);
+    n++;
+  }
+  return n;
+}
+
+/** Self-host fonts from packages already in the dependency tree. */
+async function copyFonts() {
+  const wanted = [
+    ['@fontsource/instrument-serif', /latin-400-(normal|italic)\.woff2$/],
+    ['@fontsource/ibm-plex-mono', /latin-(400|600)-normal\.woff2$/],
+  ];
+  const dest = join(OUT, 'assets', 'fonts');
+  let copied = 0;
+  for (const [pkg, re] of wanted) {
+    const dir = join(ROOT, 'node_modules', pkg, 'files');
+    if (!existsSync(dir)) continue;
+    for (const f of await readdir(dir)) {
+      if (!re.test(f)) continue;
+      await mkdir(dest, { recursive: true });
+      await copyFile(join(dir, f), join(dest, f));
+      copied++;
+    }
+  }
+  return copied;
+}
+
+// ---------------------------------------------------------------------------
+// Build
+// ---------------------------------------------------------------------------
+
+async function build({ drafts = false } = {}) {
+  const started = Date.now();
+  marked.setOptions({ mangle: false, headerIds: false, breaks: false });
+
+  const all = await loadAll(drafts);
+  const social = await loadSocial();
+
+  await rm(OUT, { recursive: true, force: true });
+  await mkdir(OUT, { recursive: true });
+
+  const write = async (rel, body) => {
+    const abs = join(OUT, rel);
+    await mkdir(dirname(abs), { recursive: true });
+    await writeFile(abs, body);
+  };
+
+  for (const entry of all) await write(entry.url.replace(/^\//, ''), await storyPage(entry));
+  await write('index.html', await frontPage(all, social));
+  await write('archivo.html', archivePage(all));
+  await write('404.html', notFoundPage());
+
+  for (const s of SECTIONS) {
+    const items = all.filter((e) => e.section === s.id);
+    if (!items.length) continue;
+    await write(`secciones/${s.id}.html`, await sectionPage(s, items));
+  }
+
+  await write('sitemap.xml', sitemap(all));
+  await write('feed.xml', feed(all));
+  await write('robots.txt', robots());
+
+  const themeFiles = await copyDir(THEME, join(OUT, 'assets'));
+  const mediaFiles = await copyDir(join(CONTENT, 'media'), join(OUT, 'media'));
+  const fontFiles = await copyFonts();
+
+  // Author-facing artifacts stay OUT of the public web root.
+  await mkdir(ARTIFACTS, { recursive: true });
+  await writeFile(join(ARTIFACTS, 'whatsapp.txt'), whatsappCopy(all));
+  await writeFile(join(ARTIFACTS, 'publicacion.json'), JSON.stringify({
+    generated: new Date().toISOString(),
+    site: SITE.name,
+    origin: SITE.origin,
+    total: all.length,
+    entries: all.map((e) => ({
+      number: e.number, title: e.title, url: e.absoluteUrl, section: e.section,
+      type: e.type, date: isoDate(e.date), whatsapp: whatsappUrl(e), source: e.sourceFile,
+    })),
+  }, null, 2));
+
+  let bytes = 0;
+  const walk = async (dir) => {
+    for (const it of await readdir(dir, { withFileTypes: true })) {
+      const p = join(dir, it.name);
+      if (it.isDirectory()) await walk(p);
+      else bytes += (await stat(p)).size;
+    }
+  };
+  await walk(OUT);
+
+  const bySec = SECTIONS.map((s) => {
+    const n = all.filter((e) => e.section === s.id).length;
+    return n ? `${s.label}: ${n}` : null;
+  }).filter(Boolean).join(', ');
+
+  console.log(`\n  Relatos desde Santiago — build complete`);
+  console.log(`  ${all.length} entries (${bySec || 'none'})`);
+  console.log(`  theme files: ${themeFiles}, media: ${mediaFiles}, fonts: ${fontFiles}`);
+  if (!fontFiles) console.log('  ! fonts not copied (run npm ci) — falling back to system serif');
+  console.log(`  output: blog-dist/ — ${(bytes / 1024).toFixed(0)} kB total`);
+  console.log(`  artifacts: blog-artifacts/whatsapp.txt, publicacion.json`);
+  console.log(`  done in ${Date.now() - started} ms\n`);
+
+  return { all, bytes };
+}
+
+const isMain = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
+if (isMain) {
+  build({ drafts: process.argv.includes('--drafts') }).catch((err) => {
+    console.error(`\n  BUILD FAILED: ${err.message}\n`);
+    process.exit(1);
+  });
+}
+
+export { build, whatsappUrl };

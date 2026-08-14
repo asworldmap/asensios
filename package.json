@@ -1,14 +1,16 @@
 {
   "name": "asensios-web",
   "version": "2.0.0",
-  "description": "Asensio Sabater — building communities, experiences and opportunities between cultures.",
+  "description": "Asensio Sabater \u2014 building communities, experiences and opportunities between cultures.",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "test": "node tests/media.js"
+    "test": "node tests/media.js",
+    "build:blog": "node tools/blog/build.mjs",
+    "dev:blog": "node tools/blog/build.mjs --drafts && python3 -m http.server 8080 --directory blog-dist"
   },
   "keywords": [
     "asensio",
@@ -21,6 +23,8 @@
   "devDependencies": {
     "eslint": "^9.13.0",
     "globals": "^15.11.0",
+    "js-yaml": "^4.1.0",
+    "marked": "^12.0.2",
     "vite": "^5.4.10"
   },
   "dependencies": {

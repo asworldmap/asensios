@@ -1,11 +1,11 @@
 name: Deploy blog to Hostinger VPS
 
-# Deploys the static blog (blog/) to blog.asensios.com — fully isolated from
-# the apex-site workflow (deploy.yml): its own triggers, its own concurrency
-# group, its own SSH steps. Never builds or touches the apex site or its
-# deploy target. Runs on pushes to main that touch blog/ or deploy/blog/,
-# and can be triggered manually for any other run (e.g. first-time Caddy
-# provisioning, or re-verification).
+# Builds "Relatos desde Santiago" from content/ and deploys the generated
+# blog-dist/ to blog.asensios.com. Fully isolated from the apex-site
+# workflow (deploy.yml): its own triggers, its own concurrency group, its
+# own SSH steps. Never builds or touches the apex site or its deploy
+# target. Runs on pushes to main that touch content/ or tools/blog/, and
+# can be triggered manually.
 #
 # SSH_PRIVATE_KEY_B64 was rotated on 2026-08-14 after the previous key was
 # exposed in plaintext in earlier Actions logs. The rotated key is an
@@ -16,7 +16,8 @@ on:
   push:
     branches: [main]
     paths:
-      - "blog/**"
+      - "content/**"
+      - "tools/blog/**"
       - "deploy/blog/**"
       - ".github/workflows/deploy-blog.yml"
   workflow_dispatch:
@@ -35,6 +36,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The printing press: content/ -> blog-dist/. Fails the deploy on a
+      # malformed story rather than shipping a broken publication.
+      - name: Build Relatos desde Santiago
+        run: npm run build:blog
 
       - name: Check SSH secrets are configured
         id: check
@@ -167,7 +182,7 @@ jobs:
       # deploy.yml, but to a fixed, non-secret target — this path is not
       # sensitive, unlike the apex target which stays a secret since it was
       # already configured that way.
-      - name: Deploy blog/ to VPS
+      - name: Deploy blog-dist/ to VPS
         if: steps.check.outputs.configured == 'true'
         uses: easingthemes/ssh-deploy@v5.1.0
         env:
@@ -175,8 +190,8 @@ jobs:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
-          # Static source, no build step for the blog.
-          SOURCE: "blog/"
+          # Generated output of npm run build:blog.
+          SOURCE: "blog-dist/"
           # Fixed document root — not secret, deliberately not a repo secret.
           TARGET: "/var/www/blog.asensios.com/"
           ARGS: "-rltgoDzvO --delete"
