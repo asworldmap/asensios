@@ -22,6 +22,10 @@ concurrency:
 jobs:
   deploy-blog:
     runs-on: ubuntu-latest
+    # Guards against a hung/throttled SSH connection tying up the runner
+    # (and blocking future runs behind the concurrency group) indefinitely —
+    # the default with no timeout-minutes is 360.
+    timeout-minutes: 12
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -65,7 +69,7 @@ jobs:
       - name: Upload Caddy snippet to VPS
         if: steps.check.outputs.configured == 'true'
         run: |
-          scp -i /tmp/deploy_key -P ${{ secrets.REMOTE_PORT || 22 }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+          scp -i /tmp/deploy_key -P ${{ secrets.REMOTE_PORT || 22 }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 -o ServerAliveInterval=5 -o ServerAliveCountMax=3 \
             deploy/blog/Caddyfile.blog.snippet "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/tmp/blog-caddy-snippet.conf"
 
       # Idempotent: creates /var/www/blog.asensios.com and adds the Caddy
@@ -80,7 +84,7 @@ jobs:
         if: steps.check.outputs.configured == 'true'
         run: |
           set -euo pipefail
-          SSH_OPTS="-i /tmp/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+          SSH_OPTS="-i /tmp/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 -o ServerAliveInterval=5 -o ServerAliveCountMax=3"
           ssh $SSH_OPTS "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" bash -s <<'REMOTE_SCRIPT'
           set -euo pipefail
           TARGET=/var/www/blog.asensios.com
@@ -154,7 +158,7 @@ jobs:
         if: steps.check.outputs.configured == 'true'
         run: |
           set -euo pipefail
-          SSH_OPTS="-i /tmp/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+          SSH_OPTS="-i /tmp/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 -o ServerAliveInterval=5 -o ServerAliveCountMax=3"
           ssh $SSH_OPTS "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" \
             'sudo find /var/www/blog.asensios.com -type d -exec chmod 755 {} \; && sudo find /var/www/blog.asensios.com -type f -exec chmod 644 {} \;'
 
