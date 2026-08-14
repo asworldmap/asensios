@@ -43,7 +43,19 @@ jobs:
       # than passed as an ssh command-line argument, since a bare
       # VAR="value with spaces" argument gets mangled by ssh's remote
       # command-line reconstruction (ssh just joins argv with spaces).
-      - name: Add new public key + inspect auth logs (read-only otherwise)
+      #
+      # A prior run's "echo ... >> authorized_keys" landed on a line with
+      # no trailing newline, concatenating the new key onto the end of the
+      # existing github-actions-asensios line into one unparseable line —
+      # the key material was right, sshd just couldn't parse either key
+      # out of that merged line, hence "Permission denied" despite the
+      # secret decoding to exactly the right fingerprint. This step backs
+      # up authorized_keys, then repairs it in place with a regex that
+      # inserts a newline before every key-type token that isn't already
+      # at the start of a line (operating on the file's actual bytes on
+      # the server, not a local transcription of it), dedupes any exact
+      # duplicate lines, and verifies every resulting line parses cleanly.
+      - name: Repair authorized_keys + inspect auth logs (read-only otherwise)
         run: |
           set -euo pipefail
           SSH_OPTS="-i /tmp/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 -o ServerAliveInterval=5 -o ServerAliveCountMax=3"
@@ -52,37 +64,61 @@ jobs:
           AUTHKEYS="$HOME/.ssh/authorized_keys"
           NEW_KEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILavZPCjmxLEjPgKgXnI2hSl/djDxP7J0XVnfoYupRhi github-actions-asensios-rotated-20260814-185255"
 
-          echo "=== Current authorized_keys (public keys only, safe to display) ==="
-          cat "$AUTHKEYS" 2>/dev/null || echo "(no authorized_keys file found)"
+          echo "=== authorized_keys before repair (raw, public keys only, safe to display) ==="
+          cat -A "$AUTHKEYS" | tail -c 400
+          echo ""
+
+          STAMP=$(date +%Y%m%d-%H%M%S)
+          BACKUP="${AUTHKEYS}.backup-${STAMP}"
+          cp "$AUTHKEYS" "$BACKUP"
+          echo "Backup: $BACKUP"
+
+          python3 - "$AUTHKEYS" <<'PYEOF'
+          import re, sys
+          path = sys.argv[1]
+          with open(path) as f:
+              content = f.read()
+          fixed = re.sub(
+              r'(?<!\n)(?<!\A)(ssh-rsa |ssh-ed25519 |ssh-dss |ecdsa-sha2-nistp256 |ecdsa-sha2-nistp384 |ecdsa-sha2-nistp521 )',
+              r'\n\1', content,
+          )
+          lines = [l for l in fixed.split('\n') if l.strip()]
+          seen = set()
+          deduped = []
+          for l in lines:
+              if l not in seen:
+                  seen.add(l)
+                  deduped.append(l)
+          with open(path, 'w') as f:
+              f.write('\n'.join(deduped) + '\n')
+          PYEOF
+          chmod 600 "$AUTHKEYS"
+
+          echo "=== authorized_keys after repair -- one entry per line, each fingerprint must resolve ==="
+          FAIL=0
+          while IFS= read -r line; do
+            [ -z "$line" ] && continue
+            echo "$line" > /tmp/_k.pub
+            if ! ssh-keygen -lf /tmp/_k.pub 2>/dev/null; then
+              echo "!! FAILED TO PARSE: ${line:0:40}..."
+              FAIL=1
+            fi
+            rm -f /tmp/_k.pub
+          done < "$AUTHKEYS"
 
           echo ""
-          echo "=== Fingerprints currently authorized ==="
-          if [ -f "$AUTHKEYS" ]; then
-            while IFS= read -r line; do
-              [ -z "$line" ] && continue
-              case "$line" in \#*) continue;; esac
-              echo "$line" > /tmp/_k.pub
-              ssh-keygen -lf /tmp/_k.pub 2>/dev/null || true
-              rm -f /tmp/_k.pub
-            done < "$AUTHKEYS"
-          fi
-
-          echo ""
-          if [ -f "$AUTHKEYS" ] && grep -qF "$NEW_KEY" "$AUTHKEYS"; then
-            echo "New public key already present -- not appending again."
+          if grep -qF "$NEW_KEY" "$AUTHKEYS"; then
+            echo "New rotated key confirmed present as its own clean line."
           else
-            mkdir -p "$HOME/.ssh"
-            chmod 700 "$HOME/.ssh"
-            echo "$NEW_KEY" >> "$AUTHKEYS"
-            chmod 600 "$AUTHKEYS"
-            echo "New public key appended to $AUTHKEYS (old key left in place)."
+            echo "!! New rotated key NOT found as a clean line after repair."
+            FAIL=1
           fi
 
-          echo ""
-          echo "=== New fingerprint now authorized ==="
-          echo "$NEW_KEY" > /tmp/_new.pub
-          ssh-keygen -lf /tmp/_new.pub
-          rm -f /tmp/_new.pub
+          if [ "$FAIL" = "1" ]; then
+            echo "::error::Repair did not produce a fully clean authorized_keys -- restoring backup."
+            cp "$BACKUP" "$AUTHKEYS"
+            exit 1
+          fi
 
           echo ""
           echo "=== sudo capability check (informational only, no change) ==="
