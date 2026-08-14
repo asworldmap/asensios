@@ -6,6 +6,12 @@ name: Deploy blog to Hostinger VPS
 # deploy target. Runs on pushes to main that touch blog/ or deploy/blog/,
 # and can be triggered manually for any other run (e.g. first-time Caddy
 # provisioning, or re-verification).
+#
+# SSH_PRIVATE_KEY_B64 was rotated on 2026-08-14 after the previous key was
+# exposed in plaintext in earlier Actions logs (see rotate-deploy-key.yml
+# history). This comment update exists to trigger this workflow (along with
+# deploy.yml, unconditional on push) as a real end-to-end deployment test
+# of the new key before the old one is revoked on the VPS.
 on:
   push:
     branches: [main]
