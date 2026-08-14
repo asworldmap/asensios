@@ -49,6 +49,27 @@ jobs:
             echo 'EOF'
           } >> $GITHUB_ENV
 
+      # Runners intermittently fail the first connection with "Network is
+      # unreachable" (seen 3x on 2026-08-14, on otherwise healthy
+      # credentials). Absorb that here with backoff so a flaky runner
+      # doesn't fail an entire production deploy.
+      - name: Wait for VPS SSH to be reachable
+        run: |
+          set -uo pipefail
+          for i in 1 2 3 4 5; do
+            if ssh -i /tmp/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} \
+                 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+                 -o ConnectTimeout=15 -o BatchMode=yes \
+                 "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" true; then
+              echo "SSH reachable on attempt $i"
+              exit 0
+            fi
+            echo "attempt $i failed; retrying in $((i * 10))s"
+            sleep $((i * 10))
+          done
+          echo "::error::VPS SSH not reachable after 5 attempts"
+          exit 1
+
       # Deploys via rsync over SSH. Requires the repository secrets listed below.
       - name: Deploy dist/ to VPS
         uses: easingthemes/ssh-deploy@v5.1.0

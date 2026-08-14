@@ -68,6 +68,28 @@ jobs:
           echo "asensios.com       -> $(getent ahostsv4 asensios.com | awk '{print $1}' | sort -u | paste -sd, -)"
           echo "blog.asensios.com  -> $(getent ahostsv4 blog.asensios.com | awk '{print $1}' | sort -u | paste -sd, -)"
 
+      # Runners intermittently fail the first connection with "Network is
+      # unreachable" (seen 3x on 2026-08-14, on otherwise healthy
+      # credentials). Absorb that here with backoff so a flaky runner
+      # doesn't fail an entire production deploy.
+      - name: Wait for VPS SSH to be reachable
+        if: steps.check.outputs.configured == 'true'
+        run: |
+          set -uo pipefail
+          for i in 1 2 3 4 5; do
+            if ssh -i /tmp/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} \
+                 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+                 -o ConnectTimeout=15 -o BatchMode=yes \
+                 "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" true; then
+              echo "SSH reachable on attempt $i"
+              exit 0
+            fi
+            echo "attempt $i failed; retrying in $((i * 10))s"
+            sleep $((i * 10))
+          done
+          echo "::error::VPS SSH not reachable after 5 attempts"
+          exit 1
+
       # The Caddy block content lives in deploy/blog/Caddyfile.blog.snippet
       # (checked out above) and is copied to the VPS here, rather than
       # embedded inline, to keep this workflow file's YAML/heredoc nesting
