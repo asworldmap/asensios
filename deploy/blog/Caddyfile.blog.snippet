@@ -1,0 +1,28 @@
+# Static editorial blog: blog.asensios.com
+blog.asensios.com {
+	encode zstd gzip
+	root * /var/www/blog.asensios.com
+
+	try_files {path} {path}.html
+	file_server
+
+	handle_errors {
+		@notfound expression {http.error.status_code} == 404
+		rewrite @notfound /404.html
+		file_server
+	}
+
+	header {
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "SAMEORIGIN"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=604800, immutable"
+
+	@html path *.html /
+	header @html Cache-Control "no-cache"
+}

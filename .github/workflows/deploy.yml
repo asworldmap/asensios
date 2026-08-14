@@ -58,3 +58,51 @@ jobs:
           # Excludes are protected so nothing outside the build is touched.
           ARGS: "-rltgoDzvO --delete"
           EXCLUDE: ".git/, .github/, node_modules/"
+
+  # Isolated deploy for the static blog (blog/ -> /var/www/blog.asensios.com).
+  # Independent of the apex job above: different source, different target,
+  # own SSH step, never touches the apex deploy target. No-ops until the
+  # REMOTE_TARGET_BLOG secret is set.
+  deploy-blog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check blog deploy target is configured
+        id: check
+        run: |
+          if [ -z "${{ secrets.REMOTE_TARGET_BLOG }}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "REMOTE_TARGET_BLOG secret not set — skipping blog deploy."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Prepare SSH key
+        if: steps.check.outputs.configured == 'true'
+        run: |
+          KEY=$(echo "${{ secrets.SSH_PRIVATE_KEY_B64 }}" | base64 -d)
+          echo "$KEY" > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+          ssh-keygen -y -f /tmp/deploy_key >/dev/null
+          {
+            echo 'SSH_PRIVATE_KEY<<EOF'
+            echo "$KEY"
+            echo 'EOF'
+          } >> $GITHUB_ENV
+
+      - name: Deploy blog/ to VPS
+        if: steps.check.outputs.configured == 'true'
+        uses: easingthemes/ssh-deploy@v5.1.0
+        env:
+          SSH_PRIVATE_KEY: ${{ env.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+          # Static source, no build step for the blog.
+          SOURCE: "blog/"
+          # Absolute path to the blog's document root on the VPS.
+          TARGET: ${{ secrets.REMOTE_TARGET_BLOG }}
+          ARGS: "-rltgoDzvO --delete"
+          EXCLUDE: ".git/, .github/, node_modules/"
