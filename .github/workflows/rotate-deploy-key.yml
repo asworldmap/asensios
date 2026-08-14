@@ -34,6 +34,9 @@ jobs:
           done <<< "$KEY"
           echo "$KEY" > /tmp/deploy_key
           chmod 600 /tmp/deploy_key
+          echo "=== Fingerprint the secret currently decodes to (public fingerprint, safe to print) ==="
+          ssh-keygen -y -f /tmp/deploy_key | ssh-keygen -lf - || echo "ssh-keygen could not derive a public key from this secret's content"
+          echo "Expected new-key fingerprint: SHA256:MW/RWTGOYpbmwOSrzb4UQlcS4mhjpoPgSqSkfJDTeSw (github-actions-asensios-rotated-20260814-185255)"
 
       # The public key below is not a secret (public keys are safe to
       # log/store) — it's hardcoded directly in this quoted heredoc rather
