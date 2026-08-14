@@ -8,10 +8,9 @@ name: Deploy blog to Hostinger VPS
 # provisioning, or re-verification).
 #
 # SSH_PRIVATE_KEY_B64 was rotated on 2026-08-14 after the previous key was
-# exposed in plaintext in earlier Actions logs (see rotate-deploy-key.yml
-# history). This comment update exists to trigger this workflow (along with
-# deploy.yml, unconditional on push) as a real end-to-end deployment test
-# of the new key before the old one is revoked on the VPS.
+# exposed in plaintext in earlier Actions logs. The rotated key is an
+# ed25519 key with fingerprint
+# SHA256:MW/RWTGOYpbmwOSrzb4UQlcS4mhjpoPgSqSkfJDTeSw.
 on:
   push:
     branches: [main]
