@@ -1,0 +1,101 @@
+name: Revoke old exposed deploy key (incident close-out)
+
+# Final step of the SSH_PRIVATE_KEY_B64 rotation incident.
+#
+# Connects to the VPS with the NEW rotated key (from the already-updated
+# secret), removes the OLD exposed key from authorized_keys by
+# fingerprint, and verifies production is healthy afterwards. Because it
+# can only reach the VPS using the new key, a successful run is itself
+# end-to-end proof that the new key authenticates.
+#
+# Deliberately NOT triggered by pushes to this file or to the script it
+# runs: it fires only when deploy/security/ROTATION-STATE.md changes (or
+# via manual dispatch). That way the workflow can be committed and
+# reviewed without firing an SSH attempt before authorized_keys has been
+# repaired.
+#
+# Delete this workflow and deploy/security/ once the incident is closed.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "deploy/security/ROTATION-STATE.md"
+  workflow_dispatch:
+
+concurrency:
+  group: revoke-old-deploy-key
+  cancel-in-progress: false
+
+jobs:
+  revoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      OLD_FP: "SHA256:NrTF6iy/8qYWL662L0Z+FRCohINqrNhljomafqxcXOY"
+      NEW_FP: "SHA256:MW/RWTGOYpbmwOSrzb4UQlcS4mhjpoPgSqSkfJDTeSw"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare SSH key and assert it is the rotated key
+        run: |
+          set -euo pipefail
+          KEY=$(echo "${{ secrets.SSH_PRIVATE_KEY_B64 }}" | base64 -d)
+          while IFS= read -r line; do
+            [ -n "$line" ] && echo "::add-mask::$line"
+          done <<< "$KEY"
+          echo "$KEY" > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+          # Public fingerprints are not sensitive; the private half is masked above.
+          ACTUAL=$(ssh-keygen -y -f /tmp/deploy_key | ssh-keygen -lf - | awk '{print $2}')
+          echo "Secret decodes to: $ACTUAL"
+          echo "Expected (new key): $NEW_FP"
+          if [ "$ACTUAL" != "$NEW_FP" ]; then
+            echo "::error::SSH_PRIVATE_KEY_B64 does not contain the rotated key. Aborting before touching authorized_keys."
+            exit 1
+          fi
+          echo "Confirmed: the secret holds the rotated key."
+
+      - name: Upload revocation script
+        run: |
+          scp -i /tmp/deploy_key -P ${{ secrets.REMOTE_PORT || 22 }} \
+            -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            -o ConnectTimeout=15 \
+            deploy/security/revoke-old-key.sh \
+            "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/tmp/revoke-old-key.sh"
+
+      # Reaching this step at all proves the NEW key authenticates: every
+      # connection above used it and nothing else.
+      - name: Revoke old key on VPS (fingerprint-matched, self-verifying)
+        run: |
+          set -euo pipefail
+          ssh -i /tmp/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} \
+            -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            -o ConnectTimeout=15 -o ServerAliveInterval=5 -o ServerAliveCountMax=3 \
+            "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" \
+            "bash /tmp/revoke-old-key.sh '$OLD_FP' '$NEW_FP'; rc=\$?; rm -f /tmp/revoke-old-key.sh; exit \$rc"
+
+      - name: Verify production is healthy after revocation
+        run: |
+          set -euo pipefail
+          fail=0
+          expect() {
+            code=$(curl -sS -o /dev/null -w '%{http_code}' "$1" || echo "000")
+            echo "$1 -> $code"
+            [ "$code" = "$2" ] || { echo "::error::expected $2 from $1, got $code"; fail=1; }
+          }
+          expect_healthy() {
+            code=$(curl -sS -o /dev/null -w '%{http_code}' -L "$1" || echo "000")
+            echo "$1 -> $code (following redirects)"
+            case "$code" in 2??) ;; *) echo "::error::expected 2xx from $1, got $code"; fail=1;; esac
+          }
+          expect_healthy "https://asensios.com/"
+          expect_healthy "https://www.asensios.com/"
+          expect "https://blog.asensios.com/" 200
+          expect "https://blog.asensios.com/relatos/001-no-parti-el-dia-previsto.html" 200
+          expect "https://blog.asensios.com/relatos/002-una-bicicleta-ordeno-santiago.html" 200
+          expect "https://blog.asensios.com/relatos/003-dificil-arte-estarse-quieto.html" 200
+          expect "https://blog.asensios.com/robots.txt" 200
+          expect "https://blog.asensios.com/sitemap.xml" 200
+          expect "https://blog.asensios.com/this-definitely-does-not-exist" 404
+          exit $fail
