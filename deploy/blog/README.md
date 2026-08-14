@@ -68,8 +68,8 @@ curl -I https://www.asensios.com
 Either:
 
 - **Manual**: copy `blog/` from this repo to the VPS (e.g. `rsync -az
-  blog/ user@host:/tmp/papeles-desde-santiago/`), then run
-  `sudo deploy-blog.sh /tmp/papeles-desde-santiago` (this folder's script —
+  blog/ user@host:/tmp/relatos-desde-santiago/`), then run
+  `sudo deploy-blog.sh /tmp/relatos-desde-santiago` (this folder's script —
   it backs up any existing `/var/www/blog.asensios.com` to `/var/backups/`
   before syncing).
 - **CI**: set the `REMOTE_TARGET_BLOG` GitHub Actions secret to
@@ -82,9 +82,9 @@ Either:
 
 ```bash
 curl -sS -o /dev/null -w '%{http_code}\n' https://blog.asensios.com/
-curl -sS -o /dev/null -w '%{http_code}\n' https://blog.asensios.com/papeles/001-no-parti-el-dia-previsto.html
-curl -sS -o /dev/null -w '%{http_code}\n' https://blog.asensios.com/papeles/002-una-bicicleta-ordeno-santiago.html
-curl -sS -o /dev/null -w '%{http_code}\n' https://blog.asensios.com/papeles/003-dificil-arte-estarse-quieto.html
+curl -sS -o /dev/null -w '%{http_code}\n' https://blog.asensios.com/relatos/001-no-parti-el-dia-previsto.html
+curl -sS -o /dev/null -w '%{http_code}\n' https://blog.asensios.com/relatos/002-una-bicicleta-ordeno-santiago.html
+curl -sS -o /dev/null -w '%{http_code}\n' https://blog.asensios.com/relatos/003-dificil-arte-estarse-quieto.html
 curl -sS -o /dev/null -w '%{http_code}\n' https://blog.asensios.com/robots.txt
 curl -sS -o /dev/null -w '%{http_code}\n' https://blog.asensios.com/sitemap.xml
 curl -sS -o /dev/null -w '%{http_code}\n' https://blog.asensios.com/this-page-does-not-exist

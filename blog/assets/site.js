@@ -5,8 +5,8 @@
   2) Cambia WHATSAPP_CHANNEL_URL por la URL pública del canal.
 */
 const SITE_CONFIG = {
-  GA_MEASUREMENT_ID: "G-XXXXXXXXXX",
-  WHATSAPP_CHANNEL_URL: "https://whatsapp.com/channel/PEGA_AQUI_TU_CANAL"
+  GA_MEASUREMENT_ID: "G-7V5M9TTKGV",
+  WHATSAPP_CHANNEL_URL: "https://whatsapp.com/channel/0029Vb9813y7tkj1bIgcId3n"
 };
 
 function hasRealGaId(){
@@ -29,19 +29,19 @@ function loadGoogleAnalytics(){
 
 function setupConsent(){
   if(!hasRealGaId()) return;
-  const state = localStorage.getItem("papeles_analytics_consent");
+  const state = localStorage.getItem("relatos_analytics_consent");
   if(state === "yes"){ loadGoogleAnalytics(); return; }
   if(state === "no") return;
   const box = document.querySelector(".consent");
   if(!box) return;
   box.classList.add("show");
   box.querySelector("[data-accept]").onclick = () => {
-    localStorage.setItem("papeles_analytics_consent","yes");
+    localStorage.setItem("relatos_analytics_consent","yes");
     box.classList.remove("show");
     loadGoogleAnalytics();
   };
   box.querySelector("[data-decline]").onclick = () => {
-    localStorage.setItem("papeles_analytics_consent","no");
+    localStorage.setItem("relatos_analytics_consent","no");
     box.classList.remove("show");
   };
 }
