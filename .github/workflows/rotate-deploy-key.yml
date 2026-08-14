@@ -35,17 +35,19 @@ jobs:
           echo "$KEY" > /tmp/deploy_key
           chmod 600 /tmp/deploy_key
 
-      # NEW_PUBLIC_KEY is not a secret (public keys are safe to log/store).
+      # The public key below is not a secret (public keys are safe to
+      # log/store) — it's hardcoded directly in this quoted heredoc rather
+      # than passed as an ssh command-line argument, since a bare
+      # VAR="value with spaces" argument gets mangled by ssh's remote
+      # command-line reconstruction (ssh just joins argv with spaces).
       - name: Add new public key + inspect auth logs (read-only otherwise)
-        env:
-          NEW_PUBLIC_KEY: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILavZPCjmxLEjPgKgXnI2hSl/djDxP7J0XVnfoYupRhi github-actions-asensios-rotated-20260814-185255"
         run: |
           set -euo pipefail
           SSH_OPTS="-i /tmp/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 -o ServerAliveInterval=5 -o ServerAliveCountMax=3"
-          ssh $SSH_OPTS "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" \
-            NEW_KEY="$NEW_PUBLIC_KEY" bash -s <<'REMOTE_SCRIPT'
+          ssh $SSH_OPTS "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" bash -s <<'REMOTE_SCRIPT'
           set -euo pipefail
           AUTHKEYS="$HOME/.ssh/authorized_keys"
+          NEW_KEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILavZPCjmxLEjPgKgXnI2hSl/djDxP7J0XVnfoYupRhi github-actions-asensios-rotated-20260814-185255"
 
           echo "=== Current authorized_keys (public keys only, safe to display) ==="
           cat "$AUTHKEYS" 2>/dev/null || echo "(no authorized_keys file found)"
