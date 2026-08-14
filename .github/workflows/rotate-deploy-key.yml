@@ -1,0 +1,101 @@
+name: Rotate compromised deploy SSH key (incident response)
+
+# One-time remediation workflow for the SSH_PRIVATE_KEY_B64 exposure
+# incident. Runs only when this file itself is pushed, so it doesn't
+# re-fire on unrelated commits. Delete this file once the incident is
+# closed (old key removed, rotation confirmed).
+#
+# This step uses the CURRENT (old, compromised-but-still-valid) key from
+# the SSH_PRIVATE_KEY_B64 secret to reach the VPS — that secret cannot be
+# rotated from inside this repo (no available credential/tool has
+# Actions-secrets write access), so a human must update it before the old
+# key can be safely removed. This run only ADDS the new public key and
+# reads (does not modify) auth logs; it does not remove anything.
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/rotate-deploy-key.yml"
+
+concurrency:
+  group: rotate-deploy-key
+  cancel-in-progress: false
+
+jobs:
+  rotate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Prepare SSH key
+        run: |
+          KEY=$(echo "${{ secrets.SSH_PRIVATE_KEY_B64 }}" | base64 -d)
+          while IFS= read -r line; do
+            [ -n "$line" ] && echo "::add-mask::$line"
+          done <<< "$KEY"
+          echo "$KEY" > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+
+      # NEW_PUBLIC_KEY is not a secret (public keys are safe to log/store).
+      - name: Add new public key + inspect auth logs (read-only otherwise)
+        env:
+          NEW_PUBLIC_KEY: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILavZPCjmxLEjPgKgXnI2hSl/djDxP7J0XVnfoYupRhi github-actions-asensios-rotated-20260814-185255"
+        run: |
+          set -euo pipefail
+          SSH_OPTS="-i /tmp/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 -o ServerAliveInterval=5 -o ServerAliveCountMax=3"
+          ssh $SSH_OPTS "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" \
+            NEW_KEY="$NEW_PUBLIC_KEY" bash -s <<'REMOTE_SCRIPT'
+          set -euo pipefail
+          AUTHKEYS="$HOME/.ssh/authorized_keys"
+
+          echo "=== Current authorized_keys (public keys only, safe to display) ==="
+          cat "$AUTHKEYS" 2>/dev/null || echo "(no authorized_keys file found)"
+
+          echo ""
+          echo "=== Fingerprints currently authorized ==="
+          if [ -f "$AUTHKEYS" ]; then
+            while IFS= read -r line; do
+              [ -z "$line" ] && continue
+              case "$line" in \#*) continue;; esac
+              echo "$line" > /tmp/_k.pub
+              ssh-keygen -lf /tmp/_k.pub 2>/dev/null || true
+              rm -f /tmp/_k.pub
+            done < "$AUTHKEYS"
+          fi
+
+          echo ""
+          if [ -f "$AUTHKEYS" ] && grep -qF "$NEW_KEY" "$AUTHKEYS"; then
+            echo "New public key already present -- not appending again."
+          else
+            mkdir -p "$HOME/.ssh"
+            chmod 700 "$HOME/.ssh"
+            echo "$NEW_KEY" >> "$AUTHKEYS"
+            chmod 600 "$AUTHKEYS"
+            echo "New public key appended to $AUTHKEYS (old key left in place)."
+          fi
+
+          echo ""
+          echo "=== New fingerprint now authorized ==="
+          echo "$NEW_KEY" > /tmp/_new.pub
+          ssh-keygen -lf /tmp/_new.pub
+          rm -f /tmp/_new.pub
+
+          echo ""
+          echo "=== sudo capability check (informational only, no change) ==="
+          if sudo -n true 2>/dev/null; then
+            echo "passwordless sudo: available (existing config, unchanged)"
+          else
+            echo "passwordless sudo: NOT available"
+          fi
+
+          echo ""
+          echo "=== SSH auth log inspection (read-only) ==="
+          if command -v journalctl >/dev/null 2>&1 && sudo -n journalctl -u ssh --since "2026-08-01" >/dev/null 2>&1; then
+            echo "--- accepted/failed publickey events since 2026-08-01 (journalctl -u ssh) ---"
+            sudo journalctl -u ssh --since "2026-08-01" --no-pager 2>/dev/null | grep -iE "Accepted|Failed|Invalid user|Disconnected" || echo "(no matching lines)"
+          elif [ -r /var/log/auth.log ]; then
+            echo "--- accepted/failed publickey events (/var/log/auth.log) ---"
+            grep -iE "Accepted|Failed|Invalid user|Disconnected" /var/log/auth.log 2>/dev/null | tail -200 || echo "(no matching lines)"
+          else
+            echo "No readable ssh auth log source found (journalctl -u ssh and /var/log/auth.log both unavailable to this user)."
+          fi
+          REMOTE_SCRIPT
