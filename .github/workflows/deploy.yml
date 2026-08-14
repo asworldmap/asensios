@@ -14,6 +14,10 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # Without this a stalled SSH connection runs for the 6h default. A
+    # transient "Network is unreachable" from the runner hung this step
+    # for over 2 minutes on 2026-08-14.
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -61,3 +65,6 @@ jobs:
           # Excludes are protected so nothing outside the build is touched.
           ARGS: "-rltgoDzvO --delete"
           EXCLUDE: ".git/, .github/, node_modules/"
+          # Fail fast on an unreachable host instead of hanging on the
+          # connect; mirrors the hardening already in deploy-blog.yml.
+          SSH_CMD_ARGS: "-o StrictHostKeyChecking=no -o ConnectTimeout=15 -o ServerAliveInterval=5 -o ServerAliveCountMax=3"
