@@ -38,8 +38,12 @@ jobs:
       - name: Run read-only investigation on VPS
         run: |
           set -euo pipefail
-          SSH_OPTS="-i /tmp/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15"
-          scp $SSH_OPTS deploy/security/investigate.sh \
+          COMMON="-i /tmp/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15"
+          # scp takes -P for the port; ssh takes -p. Reusing one option
+          # string for both makes scp treat the port as a source filename.
+          SCP_OPTS="$COMMON -P ${{ secrets.REMOTE_PORT || 22 }}"
+          SSH_OPTS="$COMMON -p ${{ secrets.REMOTE_PORT || 22 }}"
+          scp $SCP_OPTS deploy/security/investigate.sh \
             "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/tmp/investigate.sh"
           ssh $SSH_OPTS "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" \
             "bash /tmp/investigate.sh; rc=\$?; rm -f /tmp/investigate.sh; exit \$rc"
