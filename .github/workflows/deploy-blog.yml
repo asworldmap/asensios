@@ -10,7 +10,8 @@ name: Deploy blog to Hostinger VPS
 # SSH_PRIVATE_KEY_B64 was rotated on 2026-08-14 after the previous key was
 # exposed in plaintext in earlier Actions logs. The rotated key is an
 # ed25519 key with fingerprint
-# SHA256:MW/RWTGOYpbmwOSrzb4UQlcS4mhjpoPgSqSkfJDTeSw.
+# SHA256:MW/RWTGOYpbmwOSrzb4UQlcS4mhjpoPgSqSkfJDTeSw. The previously
+# exposed key was revoked from the VPS on 2026-08-14 at 20:13 UTC.
 on:
   push:
     branches: [main]

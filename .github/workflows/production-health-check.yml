@@ -2,7 +2,8 @@ name: Production health check
 
 # Read-only public verification of both sites from a GitHub runner (real
 # outbound network). No SSH, no secrets, no deployment — safe to run at
-# any time, including while deploy credentials are broken.
+# any time, including while deploy credentials are broken. Kept after
+# the 2026-08-14 key-rotation incident as a standing check.
 on:
   workflow_dispatch:
   push:
