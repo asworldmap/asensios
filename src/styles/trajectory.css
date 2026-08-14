@@ -52,9 +52,98 @@
   color: var(--nature);
 }
 
-/* ------------------------------------------------ Route (the six moments) */
+/* --- The way in ----------------------------------------------------- */
+.tj-scroll-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8em;
+  margin-top: clamp(30px, 5vh, 48px);
+  color: var(--ink-faint);
+}
+
+.tj-scroll-arrow {
+  display: inline-block;
+  animation: hint-drift 2.4s var(--ease) infinite;
+}
+
+@keyframes hint-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(5px);
+    opacity: 1;
+  }
+}
+
+/* ------------------------------------------------ Route (ten moments) */
 .tj-route {
   position: relative;
+}
+
+/* --- Timeline rail --------------------------------------------------
+   A fixed ladder down the left margin: NOW at the top, ORIGIN at the
+   bottom, a fill that tracks the descent and a step counter. It only
+   exists where there is margin to spare, so below 1100px it becomes a
+   thin progress bar pinned to the top of the viewport instead. */
+.tj-rail {
+  position: fixed;
+  left: clamp(14px, 2.4vw, 30px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 6;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  pointer-events: none;
+}
+
+@media (min-width: 1100px) {
+  .tj-rail {
+    display: flex;
+  }
+}
+
+.tj-rail-cap {
+  font-size: 0.56rem;
+  letter-spacing: 0.2em;
+  color: var(--ink-faint);
+  writing-mode: vertical-rl;
+}
+
+.tj-rail-track {
+  position: relative;
+  width: 1px;
+  height: clamp(120px, 22vh, 210px);
+  background: var(--line);
+  overflow: hidden;
+}
+
+.tj-rail-fill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, var(--signal-ink), var(--signal));
+  transform: scaleY(0);
+  transform-origin: top center;
+}
+
+.tj-rail-count {
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  color: var(--ink-faint);
+  transition: color 0.4s var(--ease);
+}
+
+.tj-rail.is-live .tj-rail-count {
+  color: var(--mono-ink);
+}
+
+.tj-rail-count b {
+  font-weight: 500;
+  color: var(--signal-ink);
 }
 
 /* A hairline spine, the flattened version of the great-circle language.
@@ -93,6 +182,24 @@
   margin-bottom: clamp(12px, 2vh, 18px);
 }
 
+/* The step number makes the descent countable — you can see you are on 3 of
+   10 without reading a date. Dimmer than the metadata beside it until its
+   chapter is the one being read. */
+.moment-step {
+  flex: none;
+  color: var(--ink-faint);
+  /* Ruled off from the place/date beside it, otherwise "05" and "MURCIA"
+     read as one string. */
+  padding-right: 0.75em;
+  border-right: 1px solid var(--line);
+  transition: color 0.45s var(--ease), border-color 0.45s var(--ease);
+}
+
+.moment.is-current .moment-step {
+  color: var(--signal-ink);
+  border-right-color: color-mix(in srgb, var(--signal-ink) 45%, transparent);
+}
+
 /* The node on the spine. Pops to size as its chapter arrives, rather than
    sitting there pre-drawn — one small beat, not a loop. */
 .moment-index .node {
@@ -108,6 +215,14 @@
 
 .moment.is-visible .moment-index .node {
   transform: scale(1);
+}
+
+/* The chapter you are actually reading takes the signal colour — the route
+   lights up under you as you descend and dims again behind you. */
+.moment.is-current .moment-index .node {
+  background: var(--signal);
+  opacity: 1;
+  transform: scale(1.35);
 }
 
 /* The live signal: the only node that keeps moving once it has arrived. */
@@ -197,7 +312,7 @@
 }
 
 .tj-now-title strong {
-  font-weight: 300;
+  font-weight: 400;
   color: var(--nature);
 }
 
@@ -229,15 +344,114 @@
   border-top: 1px solid var(--line-soft);
 }
 
-.tj-exit .wrap {
+.tj-exit-inner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(36px, 6vh, 56px);
+}
+
+.tj-exit-links {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: clamp(18px, 4vw, 44px);
 }
 
-.tj-exit-primary {
-  font-size: clamp(1.15rem, 2.6vw, 1.6rem);
-  font-weight: 300;
-  letter-spacing: -0.015em;
+/* --- Contact: a field note, not a corporate form ---------------------
+   Underline-only inputs, no boxes, no fills — reads as an extension of
+   the page's mono/editorial voice rather than a bolted-on widget. */
+.tj-contact {
+  max-width: 46ch;
+}
+
+.tj-contact-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  margin-bottom: clamp(16px, 2.6vh, 24px);
+}
+
+.tj-contact-kicker .rule {
+  display: inline-block;
+  width: clamp(24px, 5vw, 44px);
+  height: 1px;
+  background: var(--bamboo);
+  opacity: 0.5;
+}
+
+.tj-contact-fields {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 3vh, 26px);
+}
+
+.tj-contact-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  padding: 0.5em 0;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--ink);
+  resize: none;
+  transition: border-color 0.3s var(--ease);
+}
+
+.tj-contact-input::placeholder {
+  color: var(--ink-faint);
+}
+
+.tj-contact-input:focus {
+  outline: none;
+  border-color: var(--signal-ink);
+}
+
+.tj-contact-textarea {
+  min-height: 2.6em;
+  line-height: 1.5;
+}
+
+.tj-contact-row {
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+  margin-top: clamp(20px, 3vh, 30px);
+}
+
+.tj-contact-send {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.65em 1.4em;
+  border: 1px solid var(--signal-ink);
+  color: var(--signal-ink);
+  background: transparent;
+  border-radius: 999px;
+  transition: background 0.25s var(--ease), color 0.25s var(--ease), transform 0.25s var(--ease);
+}
+
+.tj-contact-send:hover {
+  background: var(--signal-ink);
+  color: var(--bg);
+  transform: translateY(-1px);
+}
+
+.tj-contact-status {
+  color: var(--ink-faint);
+}
+
+.tj-contact-status.is-visible {
+  animation: signal-pulse-text 1.6s var(--ease) 2;
+}
+
+@keyframes signal-pulse-text {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
 }

@@ -2,9 +2,9 @@
 //
 // Editorial rather than cartographic: a thin wireframe planet on the page's
 // own surface, with routes that draw themselves as you read and retreat as you
-// scroll back up. The globe turns east through Europe and Asia, then west
-// across the Pacific into South America, so Santiago — the present — is the
-// last node to arrive.
+// scroll back up. The story runs from the present backwards, so the planet
+// opens over Santiago, crosses the Pacific into Asia and carries west through
+// Europe until Murcia — the origin — closes it.
 //
 // The loop is demand-driven: it renders on scroll/resize and while fading,
 // then parks itself. A globe sitting still costs nothing, which also means
@@ -14,9 +14,9 @@ import { clamp, deviceTier, easeOut, fitCanvas, lerp, range } from './motion.js'
 import { ORIGIN, PLACES, drawGraticule, drawNode, drawRoute, makeLabelSpace } from './globe.js';
 import { createCinema, drawCover } from './cinema.js';
 
-// Optional atmosphere for the Santiago arrival — the Pacific crossing that
-// closes the route sequence. Requested once, on desktop, when the section
-// comes into view; a no-op until public/cinematic/pacific-andes.* exists.
+// Optional atmosphere for Santiago — the Pacific crossing that now opens the
+// route sequence. Requested once, on desktop, when the section comes into
+// view; a no-op until public/cinematic/pacific-andes.* exists.
 const { primeCinema, cinemaFrame } = createCinema();
 
 /**
@@ -155,9 +155,11 @@ export function initWorldmap(sectionSelector = '.tj-route') {
 
     // Fade in at the start of the section, out at the very end, and stay
     // deliberately faint through the middle: while the photographs are doing
-    // the work the globe is only atmosphere. It comes back up for the arrival.
-    const envelope = Math.min(range(progress, 0.02, 0.18), 1 - range(progress, 0.9, 1));
-    const emphasis = 0.52 + 0.48 * range(progress, 0.58, 0.78);
+    // the work the globe is only atmosphere. Reversed with the narrative, the
+    // strong beat is now the opening — Santiago, the present — and it settles
+    // back once the descent into the past is under way.
+    const envelope = Math.min(range(progress, 0.01, 0.1), 1 - range(progress, 0.9, 1));
+    const emphasis = 1 - 0.42 * range(progress, 0.16, 0.42);
     const alpha = maxOpacity * envelope * emphasis * shown;
     if (alpha <= 0.01) return;
 
@@ -170,12 +172,14 @@ export function initWorldmap(sectionSelector = '.tj-route') {
       cx: w * (tier === 'mobile' ? 0.5 : 0.72),
       cy: h * 0.52,
       r: min * (tier === 'mobile' ? 0.42 : 0.36),
-      // East through Europe and Asia, then west across the Pacific.
+      // The reading runs backwards, so the planet does too: we open over
+      // Santiago, cross the Pacific east into Asia, then carry west across
+      // Asia and Europe until Murcia — the origin — is under the camera.
       lon:
-        progress < 0.45
-          ? lerp(10, 95, easeOut(range(progress, 0, 0.45)))
-          : lerp(95, -70, easeOut(range(progress, 0.45, 1))),
-      lat: lerp(40, -18, range(progress, 0.1, 1)),
+        progress < 0.5
+          ? lerp(-70, 95, easeOut(range(progress, 0, 0.5)))
+          : lerp(95, 10, easeOut(range(progress, 0.5, 1))),
+      lat: lerp(-18, 40, range(progress, 0.05, 0.95)),
     };
     const space = makeLabelSpace(w, h);
 
@@ -183,9 +187,10 @@ export function initWorldmap(sectionSelector = '.tj-route') {
     // the Andes, clipped to the globe circle and painted BELOW the graticule,
     // routes and nodes so the information always reads on top of it.
     // Timed so the footage is at full strength exactly while the Santiago node
-    // and its route land (progress ~0.70–0.86), not ramping through it.
+    // and its route land. Santiago now opens the route rather than closing it,
+    // so the Pacific crossing belongs at the top of the descent.
     if (wantsFootage) {
-      const arrive = range(progress, 0.66, 0.75) * (1 - range(progress, 0.9, 0.99));
+      const arrive = range(progress, 0.04, 0.12) * (1 - range(progress, 0.24, 0.38));
       if (arrive > 0.01) {
         const av = cinemaFrame('pacific-andes');
         if (av) {
@@ -236,9 +241,10 @@ export function initWorldmap(sectionSelector = '.tj-route') {
       space,
     });
 
-    // Routes reveal across the reading of the story; Santiago lands last and
-    // is the only node allowed to be slightly larger.
-    PLACES.forEach((place, i) => {
+    // Routes reveal across the reading of the story. Reversed with the
+    // narrative: Santiago is the first to land — it is the present, and the
+    // only node allowed to be slightly larger — and Europe the last.
+    [...PLACES].reverse().forEach((place, i) => {
       const start = 0.12 + (i / PLACES.length) * 0.72;
       const t = easeOut(range(progress, start, start + 0.16));
       if (t <= 0) return;

@@ -2,13 +2,13 @@
   <!-- Share card in the V2 language: paper surface, wood type, one green route
        ending in Santiago. Copy matches the homepage verbatim. Font stack names
        IBM Plex first and falls back, since card renderers won't have it. -->
-  <rect width="1200" height="630" fill="#f7f4ec"/>
+  <rect width="1200" height="630" fill="#e5d6bb"/>
 
   <!-- The globe, kept to the right margin as a limb rather than a ball -->
   <g opacity="0.5">
-    <circle cx="1010" cy="315" r="250" fill="none" stroke="#6b4f35" stroke-width="1.4" opacity="0.45"/>
-    <ellipse cx="1010" cy="315" rx="250" ry="86" fill="none" stroke="#6b4f35" stroke-width="1.1" opacity="0.35"/>
-    <ellipse cx="1010" cy="315" rx="96" ry="250" fill="none" stroke="#6b4f35" stroke-width="1.1" opacity="0.35"/>
+    <circle cx="1010" cy="315" r="250" fill="none" stroke="#5d4529" stroke-width="1.4" opacity="0.45"/>
+    <ellipse cx="1010" cy="315" rx="250" ry="86" fill="none" stroke="#5d4529" stroke-width="1.1" opacity="0.35"/>
+    <ellipse cx="1010" cy="315" rx="96" ry="250" fill="none" stroke="#5d4529" stroke-width="1.1" opacity="0.35"/>
   </g>
   <path d="M842 196 C 940 250, 1010 360, 966 470" fill="none" stroke="#3fbf16"
         stroke-width="2.4" stroke-linecap="round" opacity="0.85"/>
@@ -17,13 +17,13 @@
 
   <!-- Identity -->
   <text x="90" y="196" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="21"
-        letter-spacing="3.2" fill="#6b4f35">SANTIAGO DE CHILE · DELEGACIÓN DE LA UNIÓN EUROPEA</text>
-  <text x="86" y="316" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="92"
-        font-weight="300" letter-spacing="-2" fill="#4a3527">Asensio Sabater</text>
-  <text x="90" y="392" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="32"
-        font-weight="400" fill="#6b4f35">Relaciones internacionales, comercio y cooperación</text>
-  <text x="90" y="436" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="32"
-        font-weight="400" fill="#6b4f35">entre Europa y América Latina.</text>
+        letter-spacing="3.2" fill="#5d4529">SANTIAGO DE CHILE · DELEGACIÓN DE LA UNIÓN EUROPEA</text>
+  <text x="86" y="316" font-family="'Instrument Serif', Georgia, serif" font-size="92"
+        font-weight="400" letter-spacing="-2" fill="#3a2a1c">Asensio Sabater</text>
+  <text x="90" y="392" font-family="'Instrument Serif', Georgia, serif" font-size="32"
+        font-weight="400" fill="#5d4529">Relaciones internacionales, comercio y cooperación</text>
+  <text x="90" y="436" font-family="'Instrument Serif', Georgia, serif" font-size="32"
+        font-weight="400" fill="#5d4529">entre Europa y América Latina.</text>
   <text x="92" y="516" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="20"
-        letter-spacing="3" fill="#2f5d3a">THE EARTH IS MY PLAYGROUND</text>
+        letter-spacing="3" fill="#27512f">THE EARTH IS MY PLAYGROUND</text>
 </svg>

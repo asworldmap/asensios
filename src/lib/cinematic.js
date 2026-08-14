@@ -61,14 +61,14 @@ let running = false;
 
 // The surface we land on — read from the live theme so a departure into dark
 // mode never flashes paper white.
-let surface = '#f7f4ec';
+let surface = '#e5d6bb';
 
 function readSurface() {
   try {
     const v = getComputedStyle(document.documentElement).getPropertyValue('--bg');
-    return v.trim() || '#f7f4ec';
+    return v.trim() || '#e5d6bb';
   } catch {
-    return '#f7f4ec';
+    return '#e5d6bb';
   }
 }
 
@@ -317,7 +317,7 @@ function drawScaleLabels(ctx, size, p) {
     const y = h * 0.5 + min * 0.02 * (1 - a);
     ctx.globalAlpha = a;
     ctx.fillStyle = PAPER;
-    ctx.font = `300 ${Math.max(30, min * 0.105)}px 'IBM Plex Sans', system-ui, sans-serif`;
+    ctx.font = `400 ${Math.max(30, min * 0.105)}px 'Instrument Serif', Georgia, serif`;
     ctx.fillText(l.text, w / 2, y);
     if (l.sub) {
       ctx.globalAlpha = a * 0.55;

@@ -20,6 +20,97 @@
   width: 100%;
 }
 
+/* --- The identity grid ---------------------------------------------
+   One column on a phone (name → face → sentence → signals → exits), two
+   from tablet up: the type holds the left, the portrait takes a narrow
+   right column and spans the rows beside it. Declared with explicit grid
+   areas rather than source order so the mobile reading order stays right. */
+@media (min-width: 860px) {
+  .home-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(230px, 25vw, 320px);
+    grid-template-areas:
+      'place    portrait'
+      'name     portrait'
+      'lead     portrait'
+      'social   portrait'
+      'exits    portrait';
+    grid-template-rows: auto auto auto auto 1fr;
+    column-gap: clamp(40px, 6vw, 88px);
+    align-items: start;
+  }
+
+  .home-place {
+    grid-area: place;
+  }
+  .home-name {
+    grid-area: name;
+  }
+  .home-lead {
+    grid-area: lead;
+  }
+  .home-social {
+    grid-area: social;
+  }
+  .home-exits {
+    grid-area: exits;
+  }
+  .home-portrait {
+    grid-area: portrait;
+    /* Dropped a little so its top edge lines up with the name, not the
+       kicker — the face should meet the type, not float above it. */
+    margin-top: clamp(6px, 1.5vw, 18px);
+  }
+}
+
+/* --- Portrait: evidence, not an avatar ------------------------------
+   No circle, no border ring, no drop shadow. A plain 4:5 editorial frame
+   with a hairline and a mono caption, matching how the trajectory treats
+   its photographs. */
+.home-portrait {
+  position: relative;
+  margin: 0 0 clamp(28px, 5vh, 44px);
+  max-width: 300px;
+}
+
+.home-portrait img {
+  width: 100%;
+  /* Without this the height="1185" presentational hint wins and the frame
+     renders at the file's intrinsic height instead of the 4:5 box. */
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: 50% 22%;
+  border: 1px solid var(--line);
+  filter: saturate(0.94);
+  /* Wipes open from the bottom as it arrives, like the trajectory photos. */
+  clip-path: inset(0 0 100% 0);
+  transform: scale(1.04);
+  transition: clip-path 1s var(--ease) 0.15s, transform 1.2s var(--ease) 0.15s;
+}
+
+[data-reveal].is-visible.home-portrait img {
+  clip-path: inset(0 0 0 0);
+  transform: scale(1);
+}
+
+.home-portrait figcaption {
+  margin-top: 0.7rem;
+  color: var(--ink-faint);
+}
+
+/* On night the photograph is dimmed slightly so it sits in the dark
+   surface instead of glowing out of it. */
+:root[data-theme='dark'] .home-portrait img {
+  filter: saturate(0.86) brightness(0.88);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .home-portrait img {
+    filter: saturate(0.86) brightness(0.88);
+  }
+}
+
 /* --- Place: mono, quiet, above the name ---------------------------- */
 .home-place {
   display: flex;
@@ -40,6 +131,18 @@
 .home-name {
   font-size: clamp(2.9rem, 11.5vw, 7.4rem);
   margin-bottom: clamp(22px, 4vh, 38px);
+}
+
+/* A whisper of the neon signal behind the name at night — energy, not glow
+   spam. Invisible until dark mode, and even then barely there. */
+:root[data-theme='dark'] .home-name {
+  text-shadow: 0 0 60px rgba(var(--signal-rgb), 0.14);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .home-name {
+    text-shadow: 0 0 60px rgba(var(--signal-rgb), 0.14);
+  }
 }
 
 /* --- Positioning sentence ----------------------------------------- */
@@ -86,19 +189,54 @@
   align-items: baseline;
   gap: 0.6em;
   font-size: clamp(1.3rem, 3.4vw, 2.05rem);
-  font-weight: 300;
+  font-weight: 400;
   letter-spacing: -0.02em;
   color: var(--ink);
+  transition: color 0.35s var(--ease);
+}
+
+.home-exit:hover {
+  color: var(--signal-ink);
 }
 
 .home-exit .arrow {
   display: inline-block;
   color: var(--signal-ink);
-  transition: transform 0.45s var(--ease);
+  transition: transform 0.5s var(--ease-spring);
 }
 
 .home-exit:hover .arrow {
-  transform: translateX(9px);
+  transform: translateX(11px);
+}
+
+/* Contact: the second real exit. Mono like the Playroom so it reads as a
+   utility, but signal-coloured and underlined so it is obviously live. */
+.home-contact {
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--signal-ink);
+  padding-bottom: 3px;
+}
+
+.home-contact::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+  transform-origin: left;
+  transition: opacity 0.3s var(--ease), transform 0.4s var(--ease);
+}
+
+.home-contact:hover::after {
+  opacity: 1;
+  transform: scaleX(1.06);
 }
 
 /* Secondary: the playroom. Small, mono, slightly playful — a door you
@@ -120,10 +258,24 @@
 .home-play .pin {
   display: inline-block;
   transition: transform 0.5s var(--ease);
+  animation: pin-idle 5.5s ease-in-out infinite;
 }
 
 .home-play:hover .pin {
+  animation-play-state: paused;
   transform: rotate(-18deg) scale(1.15);
+}
+
+/* A very small idle drift — the "door you notice only if you look" gets a
+   whisper of its own life instead of sitting completely still. */
+@keyframes pin-idle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
 }
 
 /* --- Footer: coordinates, as a field note ------------------------- */

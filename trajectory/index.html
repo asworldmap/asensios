@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#f7f4ec" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0e120d" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#e5d6bb" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0d0a" media="(prefers-color-scheme: dark)" />
 
     <title data-i18n="traj.meta.title">Trayectoria — Asensio Sabater</title>
     <meta
       name="description"
       data-i18n-attr="content:traj.meta.description"
-      content="Diez aprendizajes, no un currículum: de Finlandia a la Delegación de la UE en Chile, pasando por Corea, Japón y las comunidades que Asensio Sabater ha construido por el camino."
+      content="Diez aprendizajes, del presente al origen: desde la Delegación de la UE en Chile hacia atrás, pasando por Japón, Corea, Finlandia y las comunidades que Asensio Sabater ha construido por el camino."
     />
     <link rel="canonical" href="https://asensios.com/trajectory" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -21,7 +21,7 @@
     <meta
       property="og:description"
       data-i18n-attr="content:traj.meta.ogDescription"
-      content="Diez aprendizajes de una vida internacional: de Finlandia a Santiago de Chile."
+      content="Diez aprendizajes de una vida internacional, de Santiago de Chile hacia el principio."
     />
     <meta property="og:url" content="https://asensios.com/trajectory" />
     <meta property="og:image" content="https://asensios.com/og.svg" />
@@ -65,268 +65,50 @@
             <span data-i18n="traj.hero.eyebrow">Trayectoria</span>
           </p>
           <h1 class="tj-title display" data-reveal data-reveal-delay="60" data-i18n="traj.hero.title">
-            Diez aprendizajes, no un currículum.
+            Diez aprendizajes, del presente al origen.
           </h1>
           <p class="lead" data-reveal data-reveal-delay="120" data-i18n="traj.hero.lead">
-            Los países, los proyectos y las instituciones son la evidencia. Lo que de verdad
-            cambió las cosas fue lo que aprendí en cada uno.
+            Empiezo por donde estoy hoy y bajo hasta el principio.
+          </p>
+          <p class="mono tj-scroll-hint" data-reveal data-reveal-delay="200" aria-hidden="true">
+            <span data-i18n="traj.hero.hint">Baja para retroceder</span>
+            <span class="tj-scroll-arrow">↓</span>
           </p>
         </div>
       </section>
 
-      <!-- The whole route lives in one section: the worldmap behind it measures
-           its own progress against this element, so Santiago always arrives at
-           the end of the reading. -->
+      <!-- The route runs backwards: Santiago (now) opens it and Murcia closes
+           it. The worldmap behind measures its progress against this section,
+           so its camera sweep has to run the same direction as the reading. -->
       <section class="tj-route">
+        <!-- Timeline rail: where you are in the descent, and how far is left.
+             Desktop shows the full ladder; on a phone it collapses to a slim
+             progress bar pinned under the masthead. Purely a progress readout,
+             so it is hidden from assistive tech — the headings carry the
+             structure. -->
+        <div class="tj-rail" data-rail aria-hidden="true">
+          <span class="mono tj-rail-cap" data-i18n="traj.rail.now">Ahora</span>
+          <span class="tj-rail-track"><span class="tj-rail-fill" data-rail-fill></span></span>
+          <span class="mono tj-rail-count"><b data-rail-step>01</b>/10</span>
+          <span class="mono tj-rail-cap" data-i18n="traj.rail.origin">Origen</span>
+        </div>
+
         <div class="wrap">
 
-          <!-- 1 · Divulgalo / CienciaClip -->
-          <article class="moment moment--wide has-media" data-reveal>
-            <figure class="ph ph-4x3" data-parallax>
-              <img
-                src="/media/divulgalo-muncyt.webp"
-                alt="Asensio con el equipo de Divulgalo/CienciaClip en el Museo Nacional de Ciencia y Tecnología"
-                width="1600" height="1200" loading="lazy" decoding="async"
-              />
-              <figcaption data-i18n="traj.ch1.caption">Murcia · Divulgalo / CienciaClip</figcaption>
-            </figure>
-            <div class="moment-body">
-              <p class="mono moment-index">
-                <span class="node" aria-hidden="true"></span>
-                <span data-i18n="traj.ch1.meta">Murcia · Divulgalo / CienciaClip</span>
-              </p>
-              <h2 class="moment-title display" data-i18n="traj.ch1.title">
-                La primera vez que convertí una idea en algo real.
-              </h2>
-              <p class="moment-text" data-i18n="traj.ch1.text">
-                Con un grupo de amigos convertimos la divulgación científica en algo que se
-                podía tocar: contenido, formato, público real. No sabíamos que eso también
-                era emprender.
-              </p>
-            </div>
-          </article>
-
-          <!-- 2 · Finland -->
-          <article class="moment has-media" data-reveal>
-            <div class="moment-body">
-              <p class="mono moment-index">
-                <span class="node" aria-hidden="true"></span>
-                <span data-i18n="traj.ch2.meta">Finlandia · 2018</span>
-              </p>
-              <h2 class="moment-title display" data-i18n="traj.ch2.title">
-                Hacer bien lo sencillo también importa.
-              </h2>
-              <p class="moment-text" data-i18n="traj.ch2.text">
-                Elegí una experiencia internacional en lugar del camino esperado a los 18.
-                Cortar césped y llevar un casco de protección enseña lo mismo que cualquier
-                proyecto grande: hazlo bien, aunque nadie mire.
-              </p>
-            </div>
-            <figure class="ph ph-4x5">
-              <img
-                src="/media/finland-2018.webp"
-                alt="Asensio con casco de protección y desbrozadora, delante de una caseta de madera roja en Finlandia"
-                width="1200" height="1500" loading="lazy" decoding="async"
-                style="object-position: 50% 38%"
-              />
-              <figcaption data-i18n="traj.ch2.caption">Finlandia</figcaption>
-            </figure>
-          </article>
-
-          <!-- 3 · LEINN / KEIKOA (no photo) -->
-          <article class="moment" data-reveal>
-            <div class="moment-body">
-              <p class="mono moment-index">
-                <span class="node" aria-hidden="true"></span>
-                <span data-i18n="traj.ch3.meta">País Vasco · LEINN / KEIKOA · 2019–2022</span>
-              </p>
-              <h2 class="moment-title display" data-i18n="traj.ch3.title">
-                Aprendí a fallar sin dejar de construir.
-              </h2>
-              <p class="moment-text" data-i18n="traj.ch3.text">
-                Cuatro años formando una empresa real con un equipo, desde cero, aprendiendo
-                haciendo. KEIKOA no siempre funcionó — y ahí es exactamente donde aprendí
-                más.
-              </p>
-            </div>
-          </article>
-
-          <!-- 4 · Korea / Erasmus+ -->
-          <article class="moment has-media flip" data-reveal>
-            <div class="moment-body">
-              <p class="mono moment-index">
-                <span class="node" aria-hidden="true"></span>
-                <span data-i18n="traj.ch4.meta">Corea del Sur · Erasmus+</span>
-              </p>
-              <h2 class="moment-title display" data-i18n="traj.ch4.title">
-                El mundo dejó de parecerme lejano.
-              </h2>
-              <p class="moment-text" data-i18n="traj.ch4.text">
-                Vivir fuera de Europa cambió algo que ya venía moviéndose con Erasmus+: dejar
-                de tratar "el extranjero" como algo excepcional y empezar a tratarlo como
-                parte normal de vivir.
-              </p>
-            </div>
-            <figure class="ph ph-4x5">
-              <img
-                src="/media/korea-cherry-signpost.webp"
-                alt="Asensio sobre un poste indicador de madera con carteles en coreano, cerezos en flor y el mar al fondo"
-                width="1080" height="1350" loading="lazy" decoding="async"
-                style="object-position: 50% 34%"
-              />
-              <figcaption data-i18n="traj.ch4.caption">Corea del Sur</figcaption>
-            </figure>
-          </article>
-
-          <!-- 5 · Alpadia -->
-          <article class="moment moment--wide has-media" data-reveal>
-            <figure class="ph ph-16x9" data-parallax>
-              <img
-                src="/media/alpadia-field.webp"
-                alt="Asensio facilitando una actividad de campo con un grupo internacional de adolescentes en Alpadia"
-                width="1280" height="720" loading="lazy" decoding="async"
-              />
-              <figcaption data-i18n="traj.ch5.caption">Friburgo, Alemania · Alpadia</figcaption>
-            </figure>
-            <div class="moment-body">
-              <p class="mono moment-index">
-                <span class="node" aria-hidden="true"></span>
-                <span data-i18n="traj.ch5.meta">Friburgo, Alemania · Alpadia · 2023</span>
-              </p>
-              <h2 class="moment-title display" data-i18n="traj.ch5.title">
-                A veces se lidera con el cuerpo antes que con las palabras.
-              </h2>
-              <p class="moment-text" data-i18n="traj.ch5.text">
-                Cien adolescentes, un entorno multilingüe y ninguna instrucción perfecta que
-                sirviera para todos. A veces el grupo se mueve antes de que encuentres las
-                palabras correctas.
-              </p>
-            </div>
-          </article>
-
-          <!-- 6 · Murcia Welcomes You -->
-          <article class="moment has-media" data-reveal>
-            <div class="moment-body">
-              <p class="mono moment-index">
-                <span class="node" aria-hidden="true"></span>
-                <span data-i18n="traj.ch6.meta">Murcia · Murcia Welcomes You · 2024–2026</span>
-              </p>
-              <h2 class="moment-title display" data-i18n="traj.ch6.title">
-                Una comunidad no aparece. Se construye.
-              </h2>
-              <p class="moment-text" data-i18n="traj.ch6.text">
-                Empezó sin presupuesto y sin garantías. Hoy son más de 1.000 personas y 30
-                nacionalidades — no porque apareciera, sino porque se construyó evento a
-                evento.
-              </p>
-              <p class="mono moment-meta">
-                <span data-i18n="traj.ch6.stat1">1000+ participantes</span>
-                <span data-i18n="traj.ch6.stat2">60+ eventos</span>
-                <span data-i18n="traj.ch6.stat3">30+ nacionalidades</span>
-              </p>
-            </div>
-            <figure class="ph ph-9x16">
-              <img
-                src="/media/mwy-founder-tourism.webp"
-                alt="Asensio como fundador de Murcia Welcomes You, en un contexto turístico de la ciudad"
-                width="1153" height="2048" loading="lazy" decoding="async"
-              />
-              <figcaption data-i18n="traj.ch6.caption">Murcia Welcomes You</figcaption>
-            </figure>
-          </article>
-
-          <!-- 7 · European institutional -->
-          <article class="moment moment--wide has-media" data-reveal>
-            <figure class="ph ph-16x9" data-parallax>
-              <img
-                src="/media/eu-parliament.webp"
-                alt="Asensio en el hemiciclo del Parlamento Europeo, con las banderas de los Estados miembros al fondo"
-                width="1600" height="899" loading="lazy" decoding="async"
-              />
-              <figcaption data-i18n="traj.ch7.caption">Parlamento Europeo</figcaption>
-            </figure>
-            <div class="moment-body">
-              <p class="mono moment-index">
-                <span class="node" aria-hidden="true"></span>
-                <span data-i18n="traj.ch7.meta">Murcia · Oficina de Proyectos Europeos, Ayto. de Murcia · 2025</span>
-              </p>
-              <h2 class="moment-title display" data-i18n="traj.ch7.title">
-                Las instituciones también son sistemas.
-              </h2>
-              <p class="moment-text" data-i18n="traj.ch7.text">
-                Analizar convocatorias europeas y ayudar a redactar propuestas me enseñó que
-                una institución también es un sistema: reglas, incentivos, personas
-                intentando que algo funcione.
-              </p>
-            </div>
-          </article>
-
-          <!-- 8 · Ship for World Youth -->
-          <article class="moment has-media flip" data-reveal>
-            <div class="moment-body">
-              <p class="mono moment-index">
-                <span class="node" aria-hidden="true"></span>
-                <span data-i18n="traj.ch8.meta">Japón · Ship for World Youth 37 · 2026</span>
-              </p>
-              <h2 class="moment-title display" data-i18n="traj.ch8.title">
-                Escuchar puede ser una forma de liderar.
-              </h2>
-              <p class="moment-text" data-i18n="traj.ch8.text">
-                Cuarenta días, delegados de once países, un barco. Representar a España
-                enseña rápido que escuchar bien es más difícil — y más útil — que hablar
-                bien.
-              </p>
-            </div>
-            <figure class="ph ph-4x5">
-              <img
-                src="/media/japan-swy.webp"
-                alt="Asensio en solitario bajo un torii en Japón, durante el programa Ship for World Youth"
-                width="1152" height="1440" loading="lazy" decoding="async"
-              />
-              <figcaption data-i18n="traj.ch8.caption">Japón · Ship for World Youth</figcaption>
-            </figure>
-          </article>
-
-          <!-- 9 · BeeMoney / BYG -->
-          <article class="moment moment--wide has-media" data-reveal>
-            <figure class="ph ph-3x2" data-parallax>
-              <img
-                src="/media/beemoney-byg-stage.webp"
-                alt="El equipo de BeeMoney en el escenario del BYG Social Challenge"
-                width="1600" height="1066" loading="lazy" decoding="async"
-              />
-              <figcaption data-i18n="traj.ch9.caption">BeeMoney · BYG Social Challenge</figcaption>
-            </figure>
-            <div class="moment-body">
-              <p class="mono moment-index">
-                <span class="node" aria-hidden="true"></span>
-                <span data-i18n="traj.ch9.meta">Murcia · BeeMoney / BYG Social Challenge</span>
-              </p>
-              <h2 class="moment-title display" data-i18n="traj.ch9.title">
-                Si algo es complejo, que al menos sea usable.
-              </h2>
-              <p class="moment-text" data-i18n="traj.ch9.text">
-                Un reto social, un prototipo, un equipo tratando de convertir una idea
-                compleja en algo que alguien pudiera usar de verdad.
-              </p>
-            </div>
-          </article>
-
-          <!-- The present. Inside the route section on purpose: the Pacific
-               crossing and the Santiago node land exactly here. -->
-          <article class="moment tj-now has-media" data-reveal>
+          <!-- 01 · the present, and the way in -->
+          <article class="moment tj-now has-media" data-step="01" data-reveal>
             <div class="moment-body">
               <p class="mono moment-index mono--signal">
                 <span class="node" aria-hidden="true"></span>
+                <span class="moment-step">01</span>
                 <span data-i18n="traj.ch10.meta">Santiago de Chile · Delegación de la Unión Europea · Ahora</span>
               </p>
               <h2 class="tj-now-title display" data-i18n="traj.ch10.title">
                 Aprendiendo a conectar mundos distintos.
               </h2>
               <p class="tj-now-text" data-i18n="traj.ch10.text">
-                Ahora, en Santiago, aprendo a mover información y personas entre dos mundos
-                que no siempre se entienden a la primera. Sigue siendo el mismo oficio:
-                conectar.
+                Muevo información y personas entre dos mundos que no siempre se entienden a la
+                primera. El mismo oficio de siempre: conectar.
               </p>
               <p class="mono tj-now-coords">
                 <span class="dot" aria-hidden="true"></span>
@@ -342,18 +124,286 @@
               <figcaption data-i18n="traj.ch10.caption">Santiago de Chile · ahora</figcaption>
             </figure>
           </article>
-        </div>
+        
+          <!-- 02 -->
+          <article class="moment moment--wide has-media" data-step="02" data-reveal>
+            <figure class="ph ph-3x2" data-parallax>
+              <img
+                src="/media/beemoney-byg-stage.webp"
+                alt="El equipo de BeeMoney en el escenario del BYG Social Challenge"
+                width="1600" height="1066" loading="lazy" decoding="async"
+              />
+              <figcaption data-i18n="traj.ch9.caption">BeeMoney · BYG Social Challenge</figcaption>
+            </figure>
+            <div class="moment-body">
+              <p class="mono moment-index">
+                <span class="node" aria-hidden="true"></span>
+                <span class="moment-step">02</span>
+                <span data-i18n="traj.ch9.meta">Murcia · BeeMoney / BYG Social Challenge</span>
+              </p>
+              <h2 class="moment-title display" data-i18n="traj.ch9.title">
+                Si algo es complejo, que al menos sea usable.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch9.text">
+                Un reto social, un prototipo y un equipo peleándose con una idea compleja hasta que
+                alguien pudo usarla.
+              </p>
+            </div>
+          </article>
+          <!-- 03 -->
+          <article class="moment has-media" data-step="03" data-reveal>
+            <div class="moment-body">
+              <p class="mono moment-index">
+                <span class="node" aria-hidden="true"></span>
+                <span class="moment-step">03</span>
+                <span data-i18n="traj.ch8.meta">Japón · Ship for World Youth 37 · 2026</span>
+              </p>
+              <h2 class="moment-title display" data-i18n="traj.ch8.title">
+                Escuchar puede ser una forma de liderar.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch8.text">
+                Cuarenta días, once países, un barco. Representar a España enseña rápido que escuchar
+                bien cuesta más que hablar bien.
+              </p>
+            </div>
+            <figure class="ph ph-9x16" data-parallax>
+              <img
+                src="/media/japan-fuji-swy.webp"
+                alt="Asensio en la cubierta del barco del Ship for World Youth, con el monte Fuji nevado al fondo sobre la bahía"
+                width="1153" height="2048" loading="lazy" decoding="async"
+              />
+              <figcaption data-i18n="traj.ch8.caption">Japón · Ship for World Youth</figcaption>
+            </figure>
+          </article>
+          <!-- 04 · runs as a side portrait rather than full-bleed: with the
+               community 360 going wide next, three full-bleed photographs in a
+               row would turn the middle of the descent into a gallery. -->
+          <article class="moment has-media flip" data-step="04" data-reveal>
+            <div class="moment-body">
+              <p class="mono moment-index">
+                <span class="node" aria-hidden="true"></span>
+                <span class="moment-step">04</span>
+                <span data-i18n="traj.ch7.meta">Murcia · Oficina de Proyectos Europeos, Ayto. de Murcia · 2025</span>
+              </p>
+              <h2 class="moment-title display" data-i18n="traj.ch7.title">
+                Las instituciones también son sistemas.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch7.text">
+                Convocatorias europeas, propuestas, plazos. Por dentro, una institución funciona como
+                cualquier equipo: reglas, incentivos y gente intentando que algo salga.
+              </p>
+            </div>
+            <figure class="ph ph-4x5">
+              <img
+                src="/media/eu-parliament.webp"
+                alt="Asensio en el hemiciclo del Parlamento Europeo"
+                width="719" height="899" loading="lazy" decoding="async"
+              />
+              <figcaption data-i18n="traj.ch7.caption">Parlamento Europeo</figcaption>
+            </figure>
+          </article>
+          <!-- 05 · the community photograph carries this chapter, so it runs
+               wide: a 360° projection only reads as a whole community when the
+               entire ring is visible at size. -->
+          <article class="moment moment--wide has-media" data-step="05" data-reveal>
+            <figure class="ph ph-3x2" data-parallax>
+              <img
+                src="/media/mwy-community-360.webp"
+                alt="Foto 360° de un encuentro de Murcia Welcomes You: el grupo en círculo sobre un camino entre pinos, con Asensio en el centro"
+                width="1500" height="1000" loading="lazy" decoding="async"
+              />
+              <figcaption data-i18n="traj.ch6.caption">Murcia Welcomes You</figcaption>
+            </figure>
+            <div class="moment-body">
+              <p class="mono moment-index">
+                <span class="node" aria-hidden="true"></span>
+                <span class="moment-step">05</span>
+                <span data-i18n="traj.ch6.meta">Murcia · Murcia Welcomes You · 2024–2026</span>
+              </p>
+              <h2 class="moment-title display" data-i18n="traj.ch6.title">
+                Una comunidad no aparece. Se construye.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch6.text">
+                Empezó con una hoja de cálculo y ningún presupuesto. Hoy son más de 1.000 personas y
+                30 nacionalidades, evento a evento, durante casi dos años.
+              </p>
+              <p class="mono moment-meta">
+                <span data-i18n="traj.ch6.stat1">1000+ participantes</span>
+                <span data-i18n="traj.ch6.stat2">60+ eventos</span>
+                <span data-i18n="traj.ch6.stat3">30+ nacionalidades</span>
+              </p>
+            </div>
+          </article>
+          <!-- 06 -->
+          <article class="moment moment--wide has-media" data-step="06" data-reveal>
+            <figure class="ph ph-16x9" data-parallax>
+              <img
+                src="/media/alpadia-field.webp"
+                alt="Asensio facilitando una actividad de campo con un grupo internacional de adolescentes en Alpadia"
+                width="1280" height="720" loading="lazy" decoding="async"
+              />
+              <figcaption data-i18n="traj.ch5.caption">Friburgo, Alemania · Alpadia</figcaption>
+            </figure>
+            <div class="moment-body">
+              <p class="mono moment-index">
+                <span class="node" aria-hidden="true"></span>
+                <span class="moment-step">06</span>
+                <span data-i18n="traj.ch5.meta">Friburgo, Alemania · Alpadia · 2023</span>
+              </p>
+              <h2 class="moment-title display" data-i18n="traj.ch5.title">
+                A veces se lidera con el cuerpo antes que con las palabras.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch5.text">
+                Cien adolescentes, varios idiomas y ninguna instrucción que sirviera para todos. El
+                grupo se mueve antes de que encuentres las palabras.
+              </p>
+            </div>
+          </article>
+          <!-- 07 -->
+          <article class="moment has-media" data-step="07" data-reveal>
+            <div class="moment-body">
+              <p class="mono moment-index">
+                <span class="node" aria-hidden="true"></span>
+                <span class="moment-step">07</span>
+                <span data-i18n="traj.ch4.meta">Corea del Sur · Erasmus+</span>
+              </p>
+              <h2 class="moment-title display" data-i18n="traj.ch4.title">
+                El mundo dejó de parecerme lejano.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch4.text">
+                Erasmus+ abrió la grieta; vivir fuera de Europa la terminó de abrir. "El extranjero"
+                pasó a ser, simplemente, donde tocaba estar ese año.
+              </p>
+            </div>
+            <figure class="ph ph-4x5">
+              <img
+                src="/media/korea-cherry-signpost.webp"
+                alt="Asensio sobre un poste indicador de madera con carteles en coreano, cerezos en flor y el mar al fondo"
+                width="1080" height="1350" loading="lazy" decoding="async"
+                style="object-position: 50% 34%"
+              />
+              <figcaption data-i18n="traj.ch4.caption">Corea del Sur</figcaption>
+            </figure>
+          </article>
+          <!-- 08 -->
+          <article class="moment has-media flip" data-step="08" data-reveal>
+            <div class="moment-body">
+              <p class="mono moment-index">
+                <span class="node" aria-hidden="true"></span>
+                <span class="moment-step">08</span>
+                <span data-i18n="traj.ch3.meta">País Vasco · LEINN / KEIKOA · 2019–2022</span>
+              </p>
+              <h2 class="moment-title display" data-i18n="traj.ch3.title">
+                Aprendí a fallar sin dejar de construir.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch3.text">
+                Tres años montando una empresa de verdad, en equipo, desde cero. No siempre salió
+                bien. Lo que cuesta es volver a currar al día siguiente de un trimestre malo.
+              </p>
+            </div>
+            <figure class="ph ph-9x16" data-parallax>
+              <img
+                src="/media/keikoa-team.webp"
+                alt="Asensio en la Zona Emprendedora de KEIKOA, en el País Vasco"
+                width="1125" height="2000" loading="lazy" decoding="async"
+              />
+              <figcaption data-i18n="traj.ch3.caption">País Vasco · KEIKOA</figcaption>
+            </figure>
+          </article>
+          <!-- 09 -->
+          <article class="moment has-media" data-step="09" data-reveal>
+            <div class="moment-body">
+              <p class="mono moment-index">
+                <span class="node" aria-hidden="true"></span>
+                <span class="moment-step">09</span>
+                <span data-i18n="traj.ch2.meta">Finlandia · 2018</span>
+              </p>
+              <h2 class="moment-title display" data-i18n="traj.ch2.title">
+                Hacer bien lo sencillo también importa.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch2.text">
+                A los 18 me fui en vez de seguir el camino esperado. Cortar césped con casco enseña lo
+                mismo que cualquier proyecto grande: hazlo bien aunque nadie mire.
+              </p>
+            </div>
+            <figure class="ph ph-4x5">
+              <img
+                src="/media/finland-2018.webp"
+                alt="Asensio con casco de protección y desbrozadora, delante de una caseta de madera roja en Finlandia"
+                width="1200" height="1500" loading="lazy" decoding="async"
+                style="object-position: 50% 38%"
+              />
+              <figcaption data-i18n="traj.ch2.caption">Finlandia</figcaption>
+            </figure>
+          </article>
+          <!-- 10 -->
+          <article class="moment moment--wide has-media" data-step="10" data-reveal>
+            <figure class="ph ph-4x3" data-parallax>
+              <img
+                src="/media/divulgalo-muncyt.webp"
+                alt="Asensio con el equipo de Divulgalo/CienciaClip en el Museo Nacional de Ciencia y Tecnología"
+                width="1600" height="1200" loading="lazy" decoding="async"
+              />
+              <figcaption data-i18n="traj.ch1.caption">Murcia · Divulgalo / CienciaClip</figcaption>
+            </figure>
+            <div class="moment-body">
+              <p class="mono moment-index">
+                <span class="node" aria-hidden="true"></span>
+                <span class="moment-step">10</span>
+                <span data-i18n="traj.ch1.meta">Murcia · Divulgalo / CienciaClip</span>
+              </p>
+              <h2 class="moment-title display" data-i18n="traj.ch1.title">
+                La primera vez que convertí una idea en algo real.
+              </h2>
+              <p class="moment-text" data-i18n="traj.ch1.text">
+                Unos amigos y yo hicimos divulgación científica de verdad: contenido, formato,
+                público. Nadie lo llamó emprender. Lo era.
+              </p>
+            </div>
+          </article></div>
       </section>
 
       </main>
 
       <section class="tj-exit">
-        <div class="wrap">
-          <a class="tj-exit-primary ln ln--signal" href="mailto:hola@asensios.com">
-            hola@asensios.com
-          </a>
-          <a class="mono ln" href="/games/" data-cine-warp><span data-i18n="traj.exit.games">◕ Playroom</span></a>
-          <a class="mono ln" href="/" data-i18n="traj.exit.home">Inicio</a>
+        <div class="wrap tj-exit-inner">
+          <form class="tj-contact" data-contact-form novalidate>
+            <p class="mono tj-contact-kicker">
+              <span class="rule" aria-hidden="true"></span>
+              <span data-i18n="traj.exit.contactKicker">Escríbeme</span>
+            </p>
+            <div class="tj-contact-fields">
+              <input
+                class="tj-contact-input"
+                type="text"
+                name="name"
+                data-contact-name
+                data-i18n-attr="placeholder:contact.name"
+                placeholder="Tu nombre"
+                autocomplete="name"
+              />
+              <textarea
+                class="tj-contact-input tj-contact-textarea"
+                name="message"
+                data-contact-message
+                data-i18n-attr="placeholder:contact.message"
+                placeholder="Tu mensaje"
+                rows="2"
+                required
+              ></textarea>
+            </div>
+            <div class="tj-contact-row">
+              <button class="tj-contact-send" type="submit" data-i18n="contact.send">Enviar →</button>
+              <span class="mono tj-contact-status" data-contact-status hidden data-i18n="contact.sent">
+                Abriendo tu correo…
+              </span>
+            </div>
+          </form>
+
+          <nav class="tj-exit-links">
+            <a class="mono ln" href="/games/" data-cine-warp><span data-i18n="traj.exit.games">◕ Playroom</span></a>
+            <a class="mono ln" href="/" data-i18n="traj.exit.home">Inicio</a>
+          </nav>
         </div>
       </section>
 

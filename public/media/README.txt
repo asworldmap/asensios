@@ -25,3 +25,5 @@ vuelve a una columna sola. No hay huecos rotos ni peticiones repetidas.
 
 WebP calidad ~82, por debajo de 180 KB cada una, sin EXIF ni geolocalización
 (`-strip` / `-metadata none`).
+
+  keikoa-team.webp             País Vasco · KEIKOA · capítulo 3   9:16 · 1125×2000

@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#f7f4ec" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0e120d" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#e5d6bb" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0d0a" media="(prefers-color-scheme: dark)" />
 
     <title data-i18n="home.meta.title">Asensio Sabater</title>
     <meta
@@ -76,9 +76,23 @@
 
           <h1 class="home-name display" data-reveal data-reveal-delay="60">Asensio Sabater</h1>
 
+          <!-- The portrait sits inside the type column's flow on purpose: on a
+               phone it lands between the name and the sentence, so the page
+               reads name → face → what I do. On desktop the grid lifts it out
+               to its own column beside the text. -->
+          <figure class="home-portrait" data-reveal data-reveal-delay="90">
+            <img
+              src="/media/asensio-portrait.webp"
+              data-i18n-attr="alt:home.portraitAlt"
+              alt="Retrato de Asensio Sabater"
+              width="948" height="1185" fetchpriority="high" decoding="async"
+            />
+            <figcaption class="mono" data-i18n="home.portraitCaption">Santiago de Chile · 2026</figcaption>
+          </figure>
+
           <p class="lead home-lead" data-reveal data-reveal-delay="120" data-i18n="home.lead">
             Relaciones internacionales, comercio y cooperación entre Europa y América Latina.
-            Construyo conexiones entre culturas; la tecnología es solo la herramienta.
+            Construyo conexiones entre culturas con una mentalidad emprendedora.
           </p>
 
           <nav class="home-social" aria-label="Perfiles" data-reveal data-reveal-delay="180">
@@ -131,6 +145,11 @@
             <a class="home-exit" href="/trajectory/" data-cine-orbit>
               <span data-i18n="nav.trajectory">Mi trayectoria</span>
               <span class="arrow" aria-hidden="true">→</span>
+            </a>
+            <!-- Contact is a first-class exit, not a buried icon. The address
+                 itself never appears as text: the href carries it. -->
+            <a class="home-contact" href="mailto:hola@asensios.com">
+              <span data-i18n="home.contact">Escríbeme</span>
             </a>
             <a class="home-play" href="/games/" data-cine-warp>
               <span class="pin" aria-hidden="true">◕</span> <span data-i18n="nav.games">Playroom</span>
