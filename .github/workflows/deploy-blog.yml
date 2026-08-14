@@ -1,0 +1,185 @@
+name: Deploy blog to Hostinger VPS
+
+# Deploys the static blog (blog/) to blog.asensios.com — fully isolated from
+# the apex-site workflow (deploy.yml): its own triggers, its own concurrency
+# group, its own SSH steps. Never builds or touches the apex site or its
+# deploy target. Runs on pushes to main that touch blog/ or deploy/blog/,
+# and can be triggered manually for any other run (e.g. first-time Caddy
+# provisioning, or re-verification).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "blog/**"
+      - "deploy/blog/**"
+      - ".github/workflows/deploy-blog.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-blog-production
+  cancel-in-progress: false
+
+jobs:
+  deploy-blog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check SSH secrets are configured
+        id: check
+        run: |
+          if [ -z "${{ secrets.REMOTE_HOST }}" ] || [ -z "${{ secrets.REMOTE_USER }}" ] || [ -z "${{ secrets.SSH_PRIVATE_KEY_B64 }}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::REMOTE_HOST / REMOTE_USER / SSH_PRIVATE_KEY_B64 not fully set — skipping blog deploy."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Prepare SSH key
+        if: steps.check.outputs.configured == 'true'
+        run: |
+          KEY=$(echo "${{ secrets.SSH_PRIVATE_KEY_B64 }}" | base64 -d)
+          echo "$KEY" > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+          ssh-keygen -y -f /tmp/deploy_key >/dev/null
+          {
+            echo 'SSH_PRIVATE_KEY<<EOF'
+            echo "$KEY"
+            echo 'EOF'
+          } >> $GITHUB_ENV
+
+      - name: Check DNS for blog.asensios.com
+        if: steps.check.outputs.configured == 'true'
+        run: |
+          echo "asensios.com       -> $(getent ahostsv4 asensios.com | awk '{print $1}' | sort -u | paste -sd, -)"
+          echo "blog.asensios.com  -> $(getent ahostsv4 blog.asensios.com | awk '{print $1}' | sort -u | paste -sd, -)"
+
+      # The Caddy block content lives in deploy/blog/Caddyfile.blog.snippet
+      # (checked out above) and is copied to the VPS here, rather than
+      # embedded inline, to keep this workflow file's YAML/heredoc nesting
+      # simple and easy to audit.
+      - name: Upload Caddy snippet to VPS
+        if: steps.check.outputs.configured == 'true'
+        run: |
+          scp -i /tmp/deploy_key -P ${{ secrets.REMOTE_PORT || 22 }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            deploy/blog/Caddyfile.blog.snippet "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/tmp/blog-caddy-snippet.conf"
+
+      # Idempotent: creates /var/www/blog.asensios.com and adds the Caddy
+      # site block only if it isn't already present. Backs up the Caddyfile
+      # first, validates before reloading, and if either the validation or
+      # the post-reload health check of asensios.com/www.asensios.com fails,
+      # restores the backup and reloads again so the apex site is never left
+      # broken. Requires the deploy user to have passwordless sudo; if it
+      # doesn't, this step fails with a clear message instead of attempting
+      # a workaround (no new sudo rules are added).
+      - name: Configure Caddy for blog.asensios.com (idempotent, self-healing)
+        if: steps.check.outputs.configured == 'true'
+        run: |
+          set -euo pipefail
+          SSH_OPTS="-i /tmp/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+          ssh $SSH_OPTS "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" bash -s <<'REMOTE_SCRIPT'
+          set -euo pipefail
+          TARGET=/var/www/blog.asensios.com
+          CADDYFILE=/etc/caddy/Caddyfile
+          SNIPPET=/tmp/blog-caddy-snippet.conf
+
+          if ! sudo -n true 2>/dev/null; then
+            echo "::error::Deploy user has no passwordless sudo on this host -- cannot safely edit $CADDYFILE or reload Caddy. Not adding broad sudo rules to work around this."
+            rm -f "$SNIPPET"
+            exit 1
+          fi
+
+          sudo mkdir -p "$TARGET"
+
+          if sudo grep -q '^blog\.asensios\.com {' "$CADDYFILE" 2>/dev/null; then
+            echo "Caddy block for blog.asensios.com already present in $CADDYFILE -- skipping edit/reload."
+            rm -f "$SNIPPET"
+            exit 0
+          fi
+
+          STAMP=$(date +%Y%m%d-%H%M%S)
+          BACKUP="${CADDYFILE}.backup-${STAMP}"
+          sudo cp "$CADDYFILE" "$BACKUP"
+          echo "Backup created: $BACKUP"
+
+          { echo; cat "$SNIPPET"; } | sudo tee -a "$CADDYFILE" > /dev/null
+          rm -f "$SNIPPET"
+
+          sudo caddy fmt --overwrite "$CADDYFILE"
+
+          if ! sudo caddy validate --config "$CADDYFILE"; then
+            echo "::error::caddy validate failed after adding the blog block -- restoring backup, NOT reloading."
+            sudo cp "$BACKUP" "$CADDYFILE"
+            exit 1
+          fi
+
+          sudo systemctl reload caddy
+          sleep 2
+
+          if ! curl -fsS -o /dev/null https://asensios.com/ || ! curl -fsS -o /dev/null https://www.asensios.com/; then
+            echo "::error::asensios.com or www.asensios.com unhealthy after reload -- rolling back Caddy immediately."
+            sudo cp "$BACKUP" "$CADDYFILE"
+            sudo caddy validate --config "$CADDYFILE"
+            sudo systemctl reload caddy
+            exit 1
+          fi
+
+          echo "Caddy reloaded. asensios.com and www.asensios.com verified healthy from the VPS."
+          REMOTE_SCRIPT
+
+      # Deploys via rsync over SSH, same mechanism as the apex job in
+      # deploy.yml, but to a fixed, non-secret target — this path is not
+      # sensitive, unlike the apex target which stays a secret since it was
+      # already configured that way.
+      - name: Deploy blog/ to VPS
+        if: steps.check.outputs.configured == 'true'
+        uses: easingthemes/ssh-deploy@v5.1.0
+        env:
+          SSH_PRIVATE_KEY: ${{ env.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+          # Static source, no build step for the blog.
+          SOURCE: "blog/"
+          # Fixed document root — not secret, deliberately not a repo secret.
+          TARGET: "/var/www/blog.asensios.com/"
+          ARGS: "-rltgoDzvO --delete"
+          EXCLUDE: ".git/, .github/, node_modules/"
+
+      - name: Set static file permissions
+        if: steps.check.outputs.configured == 'true'
+        run: |
+          set -euo pipefail
+          SSH_OPTS="-i /tmp/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+          ssh $SSH_OPTS "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" \
+            'sudo find /var/www/blog.asensios.com -type d -exec chmod 755 {} \; && sudo find /var/www/blog.asensios.com -type f -exec chmod 644 {} \;'
+
+      # Public verification from this GitHub Actions runner (real,
+      # unrestricted outbound network) rather than any restricted
+      # environment.
+      - name: Verify public blog + apex health
+        if: steps.check.outputs.configured == 'true'
+        run: |
+          set -euo pipefail
+          fail=0
+          expect() {
+            code=$(curl -sS -o /dev/null -w '%{http_code}' "$1" || echo "000")
+            echo "$1 -> $code"
+            [ "$code" = "$2" ] || { echo "::error::expected $2 from $1, got $code"; fail=1; }
+          }
+          expect_healthy() {
+            code=$(curl -sS -o /dev/null -w '%{http_code}' -L "$1" || echo "000")
+            echo "$1 -> $code (following redirects)"
+            case "$code" in 2??) ;; *) echo "::error::expected a healthy 2xx from $1, got $code"; fail=1;; esac
+          }
+          expect "https://blog.asensios.com/" 200
+          expect "https://blog.asensios.com/relatos/001-no-parti-el-dia-previsto.html" 200
+          expect "https://blog.asensios.com/relatos/002-una-bicicleta-ordeno-santiago.html" 200
+          expect "https://blog.asensios.com/relatos/003-dificil-arte-estarse-quieto.html" 200
+          expect "https://blog.asensios.com/robots.txt" 200
+          expect "https://blog.asensios.com/sitemap.xml" 200
+          expect "https://blog.asensios.com/this-definitely-does-not-exist" 404
+          expect_healthy "https://asensios.com/"
+          expect_healthy "https://www.asensios.com/"
+          exit $fail
