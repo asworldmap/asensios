@@ -1,5 +1,5 @@
 ---
-title: "El plan era no llamar la atención"
+title: "El plan era pasar desapercibido"
 slug: "003-dificil-arte-estarse-quieto"
 date: 2026-08-11
 type: cronica
