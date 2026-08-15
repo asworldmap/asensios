@@ -4,6 +4,7 @@ slug: "003-dificil-arte-estarse-quieto"
 date: 2026-08-11
 type: cronica
 section: cronicas
+accent: cobalto
 location: "Santiago de Chile"
 summary: "Venía dispuesto a mirar sin tocar nada. Duré poco."
 note: "La tecnología es la parte fácil. Lo difícil empieza cuando una herramienta nueva entra en una organización hecha de personas, hábitos y responsabilidades."

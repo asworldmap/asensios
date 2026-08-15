@@ -1,18 +1,19 @@
-/* Relatos desde Santiago — V3.1
-   A small newspaper. Display serif for headlines, a reading serif for the
-   body, mono for the furniture (labels, dates, rules).
+/* Relatos desde Santiago — visual system
+   A personal Sunday newspaper: warm paper, real ink, and a family of editorial
+   colours that belong to a printed supplement rather than to a UI kit.
 
-   Two rules govern everything below:
-   1. Photographs are framed, never merely inserted. A phone portrait is
-      4000px tall; left to its intrinsic ratio it swallows a column and
-      destroys the rhythm of a page. Every editorial slot declares its own
-      crop.
-   2. Mobile is designed, not shrunk. It gets its own measure, its own
-      headline scale, full-bleed images and fewer rules — the ornament that
-      reads as engraving at 1400px reads as noise at 390px. */
+   Three rules govern everything below.
 
-/* Self-hosted from @fontsource packages already in the dependency tree.
-   If the files are absent the stacks below fall back cleanly. */
+   1. Colour is editorial, not decorative. Each story names one accent and the
+      whole page borrows it — eyebrow, rules, drop cap, pull quote, links,
+      figure marks. The paper, the type and the furniture never change, so the
+      publication stays one publication and each page keeps its own mood.
+   2. Photographs are framed, never inserted. A phone portrait is 4000px tall;
+      left to its own ratio it swallows a column and kills the rhythm. Every
+      slot declares its crop.
+   3. Mobile is designed, not shrunk: its own measure, its own headline scale,
+      photography to the edges, fewer rules. */
+
 @font-face {
   font-family: 'Instrument Serif';
   src: url('/assets/fonts/instrument-serif-latin-400-normal.woff2') format('woff2');
@@ -35,15 +36,23 @@
 }
 
 :root {
-  --paper: #f4f0e6;
-  --paper-deep: #ebe4d4;
-  --ink: #16140f;
-  --ink-soft: #3a352b;
-  --muted: #6f6759;
-  --rule: #c6bca8;
-  --rule-soft: #ded5c1;
-  --red: #8a342f;
-  --green: #3d5741;
+  --paper: #f6f1e5;
+  --paper-deep: #ece3d0;
+  --ink: #14120d;
+  --ink-soft: #38312a;
+  --muted: #6e6455;
+  --rule: #c6b99f;
+  --rule-soft: #ded3bc;
+
+  /* The publication's chromatic family. Used one at a time, per story. */
+  --wine: #7d2231;
+  --verde: #2f4b3a;
+  --cobalto: #23406b;
+  --ocre: #a8762a;
+  --terracota: #a94f33;
+
+  --accent: var(--wine);
+  --accent-soft: rgba(125, 34, 49, .1);
 
   --display: 'Instrument Serif', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
   --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
@@ -55,14 +64,20 @@
   --edge: clamp(20px, 4vw, 40px);
 }
 
-*, *::before, *::after { box-sizing: border-box; }
+/* One accent per page. Set on <body> by the generator, and on individual
+   cards so the front page shows the whole family at once. */
+.accent-wine      { --accent: var(--wine);      --accent-soft: rgba(125, 34, 49, .1); }
+.accent-verde     { --accent: var(--verde);     --accent-soft: rgba(47, 75, 58, .1); }
+.accent-cobalto   { --accent: var(--cobalto);   --accent-soft: rgba(35, 64, 107, .1); }
+.accent-ocre      { --accent: var(--ocre);      --accent-soft: rgba(168, 118, 42, .12); }
+.accent-terracota { --accent: var(--terracota); --accent-soft: rgba(169, 79, 51, .11); }
 
+*, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
-  background: linear-gradient(180deg, var(--paper) 0%, #efe8da 100%);
-  background-attachment: fixed;
+  background-color: var(--paper);
   color: var(--ink);
   font-family: var(--serif);
   font-size: 19px;
@@ -71,11 +86,21 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Paper grain. An inline SVG turbulence, so it costs no request and no
+   image decode — just enough tooth that the page does not read as a flat
+   screen colour. */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  opacity: .5; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.055'/%3E%3C/svg%3E");
+}
+body > * { position: relative; z-index: 1; }
+
 a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 img, video { max-width: 100%; height: auto; display: block; }
 h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: -.02em; }
 
-:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 .skip-link {
   position: absolute; left: -9999px; top: 0; z-index: 50;
@@ -97,21 +122,21 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   font: 600 11px/1.3 var(--mono); letter-spacing: .07em; text-transform: uppercase;
 }
 .utility ul { display: flex; flex-wrap: wrap; gap: 20px; margin: 0; padding: 0; list-style: none; }
-.utility a { text-decoration: none; padding: 4px 0; }
-.utility a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.utility a { text-decoration: none; padding: 4px 0; border-bottom: 1px solid transparent; }
+.utility a:hover { border-bottom-color: var(--accent); color: var(--accent); }
 .utility__note { margin: 0; color: var(--muted); font-weight: 400; }
 
-.masthead__brand { text-align: center; padding: clamp(26px, 4.2vw, 52px) 0 16px; }
+.masthead__brand { text-align: center; padding: clamp(26px, 4.2vw, 54px) 0 16px; }
 
 .wordmark {
   margin: 0;
-  font-size: clamp(40px, 8.6vw, 104px);
-  line-height: .9;
-  letter-spacing: -.028em;
+  font-size: clamp(40px, 8.8vw, 108px);
+  line-height: .88;
+  letter-spacing: -.03em;
 }
 .wordmark a { text-decoration: none; }
 .wordmark__sub {
-  margin: 15px auto 0; max-width: 44ch; text-wrap: balance;
+  margin: 16px auto 0; max-width: 44ch; text-wrap: balance;
   font-style: italic; font-size: clamp(15px, 1.5vw, 18px); color: var(--muted);
 }
 .masthead--compact .wordmark { font-size: clamp(23px, 3.2vw, 32px); }
@@ -119,12 +144,13 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 .masthead--compact .masthead__brand { padding: 16px 0 14px; }
 .masthead--compact { border-bottom: 1px solid var(--ink); }
 
+/* The dateline: thick rule above, hairline below — a printed folio band. */
 .edition {
   margin: 0; padding: 10px 0 11px;
-  border-top: 1px solid var(--ink); border-bottom: 3px double var(--ink);
+  border-top: 3px solid var(--ink); border-bottom: 1px solid var(--rule);
   text-align: center;
-  font: 600 10px/1.4 var(--mono); letter-spacing: .16em; text-transform: uppercase;
-  color: var(--muted);
+  font: 600 10px/1.4 var(--mono); letter-spacing: .18em; text-transform: uppercase;
+  color: var(--ink-soft);
 }
 
 /* ------------------------------------------------------------ front page */
@@ -132,13 +158,12 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 .eyebrow {
   margin: 0 0 10px;
   font: 600 10px/1.2 var(--mono); letter-spacing: .12em; text-transform: uppercase;
-  color: var(--red);
+  color: var(--accent);
 }
 .eyebrow__no { color: var(--muted); }
 
-/* The lead: one dominant story, a hairline, then the runners-up. */
 .front-lead {
-  display: grid;
+  display: grid; align-items: start;
   grid-template-columns: minmax(0, 1.62fr) minmax(270px, .92fr);
   gap: clamp(26px, 3.4vw, 52px);
   padding: clamp(30px, 4vw, 54px) 0 clamp(28px, 3.6vw, 46px);
@@ -151,8 +176,8 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 .front-lead__side .card + .card { border-top: 1px solid var(--rule-soft); padding-top: 24px; }
 
 .card__title { margin: 0 0 11px; line-height: 1.03; }
-.card__title a { text-decoration: none; }
-.card__title a:hover { text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 5px; }
+.card__title a { text-decoration: none; background-image: linear-gradient(var(--accent), var(--accent)); background-size: 0 1px; background-repeat: no-repeat; background-position: 0 92%; transition: background-size .32s cubic-bezier(.22,.61,.36,1); }
+.card__title a:hover { background-size: 100% 1px; }
 .card__deck { margin: 0 0 12px; color: var(--ink-soft); max-width: 54ch; }
 .card__meta {
   margin: 0; font: 600 10px/1.3 var(--mono);
@@ -160,24 +185,50 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 }
 
 .card--lead .figure { margin-bottom: 20px; }
-.card--lead .card__title { font-size: clamp(36px, 5.4vw, 66px); letter-spacing: -.032em; }
+.card--lead .card__title { font-size: clamp(36px, 5.6vw, 70px); letter-spacing: -.034em; }
 .card--lead .card__deck { font-size: clamp(18px, 1.9vw, 22px); line-height: 1.42; }
 .card--secondary .card__title { font-size: clamp(23px, 2.5vw, 29px); }
 .card--tertiary .card__title { font-size: clamp(21px, 2.1vw, 25px); }
 .card--postal .card__title, .card--dispatch .card__title { font-size: clamp(20px, 2.2vw, 25px); }
 .card--secondary .card__deck, .card--tertiary .card__deck { font-size: 16px; }
 
-/* Framed, not inserted. A lead photograph is cropped to a landscape plate so
-   the front page keeps its proportions whatever shape the camera produced. */
 .figure--card img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
-.card--lead .figure--card img { aspect-ratio: 16 / 10; }
+.card--lead .figure--card img { aspect-ratio: 16 / 9; }
 .front-lead__side .figure--card img { aspect-ratio: 2 / 1; }
+.js .card .figure img { transition: transform .6s cubic-bezier(.22,.61,.36,1); }
+.js .card:hover .figure img { transform: scale(1.015); }
+
+/* The band: one story as type alone, full width. The front page's change of
+   pace, so four cards do not arrive at the same volume. */
+.band {
+  padding: clamp(30px, 4vw, 52px) 0;
+  border-bottom: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  padding-left: clamp(20px, 3vw, 40px);
+}
+.band__title { margin: 0 0 14px; font-size: clamp(30px, 4.4vw, 54px); line-height: 1.02; letter-spacing: -.03em; max-width: 20ch; }
+.band__title a { text-decoration: none; }
+.band__title a:hover { color: var(--accent); }
+.band__deck {
+  margin: 0 0 14px; max-width: 46ch;
+  font-size: clamp(18px, 2vw, 23px); line-height: 1.42; color: var(--ink-soft);
+  font-style: italic;
+}
+.band__meta { margin: 0; font: 600 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 
 .section-block { padding: clamp(28px, 3.6vw, 46px) 0; border-bottom: 1px solid var(--rule); }
 .section-head {
   display: flex; align-items: baseline; justify-content: space-between; gap: 18px;
   padding-bottom: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--ink);
+  position: relative;
 }
+/* A coloured rule that draws itself in under the section title. */
+.section-head::after {
+  content: ""; position: absolute; left: 0; bottom: -2px; height: 3px;
+  background: var(--accent); width: 0;
+}
+.reveal.is-in .section-head::after,
+.section-block.is-in .section-head::after { width: 84px; transition: width .7s cubic-bezier(.22,.61,.36,1) .1s; }
 .section-head h2 { margin: 0; font-size: clamp(21px, 2.3vw, 28px); }
 .section-head h2 a { text-decoration: none; }
 .section-head p {
@@ -186,6 +237,19 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 }
 .section-block__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--gap); }
 
+/* The rail index — “En este número”. Fills the column beside a tall lead
+   with the same content in a different register: an index, not more cards. */
+.rail-index { border-top: 1px solid var(--ink); padding-top: 14px; }
+.rail-index__head {
+  margin: 0 0 6px; font: 600 10px var(--mono);
+  letter-spacing: .13em; text-transform: uppercase; color: var(--muted);
+}
+.rows--rail a { grid-template-columns: 32px minmax(0, 1fr) 18px; gap: 10px; padding: 10px 0; }
+.rows--rail .row__title { font-size: 17px; line-height: 1.2; }
+.rail-index__more { margin: 12px 0 0; font: 600 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+.rail-index__more a { text-decoration: none; color: var(--accent); }
+.rail-index__more a:hover { text-decoration: underline; }
+
 /* archive rows */
 .rows { list-style: none; margin: 0; padding: 0; }
 .rows li + li { border-top: 1px solid var(--rule-soft); }
@@ -193,16 +257,16 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   display: grid; grid-template-columns: 48px minmax(0, 1fr) auto 20px;
   align-items: baseline; gap: 16px; padding: 14px 0; text-decoration: none;
 }
-.rows a:hover .row__title { text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 4px; }
-.row__no { font: 600 10px var(--mono); letter-spacing: .08em; color: var(--muted); }
-.row__title { font-size: clamp(17px, 1.8vw, 20px); font-family: var(--display); }
+.rows a:hover .row__title { color: var(--accent); }
+.row__no { font: 600 10px var(--mono); letter-spacing: .08em; color: var(--accent); }
+.row__title { font-size: clamp(17px, 1.8vw, 20px); font-family: var(--display); transition: color .2s ease; }
 .row__date, .row__section {
   font: 600 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
 }
 .row__read { font: 400 14px/1 var(--mono); color: var(--rule); text-align: right; }
-.row__read.is-read { color: var(--green); }
+.row__read.is-read { color: var(--verde); }
 
-/* “Mientras tanto, en Santiago…” */
+/* “Mientras tanto, en Santiago…” — a contact sheet, not a stories bar. */
 .strip { padding: clamp(26px, 3.6vw, 44px) 0; border-bottom: 1px solid var(--rule); }
 .strip__rail {
   display: grid; grid-auto-flow: column; grid-auto-columns: minmax(148px, 1fr);
@@ -213,15 +277,18 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 .strip__item a { text-decoration: none; display: block; }
 .strip__item .figure { margin: 0; }
 .strip__item img { aspect-ratio: 9 / 16; object-fit: cover; width: 100%; }
+.js .strip__item { transition: transform .4s cubic-bezier(.22,.61,.36,1); }
+.js .strip__rail:hover .strip__item { transform: translateY(3px); }
+.js .strip__rail .strip__item:hover { transform: translateY(-4px); }
 .strip__label { display: block; margin-top: 8px; font-size: 15px; line-height: 1.3; }
 .strip__place {
   display: block; margin-top: 3px;
   font: 600 9px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
 }
 
-/* Who writes this — sits high on the front page, deliberately quiet. */
+/* Who writes this. Part of the newspaper, not a legal component. */
 .intro {
-  display: grid; grid-template-columns: minmax(150px, .5fr) minmax(0, 1.5fr);
+  display: grid; grid-template-columns: minmax(120px, .26fr) minmax(0, 1.74fr);
   gap: var(--gap); padding: clamp(28px, 3.6vw, 46px) 0;
   border-bottom: 1px solid var(--rule);
 }
@@ -229,21 +296,19 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 .intro__body p:first-child {
   font-size: clamp(19px, 1.9vw, 23px); line-height: 1.46; color: var(--ink);
 }
-.intro__body p:last-child { margin-bottom: 0; }
-/* The institutional clarification: present and findable, never the loudest
-   thing in the block. */
+.intro__body a { color: var(--accent); text-decoration-color: var(--rule); }
 .intro__note {
   margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--rule-soft);
-  font: 400 14px/1.55 var(--mono); color: var(--muted); max-width: 56ch;
+  font: 400 13.5px/1.55 var(--mono); color: var(--muted); max-width: 56ch;
 }
 
 /* whatsapp */
 .whatsapp {
-  display: grid; grid-template-columns: minmax(150px, .5fr) minmax(0, 1.5fr);
+  display: grid; grid-template-columns: minmax(120px, .26fr) minmax(0, 1.74fr);
   gap: var(--gap); padding: clamp(28px, 3.6vw, 46px) 0;
   border-bottom: 3px double var(--ink);
 }
-.label { margin: 0; font: 600 10px var(--mono); letter-spacing: .13em; text-transform: uppercase; color: var(--muted); }
+.label { margin: 0; font: 600 10px var(--mono); letter-spacing: .13em; text-transform: uppercase; color: var(--accent); }
 .whatsapp h2 { margin: 0 0 10px; font-size: clamp(23px, 2.6vw, 31px); }
 .whatsapp p { margin: 0 0 16px; max-width: var(--measure); color: var(--ink-soft); }
 
@@ -251,9 +316,9 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   display: inline-block; margin-top: 2px; padding: 12px 17px;
   border: 1px solid var(--ink); text-decoration: none;
   font: 600 10px var(--mono); letter-spacing: .1em; text-transform: uppercase;
-  transition: background .18s ease, color .18s ease;
+  transition: background .18s ease, color .18s ease, border-color .18s ease;
 }
-.channel-link:hover { background: var(--ink); color: var(--paper); }
+.channel-link:hover { background: var(--accent); border-color: var(--accent); color: var(--paper); }
 
 /* ------------------------------------------------------------ story pages */
 
@@ -261,26 +326,30 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 .page-head h1 { margin: 0 0 10px; font-size: clamp(32px, 5vw, 54px); }
 .page-head p { margin: 0 0 10px; color: var(--muted); max-width: var(--measure); }
 
-.story-head { padding: clamp(28px, 4vw, 56px) 0 24px; }
+.story-head { padding: clamp(28px, 4vw, 56px) 0 24px; border-bottom: 1px solid var(--accent); }
 .story-title {
   margin: 0 0 18px;
-  font-size: clamp(34px, 5.8vw, 74px); line-height: .97; letter-spacing: -.032em;
+  font-size: clamp(34px, 6vw, 78px); line-height: .96; letter-spacing: -.034em;
   max-width: 17ch;
 }
 .deck {
   margin: 0 0 20px; font-size: clamp(18px, 2vw, 24px); line-height: 1.4;
-  color: var(--ink-soft); max-width: 44ch;
+  color: var(--ink-soft); max-width: 44ch; font-style: italic;
 }
 .story-meta { margin: 0; font: 600 10px var(--mono); letter-spacing: .11em; text-transform: uppercase; color: var(--muted); }
 
+/* Figures are numbered like plates in a supplement. */
+.story-body { counter-reset: fig; }
 .figure { margin: 0 0 6px; }
 .figure figcaption {
   margin-top: 10px; font: 400 13px/1.5 var(--mono); color: var(--muted);
-  padding-left: 12px; border-left: 2px solid var(--rule-soft);
+  padding-left: 12px; border-left: 2px solid var(--accent);
   max-width: 52ch;
 }
-/* The opening photograph of a story: a wide plate, never a full-height
-   portrait dropped into the page. */
+.figure figcaption::before {
+  counter-increment: fig; content: "Fig. " counter(fig) " · ";
+  color: var(--accent); font-weight: 600;
+}
 .figure--cover { margin: 6px 0 clamp(26px, 3.4vw, 44px); }
 .figure--cover img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
 
@@ -288,26 +357,23 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   display: grid; grid-template-columns: minmax(0, var(--measure)) minmax(0, 1fr);
   gap: clamp(30px, 4vw, 60px); padding-bottom: 32px;
 }
-.story-body--visual, .story-body--movement, .story-body--dispatch, .story-body--abierta {
-  grid-template-columns: minmax(0, 1fr);
-}
+.story-body--visual, .story-body--movement, .story-body--dispatch,
+.story-body--abierta, .story-body--texto { grid-template-columns: minmax(0, 1fr); }
 
 .prose { font-size: clamp(18px, 1.2vw, 20px); line-height: 1.72; max-width: var(--measure); }
 .prose p { margin: 0 0 1.35em; }
 .prose > p:first-of-type::first-letter {
   float: left; font-family: var(--display); font-size: 4.2em; line-height: .76;
-  padding: 5px 10px 0 0; color: var(--red);
+  padding: 5px 10px 0 0; color: var(--accent);
 }
 .prose h2 { margin: 1.8em 0 .5em; font-size: 1.45em; }
 .prose blockquote {
-  margin: 1.6em 0; padding-left: 20px; border-left: 3px solid var(--red);
+  margin: 1.6em 0; padding-left: 20px; border-left: 3px solid var(--accent);
   font-style: italic; font-size: 1.1em; color: var(--ink-soft);
 }
 .prose--short { max-width: 58ch; }
 .prose--short > p:first-of-type::first-letter { float: none; font-size: inherit; padding: 0; color: inherit; }
 
-/* Crónica visual: one column, text held at reading measure and centred, so
-   photographs can open wider without the paragraphs losing their line length. */
 .prose--wide { max-width: none; }
 .prose--wide > p,
 .prose--wide > h2,
@@ -321,8 +387,6 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 .plate--inset { max-width: var(--measure); }
 .plate--wide { max-width: 900px; }
 .plate--full { max-width: none; }
-/* Nothing taller than the screen: a photograph the reader cannot see whole
-   stops being an image and becomes a scroll. */
 .plate img { width: 100%; max-height: 78vh; object-fit: cover; }
 .plate--inset img, .plate--wide img { max-height: 72vh; }
 .plate figcaption { margin-inline: auto; max-width: var(--measure); }
@@ -335,18 +399,20 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 .margin-note::before {
   content: "Nota al margen"; display: block; margin-bottom: 9px;
   font: 600 9px var(--mono); letter-spacing: .13em; text-transform: uppercase;
-  font-style: normal; color: var(--muted);
+  font-style: normal; color: var(--accent);
 }
 
 .pull {
-  max-width: 26ch; margin: clamp(32px, 4.6vw, 58px) auto;
-  font-family: var(--display); font-size: clamp(23px, 3vw, 36px);
-  line-height: 1.16; letter-spacing: -.018em; text-align: center; color: var(--red);
+  max-width: 24ch; margin: clamp(32px, 4.6vw, 58px) auto;
+  font-family: var(--display); font-size: clamp(24px, 3.2vw, 38px);
+  line-height: 1.14; letter-spacing: -.02em; text-align: center; color: var(--accent);
 }
 .pull::before, .pull::after {
-  content: ""; display: block; width: 44px; height: 1px; background: var(--rule); margin: 0 auto 20px;
+  content: ""; display: block; width: 44px; height: 2px; background: var(--accent); margin: 0 auto 20px;
 }
 .pull::after { margin: 20px auto 0; }
+/* Inside a running text column the pull quote floats rather than interrupts. */
+.story-body--texto .pull { max-width: 32ch; font-size: clamp(21px, 2.6vw, 31px); }
 
 .gallery { display: grid; gap: clamp(18px, 2.4vw, 30px); }
 .gallery--inline { margin: 30px 0 6px; }
@@ -356,7 +422,7 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 
 .story-foot {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
-  gap: 16px; padding: 24px 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--rule);
+  gap: 16px; padding: 24px 0; border-top: 3px solid var(--accent); border-bottom: 1px solid var(--rule);
 }
 .story-foot__share { margin: 0; }
 
@@ -366,18 +432,17 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   font: 600 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink);
   transition: border-color .18s ease, color .18s ease;
 }
-.read-toggle:hover { border-color: var(--ink); }
+.read-toggle:hover { border-color: var(--accent); color: var(--accent); }
 .read-toggle__mark { font-size: 14px; line-height: 1; }
-.read-toggle[aria-pressed="true"] { border-color: var(--green); color: var(--green); }
+.read-toggle[aria-pressed="true"] { border-color: var(--verde); color: var(--verde); }
 
-/* Colophon — the quiet, persistent link back to the author's own site. */
 .colofon { padding: 22px 0 2px; }
 .colofon p {
   margin: 0; max-width: var(--measure);
   font: italic 400 15px/1.6 var(--serif); color: var(--muted);
 }
-.colofon a { color: var(--ink-soft); text-decoration-color: var(--rule); }
-.colofon a:hover { color: var(--ink); text-decoration-color: currentColor; }
+.colofon a { color: var(--accent); text-decoration-color: var(--rule); }
+.colofon a:hover { text-decoration-color: currentColor; }
 
 .story-nav {
   display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
@@ -385,9 +450,9 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 }
 .story-nav__next { text-align: right; }
 .story-nav a { text-decoration: none; display: block; }
-.story-nav span { display: block; font: 600 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.story-nav span { display: block; font: 600 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
 .story-nav b { font-family: var(--display); font-weight: 400; font-size: 20px; line-height: 1.15; }
-.story-nav a:hover b { text-decoration: underline; text-decoration-color: var(--rule); }
+.story-nav a:hover b { color: var(--accent); }
 
 /* carta al autor */
 .carta {
@@ -404,6 +469,7 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   border: 1px solid var(--rule); background: rgba(255,255,255,.4); color: var(--ink);
   border-radius: 0;
 }
+.carta__form textarea:focus, .carta__form input[type="text"]:focus { border-color: var(--accent); }
 .carta__form textarea { resize: vertical; }
 .carta__form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 .carta__status { margin: 4px 0 0; font-size: 14px; color: var(--muted); min-height: 1.2em; }
@@ -435,39 +501,17 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 }
 .site-footer p { margin: 0 0 3px; }
 .site-footer a { text-decoration: none; }
-.site-footer a:hover { text-decoration: underline; }
+.site-footer a:hover { color: var(--accent); text-decoration: underline; }
 .site-footer__id { color: var(--ink); }
 
 .consent {
   position: fixed; left: 18px; bottom: 18px; z-index: 40; max-width: 370px;
-  background: #f7f2e7; border: 1px solid var(--ink); padding: 17px;
+  background: #f8f3e8; border: 1px solid var(--ink); border-top: 3px solid var(--accent); padding: 17px;
   box-shadow: 0 14px 44px rgba(0,0,0,.13);
 }
 .consent[hidden] { display: none; }
 .consent p { margin: 0 0 13px; font: 400 14px/1.5 var(--serif); color: var(--ink-soft); text-transform: none; letter-spacing: 0; }
 .consent__actions { display: flex; gap: 8px; flex-wrap: wrap; }
-
-/* ------------------------------------------------------- paleta «mesa»
-   For pieces about food and hospitality. It warms the same paper and deepens
-   the accent towards wine; the masthead, typography and furniture are
-   untouched, so the reader is still in the same newspaper. */
-body.palette-mesa {
-  --paper: #f6f0e2;
-  --paper-deep: #eee4cf;
-  --ink: #15120d;
-  --ink-soft: #3b332a;
-  --muted: #6d6353;
-  --rule: #c7b58f;
-  --rule-soft: #e2d7bc;
-  --red: #6d1f2b;
-  --gold: #a3854f;
-  background: linear-gradient(180deg, var(--paper) 0%, #f0e6d1 100%);
-}
-.palette-mesa .story-head { border-bottom: 1px solid var(--gold); padding-bottom: 22px; }
-.palette-mesa .deck { font-style: italic; }
-.palette-mesa .figure figcaption { border-left-color: var(--gold); }
-.palette-mesa .pull::before, .palette-mesa .pull::after { background: var(--gold); }
-.palette-mesa .story-foot { border-top-color: var(--gold); }
 
 /* ------------------------------------------------------------- motion */
 .reveal { opacity: 1; }
@@ -477,6 +521,10 @@ body.palette-mesa {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .js .reveal, .js .reveal.is-in { opacity: 1; transform: none; transition: none; }
+  .js .card:hover .figure img,
+  .js .strip__rail:hover .strip__item,
+  .js .strip__rail .strip__item:hover { transform: none; }
+  .reveal.is-in .section-head::after { transition: none; }
   * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 }
 
@@ -490,9 +538,6 @@ body.palette-mesa {
   .intro, .whatsapp, .carta { grid-template-columns: 1fr; gap: 14px; }
 }
 
-/* Mobile: a small newspaper, not a squeezed desktop page. Photographs go
-   edge to edge, rules thin out, the masthead keeps its authority at a size
-   that fits, and every control clears a 44px touch target. */
 @media (max-width: 640px) {
   :root { --edge: 18px; --measure: 100%; }
   body { font-size: 17.5px; line-height: 1.6; }
@@ -504,32 +549,32 @@ body.palette-mesa {
   .masthead__brand { padding: 22px 0 12px; }
   .wordmark { font-size: clamp(34px, 11vw, 46px); line-height: .94; }
   .wordmark__sub { margin-top: 12px; font-size: 15px; max-width: 30ch; }
-  .edition { font-size: 9px; letter-spacing: .12em; padding: 9px 0; border-bottom-width: 1px; border-bottom-style: solid; }
+  .edition { font-size: 9px; letter-spacing: .12em; padding: 9px 0; border-top-width: 2px; }
 
-  .front-lead { padding: 24px 0; border-bottom-width: 1px; border-bottom-style: solid; }
+  .front-lead { padding: 22px 0; border-bottom-width: 1px; border-bottom-style: solid; }
   .card--lead .card__title { font-size: clamp(30px, 8.4vw, 40px); line-height: 1.04; }
   .card--lead .card__deck { font-size: 17px; }
   .card--secondary .card__title, .card--tertiary .card__title { font-size: 22px; }
+
+  .band { padding: 24px 0 24px; padding-left: 16px; border-left-width: 3px; }
+  .band__title { font-size: clamp(26px, 7.6vw, 34px); max-width: none; }
+  .band__deck { font-size: 17px; }
 
   .story-title { font-size: clamp(30px, 8.6vw, 42px); line-height: 1.02; max-width: none; }
   .deck { font-size: 17.5px; max-width: none; }
   .prose { font-size: 17.5px; }
   .prose > p:first-of-type::first-letter { font-size: 3.4em; padding-right: 8px; }
 
-  /* Full-bleed photography: on a small screen a margin around a photograph
-     wastes the only asset that scales well.
-
-     Margin, not transform: a transform moves the paint but leaves the layout
-     box where it was, which pushes the document's scroll width past the
-     viewport and gives the page a sideways wobble. This is also why the rule
-     stops at the story pages — the front-page lead sits in a grid track, and
-     a 100vw child there widens the track itself. */
+  /* Margin, not transform: a transform moves the paint but leaves the layout
+     box behind, which pushes the document's scroll width past the viewport. */
   .figure--cover, .plate { width: 100vw; margin-left: calc(50% - 50vw); }
   .figure--cover img { aspect-ratio: 4 / 3; }
   .plate img { max-height: 74vh; }
-  .figure--cover figcaption, .plate figcaption { margin-inline: var(--edge); }
+  .figure--cover figcaption, .plate figcaption { margin-inline: var(--edge); font-size: 13.5px; }
   .figure--cover { margin-bottom: 26px; }
   .plate { margin-block: 28px; }
+
+  .pull { font-size: clamp(22px, 6.6vw, 28px); max-width: 20ch; }
 
   .rows a { grid-template-columns: 34px minmax(0, 1fr) 20px; gap: 12px; padding: 15px 0; }
   .row__date, .row__section { display: none; }
@@ -543,6 +588,7 @@ body.palette-mesa {
 }
 
 @media print {
+  body::before { display: none; }
   .consent, .utility, .story-nav, .carta, .read-toggle, .whatsapp { display: none; }
   body { background: #fff; }
   .plate img, .figure--cover img { max-height: none; }

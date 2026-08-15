@@ -4,6 +4,7 @@ slug: "001-no-parti-el-dia-previsto"
 date: 2026-07-28
 type: cronica
 section: cronicas
+accent: terracota
 location: "Murcia → Santiago"
 summary: "Una despedida a medias en Murcia y un vuelo que no me esperó."
 note: "Aquí no hace falta fingir una moraleja. El accidente fue una faena y, al mismo tiempo, acabó regalándome la despedida que no había tenido."

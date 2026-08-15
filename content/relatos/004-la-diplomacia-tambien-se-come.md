@@ -4,7 +4,7 @@ slug: "004-la-diplomacia-tambien-se-come"
 date: 2026-08-14
 type: cronica-visual
 section: cronicas
-palette: mesa
+accent: wine
 location: "Santiago de Chile"
 summary: "Fui a una cena de embajada en lugar de un compañero y me acabé acordando sobre todo del conejo."
 featured: true

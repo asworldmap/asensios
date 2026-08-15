@@ -4,6 +4,7 @@ slug: "002-una-bicicleta-ordeno-santiago"
 date: 2026-08-04
 type: cronica
 section: cronicas
+accent: verde
 location: "Santiago de Chile"
 summary: "Una ciudad que todavía no entendía y una manera bastante literal de empezar a orientarme."
 note: "Algunos lugares empiezan a sentirse propios cuando uno deja de necesitar instrucciones para volver a casa."
