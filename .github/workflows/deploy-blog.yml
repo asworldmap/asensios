@@ -169,7 +169,13 @@ jobs:
       - name: Verify public blog + apex health
         if: steps.check.outputs.configured == 'true'
         run: |
-          set -uo pipefail
+          # No `set -e` / `pipefail` here on purpose. GitHub invokes this step
+          # as `bash -e`, and `grep ... | head -1` below takes SIGPIPE when
+          # head closes the pipe early; with pipefail that reads as a fatal
+          # error and the whole verification aborts before checking anything.
+          # This step keeps its own tally in $fail and exits on that.
+          set +e
+          set -u
           fail=0
           expect() {
             code=$(curl -sS -o /dev/null -w '%{http_code}' "$1" || echo "000")
