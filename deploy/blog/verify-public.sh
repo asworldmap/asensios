@@ -110,9 +110,24 @@ if [ "$story_css" != "$css" ]; then
   fail=1
 fi
 
-# Every photograph the story references must actually load.
-for img in $(printf '%s' "$story" | grep -o '/media/004/[^"]*' | sort -u); do
-  expect_asset "$BASE$img" "image/" ""
+# Every photograph every story references must actually load, and every story
+# must reference at least one. A relato that silently lost its images would
+# otherwise still return 200 and pass.
+for slug in 001-no-parti-el-dia-previsto \
+            002-una-bicicleta-ordeno-santiago \
+            003-dificil-arte-estarse-quieto \
+            004-la-diplomacia-tambien-se-come; do
+  page=$(curl -sS --max-time 25 "$BASE/relatos/$slug.html" 2>/dev/null)
+  imgs=$(printf '%s' "$page" | grep -o '/media/[^"]*' | sort -u)
+  count=$(printf '%s' "$imgs" | grep -c . )
+  echo "--- $slug: $count image reference(s) ---"
+  if [ "$count" -lt 1 ]; then
+    echo "::error::$slug references no photographs"
+    fail=1
+  fi
+  for img in $imgs; do
+    expect_asset "$BASE$img" "image/" ""
+  done
 done
 
 # --- content, not just endpoints -------------------------------------------
