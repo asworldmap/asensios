@@ -640,9 +640,10 @@ function aboutBlock() {
   return `<section class="intro reveal" id="sobre">
   <p class="label">Quién escribe</p>
   <div class="intro__body">
-    <p>Me llamo Asensio Sabater. Estudié Relaciones Internacionales y desde 2018 ando metido en proyectos europeos y programas de juventud, casi siempre organizando cosas para gente de países distintos.</p>
-    <p>Este año me toca Santiago de Chile: unos seis meses aquí por trabajo. Escribo estos relatos porque medio año da para bastante más de lo que cabe en el grupo de la familia, y porque dentro de dos años se me habrá olvidado la mitad.</p>
-    <p>El archivo empieza en julio de 2026 y se cerrará cuando se acabe la estancia. Fuera de aquí, lo demás que hago está en <a href="${esc(SITE.homepage)}" data-event="home_link_click">asensios.com</a>.</p>
+    <p>Soy Asensio Sabater. Durante seis meses vivo en Santiago mientras hago unas prácticas en la Delegación de la Unión Europea en Chile.</p>
+    <p>Llegué en julio de 2026 y este archivo irá creciendo hasta que me marche. Aquí guardo lo que ocurre alrededor: trabajo, ciudad, viajes, gente que conozco y alguna historia que dentro de dos años recordaría bastante peor.</p>
+    <p>El resto está en <a href="${esc(SITE.homepage)}" data-event="home_link_click">asensios.com</a>.</p>
+    <p class="intro__note">Relatos desde Santiago es un proyecto personal y no representa a la Unión Europea ni a la organización en la que trabajo.</p>
   </div>
 </section>`;
 }
@@ -787,7 +788,7 @@ ${footer()}`;
 function notFoundPage() {
   return `${head({
     title: `Página no encontrada — ${SITE.name}`,
-    description: 'Aquí no hay nada.',
+    description: 'Página perdida.',
     canonical: `${SITE.origin}/404.html`,
     ogType: 'website',
   }).replace('<link rel="canonical"', '<meta name="robots" content="noindex">\n<link rel="canonical"')}
@@ -795,7 +796,7 @@ ${masthead({ compact: true })}
 <main id="contenido" class="wrap">
   <div class="page-head page-head--404">
     <p class="eyebrow">Error 404</p>
-    <h1>Aquí no hay nada</h1>
+    <h1>Página perdida</h1>
     <p>El enlace puede estar mal copiado, o el relato vivía en otra dirección.</p>
     <p><a class="channel-link" href="/">Ir a la portada →</a></p>
   </div>

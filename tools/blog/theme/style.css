@@ -230,6 +230,12 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   font-size: clamp(19px, 1.9vw, 23px); line-height: 1.46; color: var(--ink);
 }
 .intro__body p:last-child { margin-bottom: 0; }
+/* The institutional clarification: present and findable, never the loudest
+   thing in the block. */
+.intro__note {
+  margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--rule-soft);
+  font: 400 14px/1.55 var(--mono); color: var(--muted); max-width: 56ch;
+}
 
 /* whatsapp */
 .whatsapp {

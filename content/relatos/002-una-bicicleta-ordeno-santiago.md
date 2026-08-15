@@ -1,5 +1,5 @@
 ---
-title: "Aprenderse Santiago en bicicleta"
+title: "Santiago desde el manillar"
 slug: "002-una-bicicleta-ordeno-santiago"
 date: 2026-08-04
 type: cronica
