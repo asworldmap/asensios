@@ -52,6 +52,30 @@ expect_asset() {
   rm -f "$body"
 }
 
+# Asserts a string IS or IS NOT in a page's body.
+#   expect_text <url> present|absent <string>
+# Status codes and MIME types proved nothing about whether a deploy actually
+# replaced the HTML: a stale page returns 200 just as happily as a fresh one.
+# These check the words a reader would see.
+expect_text() {
+  body=$(curl -sS --max-time 25 "$1" 2>/dev/null)
+  if [ "$2" = "present" ]; then
+    if printf '%s' "$body" | grep -qF "$3"; then
+      echo "  present  : '$3'"
+    else
+      echo "::error::$1 is missing expected text: '$3' -- production is serving stale HTML"
+      fail=1
+    fi
+  else
+    if printf '%s' "$body" | grep -qF "$3"; then
+      echo "::error::$1 still contains superseded text: '$3' -- production is serving stale HTML"
+      fail=1
+    else
+      echo "  absent   : '$3'"
+    fi
+  fi
+}
+
 expect "$BASE/" 200
 expect "$BASE/relatos/001-no-parti-el-dia-previsto.html" 200
 expect "$BASE/relatos/002-una-bicicleta-ordeno-santiago.html" 200
@@ -90,6 +114,29 @@ fi
 for img in $(printf '%s' "$story" | grep -o '/media/004/[^"]*' | sort -u); do
   expect_asset "$BASE$img" "image/" ""
 done
+
+# --- content, not just endpoints -------------------------------------------
+# The published words themselves. Each string is paired with the copy it
+# replaced, so a stale deploy fails loudly instead of passing on status codes.
+echo "--- live content: homepage ---"
+expect_text "$BASE/" present "El plan era pasar desapercibido"
+expect_text "$BASE/" present "Santiago desde el manillar"
+expect_text "$BASE/" absent  "El plan era no llamar la atención"
+expect_text "$BASE/" absent  "Aprenderse Santiago en bicicleta"
+expect_text "$BASE/" absent  "De cómo"
+
+echo "--- live content: about block ---"
+expect_text "$BASE/" present "Durante seis meses vivo en Santiago"
+expect_text "$BASE/" present "Delegación de la Unión Europea en Chile"
+expect_text "$BASE/" present "es un proyecto personal y no representa a la Unión Europea"
+expect_text "$BASE/" present "asensios.com"
+expect_text "$BASE/" absent  "Esto no es una publicación institucional"
+
+echo "--- live content: story + archive + 404 ---"
+expect_text "$BASE/relatos/003-dificil-arte-estarse-quieto.html" present "El plan era pasar desapercibido"
+expect_text "$BASE/archivo.html" present "Santiago desde el manillar"
+expect_text "$BASE/this-definitely-does-not-exist" present "Página perdida"
+expect_text "$BASE/this-definitely-does-not-exist" absent  "Aquí no hay nada"
 
 expect_healthy "https://asensios.com/"
 expect_healthy "https://www.asensios.com/"
