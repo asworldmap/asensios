@@ -31,6 +31,9 @@ export const SITE = {
   tagline: 'Crónicas, postales y otros asuntos escritos desde Santiago de Chile.',
   origin: 'https://blog.asensios.com',
   author: 'Asensio Sabater',
+  // The author's own site. Referenced once, quietly, in the colophon of each
+  // story — never as a banner, a button or a repeated call to action.
+  homepage: 'https://asensios.com/',
   lang: 'es',
   whatsappChannel: 'https://whatsapp.com/channel/0029Vb9813y7tkj1bIgcId3n',
   utm: { source: 'whatsapp', medium: 'channel', campaign: 'relatos_santiago' },
@@ -112,17 +115,57 @@ async function imageSize(absPath) {
       return { w: (b & 0x3fff) + 1, h: ((b >> 14) & 0x3fff) + 1 };
     }
   }
-  // JPEG — walk the segment markers to the frame header
+  // JPEG — walk the segment markers to the frame header, and along the way
+  // read the EXIF Orientation tag from APP1 if present. Browsers rotate a
+  // JPEG to match Orientation by default (CSS image-orientation: from-image
+  // is the standing default), so a photo shot in portrait but stored with
+  // landscape byte dimensions — the common case straight off a phone camera
+  // — renders taller than it is wide. Reporting the raw frame size would
+  // hand the browser a width/height pair swapped from what actually paints,
+  // reintroducing the very layout shift this function exists to prevent.
   if (buf.length > 4 && buf[0] === 0xff && buf[1] === 0xd8) {
     let i = 2;
+    let dims = null;
+    let orientation = 1;
     while (i < buf.length - 9) {
       if (buf[i] !== 0xff) { i++; continue; }
       const marker = buf[i + 1];
-      if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
-        return { h: buf.readUInt16BE(i + 5), w: buf.readUInt16BE(i + 7) };
+      if (marker === 0xe1 && isExifMarker(buf, i + 4)) {
+        orientation = readExifOrientation(buf, i + 10, i + 4 + buf.readUInt16BE(i + 2)) ?? orientation;
       }
+      if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
+        dims = { h: buf.readUInt16BE(i + 5), w: buf.readUInt16BE(i + 7) };
+      }
+      if (dims && orientation !== 1) break;
       i += 2 + buf.readUInt16BE(i + 2);
     }
+    if (!dims) return null;
+    // 5,6,7,8 are the four orientations that carry a 90°/270° rotation.
+    return orientation >= 5 && orientation <= 8 ? { w: dims.h, h: dims.w } : dims;
+  }
+  return null;
+}
+
+/** True at an APP1 payload starting with the 6-byte "Exif" + two zero bytes. */
+function isExifMarker(buf, at) {
+  return buf.length > at + 6 &&
+    buf.toString('ascii', at, at + 4) === 'Exif' &&
+    buf[at + 4] === 0 && buf[at + 5] === 0;
+}
+
+/** Reads the EXIF Orientation tag (0x0112) from a TIFF block; null if absent. */
+function readExifOrientation(buf, tiffStart, segEnd) {
+  if (tiffStart + 8 > buf.length) return null;
+  const le = buf.toString('ascii', tiffStart, tiffStart + 2) === 'II';
+  const read16 = (o) => (le ? buf.readUInt16LE(o) : buf.readUInt16BE(o));
+  const read32 = (o) => (le ? buf.readUInt32LE(o) : buf.readUInt32BE(o));
+  const ifd0 = tiffStart + read32(tiffStart + 4);
+  if (ifd0 + 2 > segEnd) return null;
+  const count = read16(ifd0);
+  for (let e = 0; e < count; e++) {
+    const entry = ifd0 + 2 + e * 12;
+    if (entry + 12 > segEnd) break;
+    if (read16(entry) === 0x0112) return read16(entry + 8);
   }
   return null;
 }
@@ -163,15 +206,77 @@ async function renderVideo(item) {
 </figure>`;
 }
 
-async function renderMediaList(media = []) {
+/** Renders each media item once, keeping its optional anchor and size. */
+async function renderMediaItems(media = []) {
   const out = [];
   for (const raw of media) {
     const item = typeof raw === 'string' ? { src: raw } : raw;
     if (!item.src) continue;
-    if (/\.(mp4|webm|mov)$/i.test(item.src)) out.push(await renderVideo(item));
-    else out.push(await renderImage(item.src, item));
+    const html = /\.(mp4|webm|mov)$/i.test(item.src)
+      ? await renderVideo(item)
+      : await renderImage(item.src, item);
+    out.push({ anchor: item.anchor || null, size: item.size || 'wide', html });
   }
-  return out.join('\n');
+  return out;
+}
+
+async function renderMediaList(media = []) {
+  return (await renderMediaItems(media)).map((i) => i.html).join('\n');
+}
+
+const ANCHOR_RE = /<p>\s*\[\[([a-z0-9_-]+)\]\]\s*<\/p>/gi;
+
+/**
+ * Lets the author drop `[[nombre]]` on its own line in the Markdown and have
+ * the media item with that `anchor` land exactly there — so a photograph can
+ * carry a beat of the story instead of queueing up at the end. The reserved
+ * anchor `[[nota]]` places the frontmatter `note` as a pull quote.
+ *
+ * An anchor with nothing behind it disappears silently: the piece can be
+ * published as text first and gain its photographs later without the
+ * placeholders ever showing up on the page.
+ */
+function placeAnchors(html, items, entry) {
+  const used = new Set();
+  const placed = html.replace(ANCHOR_RE, (_m, key) => {
+    const name = key.toLowerCase();
+    if (name === 'nota') {
+      used.add(name);
+      return entry.note ? `<p class="pull">${esc(entry.note)}</p>` : '';
+    }
+    const hit = items.find((i) => i.anchor === name);
+    if (!hit) return '';
+    used.add(name);
+    return `<div class="plate plate--${esc(hit.size)}" data-plate="${esc(name)}">${hit.html}</div>`;
+  });
+  return {
+    html: placed,
+    rest: items.filter((i) => !i.anchor || !used.has(i.anchor)),
+    notePlaced: used.has('nota'),
+  };
+}
+
+/**
+ * A referenced photograph that isn't in the repository would ship as a broken
+ * image, so it fails the build instead. Drafts are exempt: a piece can be
+ * written before its media arrives.
+ */
+function assertMediaPresent(entry) {
+  const refs = [];
+  if (entry.cover) refs.push(entry.cover);
+  for (const raw of entry.media || []) {
+    const item = typeof raw === 'string' ? { src: raw } : raw;
+    if (item.src) refs.push(item.src);
+    if (item.poster) refs.push(item.poster);
+  }
+  const missing = refs
+    .filter((r) => typeof r === 'string' && r.startsWith('/media/'))
+    .filter((r) => !existsSync(join(CONTENT, r.replace(/^\//, ''))));
+  if (missing.length) {
+    throw new Error(
+      `${entry.sourceFile}: media referenced but not found in content/ — ${missing.join(', ')}`
+    );
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -199,6 +304,7 @@ async function loadSection(section, includeDrafts) {
     };
     validate(entry, entry.sourceFile);
     if (entry.draft && !includeDrafts) continue;
+    if (!entry.draft) assertMediaPresent(entry);
     entry.url = `/${section.dir}/${entry.slug}.html`;
     entry.absoluteUrl = SITE.origin + entry.url;
     entries.push(entry);
@@ -246,7 +352,7 @@ function whatsappUrl(entry) {
   return u.toString();
 }
 
-function head({ title, description, canonical, ogType = 'article', image }) {
+function head({ title, description, canonical, ogType = 'article', image, bodyClass = '' }) {
   const img = image ? `\n<meta property="og:image" content="${esc(SITE.origin + image)}">` : '';
   return `<!doctype html>
 <html lang="${SITE.lang}">
@@ -269,7 +375,7 @@ function head({ title, description, canonical, ogType = 'article', image }) {
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(description)}">
 </head>
-<body>
+<body${bodyClass ? ` class="${esc(bodyClass)}"` : ''}>
 <a class="skip-link" href="#contenido">Saltar al contenido</a>`;
 }
 
@@ -312,11 +418,23 @@ function footer() {
 
 /** Body renderers per editorial type — composable, one shared shell. */
 async function storyBody(entry, html) {
-  const gallery = entry.media?.length ? await renderMediaList(entry.media) : '';
+  const items = entry.media?.length ? await renderMediaItems(entry.media) : [];
+  const gallery = items.map((i) => i.html).join('\n');
   const note = entry.note
     ? `<aside class="side-column"><div class="margin-note">${esc(entry.note)}</div></aside>`
     : '';
   switch (entry.type) {
+    // A crónica where the photographs carry as much of the story as the
+    // paragraphs: one column, text held at reading measure, images allowed to
+    // break wider and land on the beat the author chose with [[anclajes]].
+    case 'cronica-visual': {
+      const { html: placed, rest, notePlaced } = placeAnchors(html, items, entry);
+      return `<section class="story-body story-body--abierta">
+        <div class="prose prose--wide">${placed}</div>
+        ${!notePlaced && entry.note ? `<p class="pull">${esc(entry.note)}</p>` : ''}
+        ${rest.length ? `<div class="gallery gallery--inline">${rest.map((i) => i.html).join('\n')}</div>` : ''}
+      </section>`;
+    }
     case 'postal':
     case 'fotoensayo':
       return `<section class="story-body story-body--visual">
@@ -341,9 +459,13 @@ async function storyBody(entry, html) {
   }
 }
 
+/** Optional accent palettes a piece may ask for. Anything else is ignored. */
+const PALETTES = new Set(['mesa']);
+
 async function storyPage(entry) {
   const html = marked.parse(entry.body);
   const label = SECTIONS.find((s) => s.id === entry.section)?.label || 'Relato';
+  const palette = PALETTES.has(entry.palette) ? `palette-${entry.palette}` : '';
   const cover = entry.cover
     ? await renderImage(entry.cover, { alt: entry.coverAlt || entry.title, className: 'figure--cover', eager: true })
     : '';
@@ -357,6 +479,7 @@ async function storyPage(entry) {
     description: entry.summary || SITE.tagline,
     canonical: entry.absoluteUrl,
     image: entry.cover,
+    bodyClass: palette,
   })}
 ${masthead({ compact: true })}
 <main id="contenido" class="wrap">
@@ -383,11 +506,23 @@ ${masthead({ compact: true })}
         </a>
       </p>
     </footer>
+    ${colofon()}
     ${cartaBlock(entry)}
   </article>
   ${nav}
 </main>
 ${footer()}`;
+}
+
+/**
+ * The only mention of asensios.com anywhere in the publication: one line of
+ * italic prose at the foot of a story, phrased as a colophon rather than an
+ * advertisement. No button, no banner, no repetition.
+ */
+function colofon() {
+  return `<aside class="colofon">
+  <p>Quien escribe esto se llama ${esc(SITE.author)} y está de paso por Chile. El resto del año, y el resto de su trabajo, viven en <a href="${esc(SITE.homepage)}" data-event="home_link_click">asensios.com</a>.</p>
+</aside>`;
 }
 
 function cartaBlock(entry) {
