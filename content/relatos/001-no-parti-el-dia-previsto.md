@@ -1,13 +1,13 @@
 ---
-title: "De cómo no partí hacia Chile el día previsto"
+title: "El avión se fue sin mí"
 slug: "001-no-parti-el-dia-previsto"
 date: 2026-07-28
 type: cronica
 section: cronicas
 location: "Murcia → Santiago"
-summary: "Una escala apresurada en Murcia, una despedida demasiado breve y un avión que decidió marcharse sin mí."
+summary: "Una despedida a medias en Murcia y un vuelo que no me esperó."
 note: "Aquí no hace falta fingir una moraleja. El accidente fue una faena y, al mismo tiempo, acabó regalándome la despedida que no había tenido."
-featured: true
+featured: false
 draft: false
 ---
 

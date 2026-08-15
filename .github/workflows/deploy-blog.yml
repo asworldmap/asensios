@@ -109,74 +109,28 @@ jobs:
       # (checked out above) and is copied to the VPS here, rather than
       # embedded inline, to keep this workflow file's YAML/heredoc nesting
       # simple and easy to audit.
-      - name: Upload Caddy snippet to VPS
+      - name: Upload Caddy snippet + apply script to VPS
         if: steps.check.outputs.configured == 'true'
         run: |
           scp -i /tmp/deploy_key -P ${{ secrets.REMOTE_PORT || 22 }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 -o ServerAliveInterval=5 -o ServerAliveCountMax=3 \
             deploy/blog/Caddyfile.blog.snippet "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/tmp/blog-caddy-snippet.conf"
+          scp -i /tmp/deploy_key -P ${{ secrets.REMOTE_PORT || 22 }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 -o ServerAliveInterval=5 -o ServerAliveCountMax=3 \
+            deploy/blog/apply-caddy-block.sh "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/tmp/apply-caddy-block.sh"
 
-      # Idempotent: creates /var/www/blog.asensios.com and adds the Caddy
-      # site block only if it isn't already present. Backs up the Caddyfile
-      # first, validates before reloading, and if either the validation or
-      # the post-reload health check of asensios.com/www.asensios.com fails,
-      # restores the backup and reloads again so the apex site is never left
-      # broken. Requires the deploy user to have passwordless sudo; if it
-      # doesn't, this step fails with a clear message instead of attempting
-      # a workaround (no new sudo rules are added).
-      - name: Configure Caddy for blog.asensios.com (idempotent, self-healing)
+      # Installs or updates the Caddy site block by running the checked-in
+      # script on the VPS. The script owns a marked region of /etc/caddy/Caddyfile
+      # and rewrites it on every deploy, so a correction to headers or caching
+      # actually reaches production — the previous version appended once and
+      # then skipped forever, which silently froze the config. It backs up,
+      # validates before reloading, and rolls back if the apex site goes
+      # unhealthy. Requires passwordless sudo; fails clearly if absent.
+      - name: Configure Caddy for blog.asensios.com (managed block, self-healing)
         if: steps.check.outputs.configured == 'true'
         run: |
           set -euo pipefail
           SSH_OPTS="-i /tmp/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 -o ServerAliveInterval=5 -o ServerAliveCountMax=3"
-          ssh $SSH_OPTS "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" bash -s <<'REMOTE_SCRIPT'
-          set -euo pipefail
-          TARGET=/var/www/blog.asensios.com
-          CADDYFILE=/etc/caddy/Caddyfile
-          SNIPPET=/tmp/blog-caddy-snippet.conf
-
-          if ! sudo -n true 2>/dev/null; then
-            echo "::error::Deploy user has no passwordless sudo on this host -- cannot safely edit $CADDYFILE or reload Caddy. Not adding broad sudo rules to work around this."
-            rm -f "$SNIPPET"
-            exit 1
-          fi
-
-          sudo mkdir -p "$TARGET"
-
-          if sudo grep -q '^blog\.asensios\.com {' "$CADDYFILE" 2>/dev/null; then
-            echo "Caddy block for blog.asensios.com already present in $CADDYFILE -- skipping edit/reload."
-            rm -f "$SNIPPET"
-            exit 0
-          fi
-
-          STAMP=$(date +%Y%m%d-%H%M%S)
-          BACKUP="${CADDYFILE}.backup-${STAMP}"
-          sudo cp "$CADDYFILE" "$BACKUP"
-          echo "Backup created: $BACKUP"
-
-          { echo; cat "$SNIPPET"; } | sudo tee -a "$CADDYFILE" > /dev/null
-          rm -f "$SNIPPET"
-
-          sudo caddy fmt --overwrite "$CADDYFILE"
-
-          if ! sudo caddy validate --config "$CADDYFILE"; then
-            echo "::error::caddy validate failed after adding the blog block -- restoring backup, NOT reloading."
-            sudo cp "$BACKUP" "$CADDYFILE"
-            exit 1
-          fi
-
-          sudo systemctl reload caddy
-          sleep 2
-
-          if ! curl -fsS -o /dev/null https://asensios.com/ || ! curl -fsS -o /dev/null https://www.asensios.com/; then
-            echo "::error::asensios.com or www.asensios.com unhealthy after reload -- rolling back Caddy immediately."
-            sudo cp "$BACKUP" "$CADDYFILE"
-            sudo caddy validate --config "$CADDYFILE"
-            sudo systemctl reload caddy
-            exit 1
-          fi
-
-          echo "Caddy reloaded. asensios.com and www.asensios.com verified healthy from the VPS."
-          REMOTE_SCRIPT
+          ssh $SSH_OPTS "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" \
+            'bash /tmp/apply-caddy-block.sh /tmp/blog-caddy-snippet.conf && rm -f /tmp/apply-caddy-block.sh'
 
       # Deploys via rsync over SSH, same mechanism as the apex job in
       # deploy.yml, but to a fixed, non-secret target — this path is not
@@ -205,13 +159,17 @@ jobs:
           ssh $SSH_OPTS "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" \
             'sudo find /var/www/blog.asensios.com -type d -exec chmod 755 {} \; && sudo find /var/www/blog.asensios.com -type f -exec chmod 644 {} \;'
 
-      # Public verification from this GitHub Actions runner (real,
-      # unrestricted outbound network) rather than any restricted
-      # environment.
+      # Public verification from this GitHub Actions runner (real, unrestricted
+      # outbound network). This checks the ASSETS, not just the HTML: an
+      # earlier release shipped a stylesheet that some devices could not load
+      # while every page still returned 200, so page-status checks alone
+      # proved nothing. Here the stylesheet and script URLs are read back out
+      # of the deployed HTML and fetched, confirming status, Content-Type and
+      # that the body really is CSS/JS rather than an error page.
       - name: Verify public blog + apex health
         if: steps.check.outputs.configured == 'true'
         run: |
-          set -euo pipefail
+          set -uo pipefail
           fail=0
           expect() {
             code=$(curl -sS -o /dev/null -w '%{http_code}' "$1" || echo "000")
@@ -223,13 +181,44 @@ jobs:
             echo "$1 -> $code (following redirects)"
             case "$code" in 2??) ;; *) echo "::error::expected a healthy 2xx from $1, got $code"; fail=1;; esac
           }
+          # $1 url, $2 expected Content-Type substring, $3 a string the body must contain
+          expect_asset() {
+            body=$(mktemp)
+            read -r code ctype < <(curl -sS -o "$body" -w '%{http_code} %{content_type}' "$1" || echo "000 none")
+            echo "$1 -> $code [$ctype]"
+            [ "$code" = "200" ] || { echo "::error::$1 returned $code"; fail=1; }
+            case "$ctype" in *"$2"*) ;; *) echo "::error::$1 served as '$ctype', expected $2 -- browsers with nosniff will refuse it"; fail=1;; esac
+            grep -qF "$3" "$body" || { echo "::error::$1 body does not look like $2 (missing '$3') -- probably an error page"; fail=1; }
+            rm -f "$body"
+          }
           expect "https://blog.asensios.com/" 200
           expect "https://blog.asensios.com/relatos/001-no-parti-el-dia-previsto.html" 200
           expect "https://blog.asensios.com/relatos/002-una-bicicleta-ordeno-santiago.html" 200
           expect "https://blog.asensios.com/relatos/003-dificil-arte-estarse-quieto.html" 200
+          expect "https://blog.asensios.com/relatos/004-la-diplomacia-tambien-se-come.html" 200
           expect "https://blog.asensios.com/robots.txt" 200
           expect "https://blog.asensios.com/sitemap.xml" 200
           expect "https://blog.asensios.com/this-definitely-does-not-exist" 404
+
+          # Read the fingerprinted asset URLs straight out of the live page, so
+          # this checks what a real browser would actually request.
+          home=$(curl -sS https://blog.asensios.com/)
+          css=$(printf '%s' "$home" | grep -o '/assets/style\.[a-f0-9]*\.css' | head -1)
+          js=$(printf '%s' "$home" | grep -o '/assets/site\.[a-f0-9]*\.js' | head -1)
+          if [ -z "$css" ] || [ -z "$js" ]; then
+            echo "::error::could not find fingerprinted asset URLs in the deployed homepage"
+            fail=1
+          else
+            expect_asset "https://blog.asensios.com$css" "text/css" "Relatos desde Santiago"
+            expect_asset "https://blog.asensios.com$js" "javascript" "GA_MEASUREMENT_ID"
+          fi
+
+          # Every photograph referenced by story 004 must actually load.
+          for img in $(curl -sS https://blog.asensios.com/relatos/004-la-diplomacia-tambien-se-come.html \
+                       | grep -o '/media/004/[^"]*' | sort -u); do
+            expect_asset "https://blog.asensios.com$img" "image/" ""
+          done
+
           expect_healthy "https://asensios.com/"
           expect_healthy "https://www.asensios.com/"
           exit $fail

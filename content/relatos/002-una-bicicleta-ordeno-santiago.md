@@ -1,11 +1,11 @@
 ---
-title: "De cómo una bicicleta empezó a ordenar Santiago"
+title: "Aprenderse Santiago en bicicleta"
 slug: "002-una-bicicleta-ordeno-santiago"
 date: 2026-08-04
 type: cronica
 section: cronicas
 location: "Santiago de Chile"
-summary: "Una ciudad desconocida, otros pasantes recién llegados y una forma bastante literal de empezar a encontrar el camino."
+summary: "Una ciudad que todavía no entendía y una manera bastante literal de empezar a orientarme."
 note: "Algunos lugares empiezan a sentirse propios cuando uno deja de necesitar instrucciones para volver a casa."
 featured: false
 draft: false
