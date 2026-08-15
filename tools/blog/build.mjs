@@ -115,17 +115,57 @@ async function imageSize(absPath) {
       return { w: (b & 0x3fff) + 1, h: ((b >> 14) & 0x3fff) + 1 };
     }
   }
-  // JPEG — walk the segment markers to the frame header
+  // JPEG — walk the segment markers to the frame header, and along the way
+  // read the EXIF Orientation tag from APP1 if present. Browsers rotate a
+  // JPEG to match Orientation by default (CSS image-orientation: from-image
+  // is the standing default), so a photo shot in portrait but stored with
+  // landscape byte dimensions — the common case straight off a phone camera
+  // — renders taller than it is wide. Reporting the raw frame size would
+  // hand the browser a width/height pair swapped from what actually paints,
+  // reintroducing the very layout shift this function exists to prevent.
   if (buf.length > 4 && buf[0] === 0xff && buf[1] === 0xd8) {
     let i = 2;
+    let dims = null;
+    let orientation = 1;
     while (i < buf.length - 9) {
       if (buf[i] !== 0xff) { i++; continue; }
       const marker = buf[i + 1];
-      if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
-        return { h: buf.readUInt16BE(i + 5), w: buf.readUInt16BE(i + 7) };
+      if (marker === 0xe1 && isExifMarker(buf, i + 4)) {
+        orientation = readExifOrientation(buf, i + 10, i + 4 + buf.readUInt16BE(i + 2)) ?? orientation;
       }
+      if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
+        dims = { h: buf.readUInt16BE(i + 5), w: buf.readUInt16BE(i + 7) };
+      }
+      if (dims && orientation !== 1) break;
       i += 2 + buf.readUInt16BE(i + 2);
     }
+    if (!dims) return null;
+    // 5,6,7,8 are the four orientations that carry a 90°/270° rotation.
+    return orientation >= 5 && orientation <= 8 ? { w: dims.h, h: dims.w } : dims;
+  }
+  return null;
+}
+
+/** True at an APP1 payload starting with the 6-byte "Exif" + two zero bytes. */
+function isExifMarker(buf, at) {
+  return buf.length > at + 6 &&
+    buf.toString('ascii', at, at + 4) === 'Exif' &&
+    buf[at + 4] === 0 && buf[at + 5] === 0;
+}
+
+/** Reads the EXIF Orientation tag (0x0112) from a TIFF block; null if absent. */
+function readExifOrientation(buf, tiffStart, segEnd) {
+  if (tiffStart + 8 > buf.length) return null;
+  const le = buf.toString('ascii', tiffStart, tiffStart + 2) === 'II';
+  const read16 = (o) => (le ? buf.readUInt16LE(o) : buf.readUInt16BE(o));
+  const read32 = (o) => (le ? buf.readUInt32LE(o) : buf.readUInt32BE(o));
+  const ifd0 = tiffStart + read32(tiffStart + 4);
+  if (ifd0 + 2 > segEnd) return null;
+  const count = read16(ifd0);
+  for (let e = 0; e < count; e++) {
+    const entry = ifd0 + 2 + e * 12;
+    if (entry + 12 > segEnd) break;
+    if (read16(entry) === 0x0112) return read16(entry + 8);
   }
   return null;
 }

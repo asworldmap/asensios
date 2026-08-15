@@ -40,7 +40,12 @@ Relatos desde Santiago/
 ## Nota sobre el entorno
 
 Traer los binarios desde Drive requiere que el entorno de ejecución permita
-salir hacia los hosts de Drive. La política de red por defecto los deniega,
-así que la copia puede tener que hacerla una persona. La ingesta automática
-no se construye hasta que este flujo manual se haya probado un par de veces
-más: primero la evidencia, después la automatización.
+salir hacia los hosts de Drive (`drive.google.com` y similares). La política
+de red de este entorno los deniega, así que la sesión no puede descargarlos
+por sí sola aunque la carpeta esté bien compartida.
+
+Con el relato #004 se probó la salida práctica: exportar las fotos elegidas
+desde otra máquina en un `.zip` con una nota editorial (`EDITORIAL-NOTES.txt`
+— qué es cada foto y qué papel se propone para ella) y entregarlo directamente
+a la sesión. Funcionó bien y es repetible para #005. La ingesta automática
+sigue sin construirse: primero la evidencia, después la automatización.

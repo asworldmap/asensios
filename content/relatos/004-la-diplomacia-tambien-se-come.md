@@ -9,27 +9,17 @@ location: "Santiago de Chile"
 summary: "Una invitación que cambió de manos, una sala llena de orgullo argentino y un conejo con pistachos que se me quedó más tiempo que ningún discurso."
 featured: true
 draft: false
-# Las cuatro fotografías reales están en Drive (#004) y todavía no en el
-# repositorio: ver content/media/004/README.md. Los anclajes [[sala]],
-# [[plato]] y [[final]] ya están puestos en el cuerpo y no imprimen nada
-# mientras no exista la imagen, así que el relato se lee entero como texto.
-# Al copiar los archivos, descomentar este bloque y completar los alt.
-# cover: "/media/004/portada.jpg"
-# coverAlt: ""
-# media:
-#   - src: "/media/004/sala.jpg"
-#     anchor: sala
-#     size: wide
-#     alt: ""
-#   - src: "/media/004/plato.jpg"
-#     anchor: plato
-#     size: full
-#     alt: ""
-#     caption: "Conejo, pistacho, queso crema y una lámina de patata negra"
-#   - src: "/media/004/final.jpg"
-#     anchor: final
-#     size: inset
-#     alt: ""
+cover: "/media/004/portada-servicio.jpg"
+coverAlt: "Dos camareros terminan de emplatar en la terraza de la residencia, de noche"
+media:
+  - src: "/media/004/sala.jpg"
+    anchor: sala
+    size: wide
+    alt: "La mesa de servicio junto a una ventana, con el jardín iluminado al fondo"
+  - src: "/media/004/plato.jpg"
+    anchor: plato
+    size: full
+    alt: "Un plato hondo y calado, servido esa noche, sobre el suelo ajedrezado de la residencia"
 ---
 
 Mi compañero no pudo ir. Le acababa de nacer un hijo, que es de las poquísimas razones que en esta vida le ganan por goleada a cualquier acto oficial. Así que la invitación cambió de manos y llegó a la mía con esa mezcla de suerte y de responsabilidad que tienen las cosas que uno no había pedido.
@@ -51,8 +41,6 @@ Conejo. Un ragú lento, oscuro, hecho con la paciencia de quien no tiene ninguna
 Se rompía con un sonido pequeño y muy satisfactorio. Lo probé, dejé de hablar y me quedé mirando el plato como se mira a alguien que acaba de decir algo inteligente.
 
 Sigo dándole vueltas a por qué aquello ordenó la noche entera. Supongo que un discurso se escribe con tiempo y se corrige, y en cambio a nadie se le ocurre mentir en un plato: alguien decidió cocer ese conejo durante horas, alguien eligió pistacho en lugar de almendra, alguien pensó que allí hacía falta una textura que se rompiera. Son decisiones pequeñas, tomadas en una cocina, y cuentan de un país bastante más de lo que uno esperaría.
-
-[[final]]
 
 No salí de allí con ningún gran acuerdo internacional.
 

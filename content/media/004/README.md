@@ -1,65 +1,49 @@
 # content/media/004 — «La diplomacia también se come»
 
-## Estado
+## Estado: publicadas
 
-Las fotografías **están en Drive y todavía no en el repositorio**. No se
-pudieron traer desde la sesión que preparó el relato: la política de red del
-entorno deniega `drive.google.com`, `docs.google.com`,
-`drive.usercontent.google.com` y `lh3.googleusercontent.com`, y el conector
-de Drive solo devuelve los binarios en base64, que no caben por esa vía.
+Tres fotografías reales, entregadas por el autor. Inspeccionadas una a una
+antes de asignarlas — no por nombre de archivo.
 
-El relato está escrito y se publica como texto. Los anclajes están puestos y
-no imprimen nada mientras la imagen no exista, así que la página nunca sale
-rota.
-
-## Los cuatro originales
-
-Carpeta: `Relatos desde Santiago/#004`
-<https://drive.google.com/drive/folders/1cz9HhUnv93mFJWPbDTGjVAg1ZOSoc9i0>
-
-| Original | Tomada | Peso | Ranura prevista |
+| Archivo | Rol | Anclaje | Notas |
 |---|---|---|---|
-| `Portada_relatos_Santiago` | — | 2,2 MB | `cover` → `portada.jpg` |
-| `20260811_190047.jpg` | 11 ago, 19:00 | 3,1 MB | por decidir |
-| `20260811_192307.jpg` | 11 ago, 19:23 | 3,1 MB | por decidir |
-| `20260811_202333.jpg` | 11 ago, 20:23 | 1,9 MB | por decidir |
+| `portada-servicio.jpg` | Portada | `cover` | Dos camareros emplatando en la terraza de la residencia, de noche. Resume la crónica sin mostrar el plato todavía. |
+| `sala.jpg` | Ambiente | `[[sala]]` | La mesa de servicio junto a una ventana, con el jardín y la piscina iluminados al fondo. |
+| `plato.jpg` | Clímax gastronómico | `[[plato]]` | El plato de la noche, a máxima anchura (`size: full`). |
 
-El nombre de la primera es una decisión editorial ya tomada por el autor, así
-que va de portada. Las otras tres están en orden cronológico de la propia
-velada, pero **cuál es la sala, cuál el plato y cuál el cierre no se ha
-podido comprobar mirándolas**, y no se asigna a ciegas.
+## Lo que se dejó fuera
 
-## Las tres ranuras del cuerpo
+`autor-contexto.jpg` (selfie del autor con banderas de la UE) **no se ha
+usado**. Las banderas son de la Unión Europea, no de Argentina ni de Chile,
+y la foto no se tomó en la residencia del relato — usarla habría sugerido
+al lector que pertenece a esa noche cuando no es así. Sigue disponible por
+si sirve para otro relato con ese contexto real (una crónica sobre Erasmus+
+o instituciones europeas, por ejemplo), pero no aquí.
 
-| Anclaje | Momento del relato | Ancho | Qué pide |
-|---|---|---|---|
-| `[[sala]]` | Tras «Fui solo…», antes de los discursos | `wide` | La noche mientras ocurre: la sala, la gente, la luz. |
-| `[[plato]]` | Justo después de la descripción del conejo | `full` | **El plato.** Es el clímax visual: rompe la columna de texto y va a sangre. Solo merece ese tamaño si la foto aguanta el detalle. |
-| `[[final]]` | Antes de las dos últimas líneas | `inset` | El después: el plato terminado, la mesa vaciándose. Pequeña y callada. |
+`Portada_relatos_Santiago.jpg`, del envío original a Drive, tampoco se ha
+usado — así se pidió explícitamente.
 
-Si una de las tres no aporta o repite a otra, **es mejor dejarla fuera**. Tres
-imágenes buenas valen más que cuatro forzadas; el anclaje sin foto no imprime
-nada.
+## Sobre `plato.jpg`
 
-## Para terminarlo
+Es un objeto oscuro, calado, con un dibujo de flores caladas, sostenido en
+la mano sobre el suelo de ajedrez. No se ven con certeza el conejo, el
+pistacho ni el queso crema por separado: la lectura más plausible es que la
+lámina negra calada **es** la "lámina de patata negra" del texto, con el
+ragú asomando en tono cobrizo por los huecos — pero es una lectura, no una
+certeza visual. Por eso el `alt` y no lleva `caption`: describe lo que se
+ve (un plato calado, servido esa noche) sin afirmar ingredientes que la
+fotografía, por sí sola, no confirma. El texto ya lleva el peso descriptivo
+del plato; la imagen no necesita repetirlo.
 
-1. Copiar los archivos aquí como `portada.jpg`, `sala.jpg`, `plato.jpg` y
-   `final.jpg`, según lo que muestre cada uno.
-2. En `content/relatos/004-la-diplomacia-tambien-se-come.md`, descomentar el
-   bloque `cover:` / `media:` y **escribir los `alt`** (una frase por imagen,
-   describiendo lo que se ve).
-3. `git push`. El resto es automático.
+## Orientación EXIF
 
-## Notas técnicas
+`portada-servicio.jpg` y `sala.jpg` se grabaron en vertical pero el sensor
+las guardó con dimensiones de fichero en horizontal + una etiqueta EXIF
+`Orientation: 6` (rotar 90° para verlas bien). El generador ya lo tiene en
+cuenta — `tools/blog/build.mjs`, función `imageSize()` — así que el
+`width`/`height` que se escribe en el HTML coincide con lo que el
+navegador pinta de verdad, y no hay salto de maquetación al cargar.
 
-- JPEG, WebP, AVIF, PNG y GIF valen. Si dejas `plato.avif` o `plato.webp`
-  junto al `.jpg`, el generador emite un `<picture>` y sirve el formato
-  ligero a quien pueda leerlo. No es requisito para publicar.
-- Las dimensiones se leen de la propia imagen, así que la página no da saltos
-  mientras carga. No hace falta declararlas.
-- El lado largo de `plato` conviene que ronde los 2400 px; el resto, 1800 px
-  basta. Los originales de 3 MB pueden ir tal cual si no hay a mano una
-  reducción sencilla.
-- Si una imagen declarada no existe, **la compilación falla a propósito** en
-  lugar de publicar una foto rota.
-- Este README no se publica: el generador no copia `README.md` al sitio.
+## Para el próximo relato
+
+Ver `content/media/README.md` para el flujo Drive → editorial → Git.
