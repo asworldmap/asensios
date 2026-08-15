@@ -92,7 +92,11 @@ jobs:
         run: |
           set -uo pipefail
           for i in 1 2 3 4 5; do
-            if ssh -i /tmp/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} \
+            # `timeout` bounds the WHOLE attempt. ConnectTimeout only covers
+            # the TCP connect, so a host that accepts the socket and then
+            # stalls during the handshake (rate limiting, fail2ban tarpit)
+            # leaves ssh waiting forever and burns the job's entire budget.
+            if timeout 30 ssh -i /tmp/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} \
                  -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
                  -o ConnectTimeout=15 -o BatchMode=yes \
                  "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" true; then
@@ -159,72 +163,10 @@ jobs:
           ssh $SSH_OPTS "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" \
             'sudo find /var/www/blog.asensios.com -type d -exec chmod 755 {} \; && sudo find /var/www/blog.asensios.com -type f -exec chmod 644 {} \;'
 
-      # Public verification from this GitHub Actions runner (real, unrestricted
-      # outbound network). This checks the ASSETS, not just the HTML: an
-      # earlier release shipped a stylesheet that some devices could not load
-      # while every page still returned 200, so page-status checks alone
-      # proved nothing. Here the stylesheet and script URLs are read back out
-      # of the deployed HTML and fetched, confirming status, Content-Type and
-      # that the body really is CSS/JS rather than an error page.
+      # Public verification, shared with production-health-check.yml. Needs no
+      # SSH and no secrets: whether the published site is correct is a question
+      # about public URLs, and answering it must not depend on being able to
+      # log into the server.
       - name: Verify public blog + apex health
-        if: steps.check.outputs.configured == 'true'
-        run: |
-          # No `set -e` / `pipefail` here on purpose. GitHub invokes this step
-          # as `bash -e`, and `grep ... | head -1` below takes SIGPIPE when
-          # head closes the pipe early; with pipefail that reads as a fatal
-          # error and the whole verification aborts before checking anything.
-          # This step keeps its own tally in $fail and exits on that.
-          set +e
-          set -u
-          fail=0
-          expect() {
-            code=$(curl -sS -o /dev/null -w '%{http_code}' "$1" || echo "000")
-            echo "$1 -> $code"
-            [ "$code" = "$2" ] || { echo "::error::expected $2 from $1, got $code"; fail=1; }
-          }
-          expect_healthy() {
-            code=$(curl -sS -o /dev/null -w '%{http_code}' -L "$1" || echo "000")
-            echo "$1 -> $code (following redirects)"
-            case "$code" in 2??) ;; *) echo "::error::expected a healthy 2xx from $1, got $code"; fail=1;; esac
-          }
-          # $1 url, $2 expected Content-Type substring, $3 a string the body must contain
-          expect_asset() {
-            body=$(mktemp)
-            read -r code ctype < <(curl -sS -o "$body" -w '%{http_code} %{content_type}' "$1" || echo "000 none")
-            echo "$1 -> $code [$ctype]"
-            [ "$code" = "200" ] || { echo "::error::$1 returned $code"; fail=1; }
-            case "$ctype" in *"$2"*) ;; *) echo "::error::$1 served as '$ctype', expected $2 -- browsers with nosniff will refuse it"; fail=1;; esac
-            grep -qF "$3" "$body" || { echo "::error::$1 body does not look like $2 (missing '$3') -- probably an error page"; fail=1; }
-            rm -f "$body"
-          }
-          expect "https://blog.asensios.com/" 200
-          expect "https://blog.asensios.com/relatos/001-no-parti-el-dia-previsto.html" 200
-          expect "https://blog.asensios.com/relatos/002-una-bicicleta-ordeno-santiago.html" 200
-          expect "https://blog.asensios.com/relatos/003-dificil-arte-estarse-quieto.html" 200
-          expect "https://blog.asensios.com/relatos/004-la-diplomacia-tambien-se-come.html" 200
-          expect "https://blog.asensios.com/robots.txt" 200
-          expect "https://blog.asensios.com/sitemap.xml" 200
-          expect "https://blog.asensios.com/this-definitely-does-not-exist" 404
-
-          # Read the fingerprinted asset URLs straight out of the live page, so
-          # this checks what a real browser would actually request.
-          home=$(curl -sS https://blog.asensios.com/)
-          css=$(printf '%s' "$home" | grep -o '/assets/style\.[a-f0-9]*\.css' | head -1)
-          js=$(printf '%s' "$home" | grep -o '/assets/site\.[a-f0-9]*\.js' | head -1)
-          if [ -z "$css" ] || [ -z "$js" ]; then
-            echo "::error::could not find fingerprinted asset URLs in the deployed homepage"
-            fail=1
-          else
-            expect_asset "https://blog.asensios.com$css" "text/css" "Relatos desde Santiago"
-            expect_asset "https://blog.asensios.com$js" "javascript" "GA_MEASUREMENT_ID"
-          fi
-
-          # Every photograph referenced by story 004 must actually load.
-          for img in $(curl -sS https://blog.asensios.com/relatos/004-la-diplomacia-tambien-se-come.html \
-                       | grep -o '/media/004/[^"]*' | sort -u); do
-            expect_asset "https://blog.asensios.com$img" "image/" ""
-          done
-
-          expect_healthy "https://asensios.com/"
-          expect_healthy "https://www.asensios.com/"
-          exit $fail
+        if: always() && steps.check.outputs.configured == 'true'
+        run: bash deploy/blog/verify-public.sh
