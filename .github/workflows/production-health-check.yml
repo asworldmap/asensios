@@ -10,42 +10,25 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/production-health-check.yml"
+      - "deploy/blog/verify-public.sh"
 
 jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Same script the deploy workflow runs, so "is production correct?" has
+      # exactly one answer and can be asked without a deploy or any credential.
       - name: Check public endpoints
+        run: bash deploy/blog/verify-public.sh
+
+      - name: TLS certificate expiry
         run: |
-          set -uo pipefail
-          fail=0
-          expect() {
-            code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 "$1" || echo "000")
-            echo "$1 -> $code (expected $2)"
-            [ "$code" = "$2" ] || { echo "::error::expected $2 from $1, got $code"; fail=1; }
-          }
-          expect_healthy() {
-            code=$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time 20 "$1" || echo "000")
-            echo "$1 -> $code (following redirects, expected 2xx)"
-            case "$code" in 2??) ;; *) echo "::error::expected 2xx from $1, got $code"; fail=1;; esac
-          }
-          echo "--- apex ---"
-          expect_healthy "https://asensios.com/"
-          expect_healthy "https://www.asensios.com/"
-          echo "--- Relatos desde Santiago ---"
-          expect "https://blog.asensios.com/" 200
-          expect "https://blog.asensios.com/relatos/001-no-parti-el-dia-previsto.html" 200
-          expect "https://blog.asensios.com/relatos/002-una-bicicleta-ordeno-santiago.html" 200
-          expect "https://blog.asensios.com/relatos/003-dificil-arte-estarse-quieto.html" 200
-          expect "https://blog.asensios.com/robots.txt" 200
-          expect "https://blog.asensios.com/sitemap.xml" 200
-          echo "--- negative control ---"
-          expect "https://blog.asensios.com/this-definitely-does-not-exist" 404
-          echo "--- TLS certificate ---"
           for h in asensios.com www.asensios.com blog.asensios.com; do
             exp=$(echo | openssl s_client -servername "$h" -connect "$h":443 2>/dev/null \
                   | openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2)
             echo "$h certificate expires: ${exp:-<could not read>}"
           done
-          exit $fail
