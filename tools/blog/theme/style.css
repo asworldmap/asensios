@@ -192,7 +192,7 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 .card--postal .card__title, .card--dispatch .card__title { font-size: clamp(20px, 2.2vw, 25px); }
 .card--secondary .card__deck, .card--tertiary .card__deck { font-size: 16px; }
 
-.figure--card img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+.figure--card img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; object-position: center 32%; }
 .card--lead .figure--card img { aspect-ratio: 16 / 9; }
 .front-lead__side .figure--card img { aspect-ratio: 2 / 1; }
 .js .card .figure img { transition: transform .6s cubic-bezier(.22,.61,.36,1); }
@@ -200,12 +200,23 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 
 /* The band: one story as type alone, full width. The front page's change of
    pace, so four cards do not arrive at the same volume. */
+/* Photograph beside the type, not above it. Most of these images are phone
+   portraits: a full-width band would crop straight through a face, while a
+   tall column suits them and gives the front page a second kind of
+   composition next to the lead's image-over-headline. */
 .band {
+  display: grid; align-items: center;
+  grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr);
+  gap: clamp(24px, 3.2vw, 46px);
   padding: clamp(30px, 4vw, 52px) 0;
   border-bottom: 1px solid var(--rule);
   border-left: 3px solid var(--accent);
   padding-left: clamp(20px, 3vw, 40px);
 }
+.band .figure--band { margin: 0; }
+.band .figure--band img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: center 30%; }
+.js .band .figure img { transition: transform .6s cubic-bezier(.22,.61,.36,1); }
+.js .band:hover .figure img { transform: scale(1.012); }
 .band__title { margin: 0 0 14px; font-size: clamp(30px, 4.4vw, 54px); line-height: 1.02; letter-spacing: -.03em; max-width: 20ch; }
 .band__title a { text-decoration: none; }
 .band__title a:hover { color: var(--accent); }
@@ -351,7 +362,7 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   color: var(--accent); font-weight: 600;
 }
 .figure--cover { margin: 6px 0 clamp(26px, 3.4vw, 44px); }
-.figure--cover img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.figure--cover img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: center 32%; }
 
 .story-body {
   display: grid; grid-template-columns: minmax(0, var(--measure)) minmax(0, 1fr);
@@ -556,7 +567,8 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   .card--lead .card__deck { font-size: 17px; }
   .card--secondary .card__title, .card--tertiary .card__title { font-size: 22px; }
 
-  .band { padding: 24px 0 24px; padding-left: 16px; border-left-width: 3px; }
+  .band { grid-template-columns: 1fr; gap: 18px; padding: 24px 0; padding-left: 16px; border-left-width: 3px; }
+  .band .figure--band img { aspect-ratio: 3 / 2; }
   .band__title { font-size: clamp(26px, 7.6vw, 34px); max-width: none; }
   .band__deck { font-size: 17px; }
 
