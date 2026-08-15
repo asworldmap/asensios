@@ -607,18 +607,28 @@ function cartaBlock(entry) {
 
 // --- front page -------------------------------------------------------------
 
-/** A story on the front page set as type alone — no image, full measure. */
-function bandCard(entry) {
+/**
+ * A story given the full width of the page: one wide photograph over a large
+ * headline. The front page's change of pace — it breaks the card rhythm
+ * without dropping to type alone once every story carries an image.
+ */
+async function bandCard(entry) {
   const label = SECTIONS.find((s) => s.id === entry.section)?.label || '';
   const accent = ACCENTS.has(entry.accent) ? ` accent-${entry.accent}` : '';
+  const img = entry.cover
+    ? await renderImage(entry.cover, { alt: entry.coverAlt || entry.title, className: 'figure--band' })
+    : '';
   return `<section class="band reveal${accent}">
-  <p class="eyebrow"><span class="eyebrow__no">Nº ${entry.number}</span> · ${esc(label)}</p>
-  <h2 class="band__title"><a href="${entry.url}">${esc(entry.title)}</a></h2>
-  ${entry.summary ? `<p class="band__deck">${esc(entry.summary)}</p>` : ''}
-  <p class="band__meta">
-    <time datetime="${isoDate(entry.date)}">${fmtDate(entry.date)}</time>
-    ${entry.location ? ` · ${esc(entry.location)}` : ''}
-  </p>
+  ${img}
+  <div class="band__text">
+    <p class="eyebrow"><span class="eyebrow__no">Nº ${entry.number}</span> · ${esc(label)}</p>
+    <h2 class="band__title"><a href="${entry.url}">${esc(entry.title)}</a></h2>
+    ${entry.summary ? `<p class="band__deck">${esc(entry.summary)}</p>` : ''}
+    <p class="band__meta">
+      <time datetime="${isoDate(entry.date)}">${fmtDate(entry.date)}</time>
+      ${entry.location ? ` · ${esc(entry.location)}` : ''}
+    </p>
+  </div>
 </section>`;
 }
 
@@ -725,7 +735,7 @@ async function frontPage(all, social) {
   if (lead || secondary) {
     blocks.push(`<section class="front-lead">${lead}<div class="front-lead__side">${secondary}${third}${railIndex}</div></section>`);
   }
-  if (banded) blocks.push(bandCard(banded));
+  if (banded) blocks.push(await bandCard(banded));
 
   blocks.push(aboutBlock());
   blocks.push(await meanwhileStrip(bySection('en-movimiento'), social));

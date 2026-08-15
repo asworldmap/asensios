@@ -1,20 +1,15 @@
 # content/media/002 — «Santiago desde el manillar»
 
-Accent: **verde**. Three real photographs are waiting in Drive
-(`Relatos desde Santiago/#002`) and are not yet in the repository.
+Accent: **verde**. Three real photographs, inspected individually before being
+assigned — not sorted by filename.
 
-| Original | Size |
-|---|---|
-| `20260731_172524.jpg` | 4.0 MB |
-| `20260802_164124.jpg` | 4.1 MB |
-| `20260808_144841.jpg` | 3.6 MB |
+All originals came from Drive (`Relatos desde Santiago/#002`). On import they
+were rotated to their true orientation, the EXIF Orientation tag was dropped
+so nothing downstream has to interpret it, and the long edge was capped at
+2400 px at quality 82. No resizing happens at build time and no image library
+is a project dependency.
 
-The story is about learning the city by bicycle, so look for: the bicycle
-itself, a street or route, and the other newly-arrived interns.
-
-**Suggested roles** (confirm against the actual images): lead, one inline
-street/detail, one closing.
-
-## To publish them
-
-Same three steps as `content/media/001/README.md`.
+Roles and placement are recorded in the story's own frontmatter: `cover`
+plus a `media:` list whose `anchor` values match the `[[anclaje]]`
+markers in the body, so each photograph falls on the beat it belongs to
+rather than in a gallery at the end.

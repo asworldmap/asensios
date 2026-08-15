@@ -50,16 +50,12 @@ desde otra máquina en un `.zip` con una nota editorial (`EDITORIAL-NOTES.txt`
 a la sesión. Funcionó bien y es repetible para #005. La ingesta automática
 sigue sin construirse: primero la evidencia, después la automatización.
 
-## Pendiente: fotografías de #001, #002 y #003
+## Importación de fotografías
 
-Están en Drive y no en el repositorio. La sesión que hizo esta pasada
-visual pudo enumerarlas (nombres, tamaños y fechas están anotados en el
-README de cada carpeta) pero no descargarlas: la política de red del entorno
-deniega `drive.google.com`, `drive.usercontent.google.com` y
-`lh3.googleusercontent.com`, y el conector solo devuelve los binarios en
-base64, que a 2–4 MB por archivo no cabe por esa vía.
+Las de #001–#004 ya están en el repositorio. Al importarlas se aplica la
+rotación EXIF de verdad (y se elimina la etiqueta, para que nadie tenga que
+interpretarla después) y se limita el lado largo a 2400 px con calidad 82.
+Los originales de cámara pesaban 33 MB en total; publicados pesan 6,7 MB.
 
-La ruta que ya funcionó con #004: exportar las fotos elegidas desde otra
-máquina en un `.zip` junto a una nota editorial breve y entregarlo a la
-sesión. Mientras tanto, los tres relatos se publican como piezas de texto con
-su cita destacada, no como galerías vacías.
+Ese paso se hace una vez, al importar, y el resultado se versiona. El
+generador sigue sin depender de ninguna librería de imagen.
