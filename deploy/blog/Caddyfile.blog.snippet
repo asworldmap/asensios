@@ -7,6 +7,12 @@ blog.asensios.com {
 	file_server
 
 	handle_errors {
+		# Error bodies must never be cached. Without this, a 404 served for
+		# /assets/... would match the immutable rule below and a browser could
+		# pin an HTML error page in place of the stylesheet for a week, with a
+		# reload unable to dislodge it (that is what `immutable` means). The
+		# reader would see unstyled HTML and have no way to recover.
+		header Cache-Control "no-store"
 		@notfound expression {http.error.status_code} == 404
 		rewrite @notfound /404.html
 		file_server
@@ -20,8 +26,20 @@ blog.asensios.com {
 		-Server
 	}
 
-	@assets path /assets/*
-	header @assets Cache-Control "public, max-age=604800, immutable"
+	# Safe to cache hard and forever: the build writes these with a
+	# content hash in the filename (style.<hash>.css, site.<hash>.js), so any
+	# edit produces a new URL. Fonts are versioned upstream and never change
+	# in place.
+	@immutable path_regexp ^/assets/(style|site)\.[a-f0-9]{10}\.(css|js)$
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	@fonts path /assets/fonts/*
+	header @fonts Cache-Control "public, max-age=31536000, immutable"
+
+	# Photographs keep their author-chosen filenames, so they are cached for a
+	# month but stay revalidatable — never immutable.
+	@media path /media/*
+	header @media Cache-Control "public, max-age=2592000"
 
 	@html path *.html /
 	header @html Cache-Control "no-cache"

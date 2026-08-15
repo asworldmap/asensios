@@ -6,7 +6,7 @@ type: cronica-visual
 section: cronicas
 palette: mesa
 location: "Santiago de Chile"
-summary: "Una invitación que cambió de manos, una sala llena de orgullo argentino y un conejo con pistachos que se me quedó más tiempo que ningún discurso."
+summary: "Fui a una cena de embajada en lugar de un compañero y me acabé acordando sobre todo del conejo."
 featured: true
 draft: false
 cover: "/media/004/portada-servicio.jpg"

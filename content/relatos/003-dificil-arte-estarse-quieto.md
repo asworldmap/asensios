@@ -1,11 +1,11 @@
 ---
-title: "Del difícil arte de estarse quieto"
+title: "El plan era no llamar la atención"
 slug: "003-dificil-arte-estarse-quieto"
 date: 2026-08-11
 type: cronica
 section: cronicas
 location: "Santiago de Chile"
-summary: "Mi plan de mantener un perfil bajo entra en conflicto con una vieja costumbre: ver procesos y querer tocarlos."
+summary: "Venía dispuesto a mirar sin tocar nada. Duré poco."
 note: "La tecnología es la parte fácil. Lo difícil empieza cuando una herramienta nueva entra en una organización hecha de personas, hábitos y responsabilidades."
 featured: false
 draft: false

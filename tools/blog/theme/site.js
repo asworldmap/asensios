@@ -153,6 +153,16 @@
       });
     }, { rootMargin: '0px 0px -8% 0px', threshold: 0.06 });
     items.forEach(function (el) { io.observe(el); });
+
+    // Failsafe. These elements start at opacity 0, so anything the observer
+    // fails to reach stays invisible — a blank page is a far worse outcome
+    // than a missed animation. If a callback has not arrived by now, show
+    // everything and stop observing.
+    window.setTimeout(function () {
+      items.forEach(function (el) {
+        if (!el.classList.contains('is-in')) { el.classList.add('is-in'); io.unobserve(el); }
+      });
+    }, 2500);
   }
 
   // --------------------------------------------------- reading progression

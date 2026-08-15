@@ -14,6 +14,7 @@
  */
 import { readFile, writeFile, mkdir, readdir, copyFile, rm, stat } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { join, dirname, extname, basename, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { marked } from 'marked';
@@ -28,7 +29,7 @@ const ARTIFACTS = join(ROOT, 'blog-artifacts');
 
 export const SITE = {
   name: 'Relatos desde Santiago',
-  tagline: 'Crónicas, postales y otros asuntos escritos desde Santiago de Chile.',
+  tagline: 'Cuaderno de seis meses en Santiago de Chile.',
   origin: 'https://blog.asensios.com',
   author: 'Asensio Sabater',
   // The author's own site. Referenced once, quietly, in the colophon of each
@@ -41,14 +42,45 @@ export const SITE = {
 
 /** Section registry. Order here is the editorial order on the front page. */
 export const SECTIONS = [
-  { id: 'cronicas', label: 'Crónicas', dir: 'relatos', blurb: 'Relatos largos.' },
-  { id: 'postales', label: 'Postales', dir: 'postales', blurb: 'Una imagen y pocas palabras.' },
-  { id: 'despachos', label: 'Despachos', dir: 'despachos', blurb: 'Notas breves de trabajo y ciudad.' },
-  { id: 'en-movimiento', label: 'En movimiento', dir: 'momentos', blurb: 'Vídeo corto y vertical.' },
+  { id: 'cronicas', label: 'Crónicas', dir: 'relatos', blurb: 'Relatos largos' },
+  { id: 'postales', label: 'Postales', dir: 'postales', blurb: 'Una imagen y poco más' },
+  { id: 'despachos', label: 'Despachos', dir: 'despachos', blurb: 'Notas breves' },
+  { id: 'en-movimiento', label: 'En movimiento', dir: 'momentos', blurb: 'Vídeo corto' },
 ];
 
 const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
   'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+/**
+ * Content-hashed asset filenames, filled in by copyTheme() before any page is
+ * rendered.
+ *
+ * These MUST stay fingerprinted. Caddy serves /assets/* with
+ * `Cache-Control: immutable`, which tells browsers never to revalidate — so
+ * with a stable filename like /assets/style.css, any response a browser once
+ * cached for that URL is pinned for the full max-age and a reload will not
+ * dislodge it. A single bad response (an error page served in place of the
+ * stylesheet, a truncated transfer) therefore leaves that device unstyled
+ * with no way for the reader to recover, and no CSS change reaches anyone who
+ * has already visited. Hashing the name makes every edit a new URL, so the
+ * cache is always correct and always bypassed exactly when it should be.
+ */
+const ASSETS = { css: '/assets/style.css', js: '/assets/site.js' };
+
+/**
+ * Inline favicon, so the browser's automatic /favicon.ico request stops
+ * 404-ing without adding a file or a round trip. Paper ground, red rule —
+ * the publication's two colours at 16 pixels.
+ */
+const FAVICON = encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">' +
+  '<rect width="32" height="32" fill="#f4f0e6"/>' +
+  '<rect x="6" y="7" width="20" height="2.4" fill="#16140f"/>' +
+  '<rect x="6" y="14" width="20" height="1.4" fill="#8a342f"/>' +
+  '<rect x="6" y="19" width="14" height="1.4" fill="#8a342f"/>' +
+  '<rect x="6" y="24" width="20" height="1.4" fill="#8a342f"/>' +
+  '</svg>'
+);
 
 const esc = (s = '') => String(s)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -362,9 +394,10 @@ function head({ title, description, canonical, ogType = 'article', image, bodyCl
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${esc(canonical)}">
-<link rel="stylesheet" href="/assets/style.css">
+<link rel="icon" href="data:image/svg+xml,${FAVICON}">
+<link rel="stylesheet" href="${ASSETS.css}">
 <link rel="alternate" type="application/rss+xml" title="${esc(SITE.name)}" href="/feed.xml">
-<script defer src="/assets/site.js"></script>
+<script defer src="${ASSETS.js}"></script>
 <meta property="og:type" content="${ogType}">
 <meta property="og:site_name" content="${esc(SITE.name)}">
 <meta property="og:title" content="${esc(title)}">
@@ -386,10 +419,10 @@ function masthead({ compact = false, edition = '' } = {}) {
     <ul>
       <li><a href="/">Portada</a></li>
       <li><a href="/archivo.html">Archivo</a></li>
+      <li><a href="/#sobre">Quién escribe</a></li>
       <li><a href="/#whatsapp">WhatsApp</a></li>
-      <li><a href="/#sobre">Sobre estos relatos</a></li>
     </ul>
-    <p class="utility__note">Sin likes · sin comentarios · con memoria</p>
+    <p class="utility__note">Santiago de Chile</p>
   </nav>
   <div class="masthead__brand">
     <${tag} class="wordmark"><a href="/">Relatos<span class="wordmark__break"> </span>desde Santiago</a></${tag}>
@@ -401,15 +434,15 @@ function masthead({ compact = false, edition = '' } = {}) {
 
 function footer() {
   return `<footer class="site-footer">
-  <p><strong>${esc(SITE.name)}</strong> · ${esc(SITE.author)}</p>
-  <p>Publicación personal. No es una publicación institucional ni representa a ningún empleador.</p>
+  <p class="site-footer__id"><strong>${esc(SITE.name)}</strong> · <a href="${esc(SITE.homepage)}">${esc(SITE.author)} · asensios.com</a></p>
+  <p>Publicación personal. Las opiniones son mías; ninguna institución ni empleador responde por ellas.</p>
   <p class="site-footer__links"><a href="/archivo.html">Archivo</a> · <a href="/feed.xml">RSS</a></p>
 </footer>
 <div class="consent" role="dialog" aria-live="polite" aria-label="Analítica" hidden>
-  <p>Este cuaderno usa analítica solo para saber qué se lee. Sin publicidad ni perfiles.</p>
+  <p>Uso analítica para saber qué se lee. Sin publicidad ni perfiles.</p>
   <div class="consent__actions">
-    <button type="button" class="btn btn--primary" data-accept>Aceptar analítica</button>
-    <button type="button" class="btn" data-decline>Seguir sin ella</button>
+    <button type="button" class="btn btn--primary" data-accept>De acuerdo</button>
+    <button type="button" class="btn" data-decline>Mejor no</button>
   </div>
 </div>
 </body>
@@ -502,7 +535,7 @@ ${masthead({ compact: true })}
       </button>
       <p class="story-foot__share">
         <a class="channel-link" data-event="whatsapp_channel_click" href="${esc(SITE.whatsappChannel)}" rel="noopener">
-          Seguir los relatos por WhatsApp →
+          Avisos por WhatsApp →
         </a>
       </p>
     </footer>
@@ -521,7 +554,7 @@ ${footer()}`;
  */
 function colofon() {
   return `<aside class="colofon">
-  <p>Quien escribe esto se llama ${esc(SITE.author)} y está de paso por Chile. El resto del año, y el resto de su trabajo, viven en <a href="${esc(SITE.homepage)}" data-event="home_link_click">asensios.com</a>.</p>
+  <p>${esc(SITE.author)} escribe estos relatos durante seis meses en Santiago. Lo demás que hace está en <a href="${esc(SITE.homepage)}" data-event="home_link_click">asensios.com</a>.</p>
 </aside>`;
 }
 
@@ -529,8 +562,8 @@ function cartaBlock(entry) {
   if (entry.carta === false) return '';
   return `<section class="carta" id="carta" data-carta>
   <div class="carta__intro">
-    <h2>Carta al autor</h2>
-    <p>Si este relato te hizo pensar en algo, puedes dejarme una nota. No se publicará.</p>
+    <h2>Escríbeme</h2>
+    <p>Si esto te ha recordado a algo, cuéntamelo. No se publica en ningún sitio.</p>
   </div>
   <form class="carta__form" data-carta-form novalidate>
     <label for="carta-msg">Mensaje</label>
@@ -540,7 +573,7 @@ function cartaBlock(entry) {
     <input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" class="hp">
     <input type="hidden" name="t" value="">
     <input type="hidden" name="relato" value="${esc(entry.slug)}">
-    <button type="submit" class="btn btn--primary">Enviar en privado</button>
+    <button type="submit" class="btn btn--primary">Enviar</button>
     <p class="carta__status" data-carta-status role="status"></p>
   </form>
 </section>`;
@@ -597,9 +630,30 @@ async function meanwhileStrip(moments, social) {
 </section>`;
 }
 
+/**
+ * Who is writing and why Santiago. Deliberately short and deliberately not a
+ * CV: it names no employer, because the point of the publication is the six
+ * months, not the job. The disclaimer in the footer does the institutional
+ * distancing, so this can stay plain.
+ */
+function aboutBlock() {
+  return `<section class="intro reveal" id="sobre">
+  <p class="label">Quién escribe</p>
+  <div class="intro__body">
+    <p>Me llamo Asensio Sabater. Estudié Relaciones Internacionales y desde 2018 ando metido en proyectos europeos y programas de juventud, casi siempre organizando cosas para gente de países distintos.</p>
+    <p>Este año me toca Santiago de Chile: unos seis meses aquí por trabajo. Escribo estos relatos porque medio año da para bastante más de lo que cabe en el grupo de la familia, y porque dentro de dos años se me habrá olvidado la mitad.</p>
+    <p>El archivo empieza en julio de 2026 y se cerrará cuando se acabe la estancia. Fuera de aquí, lo demás que hago está en <a href="${esc(SITE.homepage)}" data-event="home_link_click">asensios.com</a>.</p>
+  </div>
+</section>`;
+}
+
 async function frontPage(all, social) {
-  const now = new Date();
-  const edition = `Edición del ${fmtDate(now)} · Santiago de Chile · Nº ${all.length ? all[0].number : '000'}`;
+  // Dated by the newest entry, not by build time: a static archive that
+  // claims a new "edition" every time CI runs is lying about itself.
+  const latest = all[0];
+  const edition = latest
+    ? `Nº ${latest.number} · ${fmtDate(latest.date)} · Santiago de Chile`
+    : 'Santiago de Chile';
   const featured = all.find((e) => e.featured) || all[0];
   const rest = all.filter((e) => e !== featured);
   const bySection = (id) => rest.filter((e) => e.section === id);
@@ -613,6 +667,7 @@ async function frontPage(all, social) {
     blocks.push(`<section class="front-lead">${lead}<div class="front-lead__side">${secondary}${third}</div></section>`);
   }
 
+  blocks.push(aboutBlock());
   blocks.push(await meanwhileStrip(bySection('en-movimiento'), social));
 
   for (const s of SECTIONS.filter((s) => s.id !== 'cronicas')) {
@@ -640,22 +695,18 @@ async function frontPage(all, social) {
   blocks.push(`<section class="section-block reveal" aria-labelledby="s-archivo">
     <div class="section-head">
       <h2 id="s-archivo"><a href="/archivo.html">Archivo</a></h2>
-      <p>En orden de aparición.</p>
+      <p>Todo lo publicado</p>
     </div>
     <ol class="rows">${recent}</ol>
   </section>`);
 
   blocks.push(`<section class="whatsapp reveal" id="whatsapp">
-    <p class="label">Los próximos relatos</p>
+    <p class="label">Avisos</p>
     <div>
-      <h2>También llegan por WhatsApp.</h2>
-      <p>Cuando aparece un relato nuevo, el canal sirve solo de aviso: unas líneas, el título y un enlace de vuelta a este archivo. Nada de cadenas ni ruido.</p>
+      <h2>Por WhatsApp</h2>
+      <p>Cuando publico algo nuevo mando el título y el enlace por el canal. Ya está.</p>
       <a class="channel-link" data-event="whatsapp_channel_click" href="${esc(SITE.whatsappChannel)}" rel="noopener">Abrir el canal ↗</a>
     </div>
-  </section>
-  <section class="about" id="sobre">
-    <p class="label">Sobre estos relatos</p>
-    <p>Esto no es una publicación institucional. Son relatos personales escritos durante unos meses en Chile: ciudad, trabajo, viajes, personas, pequeñas derrotas y algunas cosas que empiezan a entenderse cuando dejan de ser teoría.</p>
   </section>`);
 
   return `${head({
@@ -697,7 +748,7 @@ function archivePage(all) {
 
   return `${head({
     title: `Archivo — ${SITE.name}`,
-    description: 'Todos los relatos, en orden de aparición.',
+    description: 'Todo lo publicado, en orden de aparición.',
     canonical: `${SITE.origin}/archivo.html`,
     ogType: 'website',
   })}
@@ -705,8 +756,8 @@ ${masthead({ compact: true })}
 <main id="contenido" class="wrap">
   <div class="page-head">
     <h1>Archivo</h1>
-    <p>Todo lo publicado, en orden de aparición. La marca ✓ es solo tuya: se guarda en este navegador.</p>
-    <p><button type="button" class="btn btn--small" data-clear-read>Borrar mis marcas de lectura</button></p>
+    <p>En orden de aparición. La marca de leído se guarda en tu navegador y no sale de ahí.</p>
+    <p><button type="button" class="btn btn--small" data-clear-read>Borrar mis marcas</button></p>
   </div>
   ${body || '<p class="empty">Todavía no hay nada archivado.</p>'}
 </main>
@@ -735,18 +786,18 @@ ${footer()}`;
 
 function notFoundPage() {
   return `${head({
-    title: `Relato no encontrado — ${SITE.name}`,
-    description: 'Esta página no llegó a Santiago.',
+    title: `Página no encontrada — ${SITE.name}`,
+    description: 'Aquí no hay nada.',
     canonical: `${SITE.origin}/404.html`,
     ogType: 'website',
   }).replace('<link rel="canonical"', '<meta name="robots" content="noindex">\n<link rel="canonical"')}
 ${masthead({ compact: true })}
 <main id="contenido" class="wrap">
   <div class="page-head page-head--404">
-    <p class="eyebrow">Relato extraviado</p>
-    <h1>Esta página no llegó a Santiago.</h1>
-    <p>Puede que el enlace haya cambiado o que el relato todavía no exista.</p>
-    <p><a class="channel-link" href="/">Volver a la portada →</a></p>
+    <p class="eyebrow">Error 404</p>
+    <h1>Aquí no hay nada</h1>
+    <p>El enlace puede estar mal copiado, o el relato vivía en otra dirección.</p>
+    <p><a class="channel-link" href="/">Ir a la portada →</a></p>
   </div>
 </main>
 ${footer()}`;
@@ -808,6 +859,35 @@ async function copyDir(from, to) {
   return n;
 }
 
+/**
+ * Copies the theme into assets/ with content-hashed filenames and records
+ * them in ASSETS. Must run before any page is rendered, since head() reads
+ * ASSETS. Anything in the theme dir that is not the stylesheet or the script
+ * is copied through unchanged.
+ */
+async function copyTheme() {
+  const dest = join(OUT, 'assets');
+  await mkdir(dest, { recursive: true });
+  const fingerprint = { 'style.css': 'css', 'site.js': 'js' };
+  let n = 0;
+  for (const item of await readdir(THEME, { withFileTypes: true })) {
+    if (isAuthorNote(item.name)) continue;
+    if (item.isDirectory()) { n += await copyDir(join(THEME, item.name), join(dest, item.name)); continue; }
+    const body = await readFile(join(THEME, item.name));
+    const key = fingerprint[item.name];
+    if (key) {
+      const hash = createHash('sha256').update(body).digest('hex').slice(0, 10);
+      const name = item.name.replace(/\.([^.]+)$/, `.${hash}.$1`);
+      await writeFile(join(dest, name), body);
+      ASSETS[key] = `/assets/${name}`;
+    } else {
+      await writeFile(join(dest, item.name), body);
+    }
+    n++;
+  }
+  return n;
+}
+
 /** Self-host fonts from packages already in the dependency tree. */
 async function copyFonts() {
   const wanted = [
@@ -849,6 +929,9 @@ async function build({ drafts = false } = {}) {
     await writeFile(abs, body);
   };
 
+  // Before any page is rendered: pages reference the hashed asset names.
+  const themeFiles = await copyTheme();
+
   for (const entry of all) await write(entry.url.replace(/^\//, ''), await storyPage(entry));
   await write('index.html', await frontPage(all, social));
   await write('archivo.html', archivePage(all));
@@ -864,7 +947,6 @@ async function build({ drafts = false } = {}) {
   await write('feed.xml', feed(all));
   await write('robots.txt', robots());
 
-  const themeFiles = await copyDir(THEME, join(OUT, 'assets'));
   const mediaFiles = await copyDir(join(CONTENT, 'media'), join(OUT, 'media'));
   const fontFiles = await copyFonts();
 
