@@ -449,6 +449,18 @@ function footer() {
 </html>`;
 }
 
+/**
+ * Inserts a pull quote after roughly the first third of a story's paragraphs.
+ * Splits on the closing tag while keeping it, so the surrounding markup is
+ * returned byte-for-byte apart from the inserted block.
+ */
+function breakWithPull(html, note) {
+  const paras = html.match(/<p>[\s\S]*?<\/p>/g);
+  if (!paras || paras.length < 4) return html;
+  const target = paras[Math.max(1, Math.round(paras.length / 3))];
+  return html.replace(target, `${target}\n<p class="pull">${esc(note)}</p>`);
+}
+
 /** Body renderers per editorial type — composable, one shared shell. */
 async function storyBody(entry, html) {
   const items = entry.media?.length ? await renderMediaItems(entry.media) : [];
@@ -484,21 +496,35 @@ async function storyBody(entry, html) {
         <div class="prose">${html}</div>
         ${gallery ? `<div class="gallery gallery--inline">${gallery}</div>` : ''}
       </section>`;
-    default:
+    default: {
+      // With photographs, the note sits in the margin as usual. Without them,
+      // it is promoted into the column as a pull quote — a story carried by
+      // text alone still needs somewhere for the eye to rest.
+      if (!gallery && entry.note) {
+        return `<section class="story-body story-body--texto">
+          <article class="prose prose--wide">${breakWithPull(html, entry.note)}</article>
+        </section>`;
+      }
       return `<section class="story-body">
         <article class="prose">${html}${gallery ? `<div class="gallery gallery--inline">${gallery}</div>` : ''}</article>
         ${note}
       </section>`;
+    }
   }
 }
 
-/** Optional accent palettes a piece may ask for. Anything else is ignored. */
-const PALETTES = new Set(['mesa']);
+/**
+ * Editorial accent colours. A story names one in frontmatter and the whole
+ * page borrows it: eyebrow, rules, drop cap, pull quote, links, caption marks.
+ * The paper, the type and the furniture never change — same newspaper, a
+ * different mood on the page. Anything not in this set is ignored.
+ */
+const ACCENTS = new Set(['wine', 'verde', 'cobalto', 'ocre', 'terracota']);
 
 async function storyPage(entry) {
   const html = marked.parse(entry.body);
   const label = SECTIONS.find((s) => s.id === entry.section)?.label || 'Relato';
-  const palette = PALETTES.has(entry.palette) ? `palette-${entry.palette}` : '';
+  const accent = ACCENTS.has(entry.accent) ? `accent-${entry.accent}` : '';
   const cover = entry.cover
     ? await renderImage(entry.cover, { alt: entry.coverAlt || entry.title, className: 'figure--cover', eager: true })
     : '';
@@ -512,7 +538,7 @@ async function storyPage(entry) {
     description: entry.summary || SITE.tagline,
     canonical: entry.absoluteUrl,
     image: entry.cover,
-    bodyClass: palette,
+    bodyClass: accent,
   })}
 ${masthead({ compact: true })}
 <main id="contenido" class="wrap">
@@ -581,6 +607,21 @@ function cartaBlock(entry) {
 
 // --- front page -------------------------------------------------------------
 
+/** A story on the front page set as type alone — no image, full measure. */
+function bandCard(entry) {
+  const label = SECTIONS.find((s) => s.id === entry.section)?.label || '';
+  const accent = ACCENTS.has(entry.accent) ? ` accent-${entry.accent}` : '';
+  return `<section class="band reveal${accent}">
+  <p class="eyebrow"><span class="eyebrow__no">Nº ${entry.number}</span> · ${esc(label)}</p>
+  <h2 class="band__title"><a href="${entry.url}">${esc(entry.title)}</a></h2>
+  ${entry.summary ? `<p class="band__deck">${esc(entry.summary)}</p>` : ''}
+  <p class="band__meta">
+    <time datetime="${isoDate(entry.date)}">${fmtDate(entry.date)}</time>
+    ${entry.location ? ` · ${esc(entry.location)}` : ''}
+  </p>
+</section>`;
+}
+
 async function frontCard(entry, variant) {
   const label = SECTIONS.find((s) => s.id === entry.section)?.label || '';
   const img = entry.cover
@@ -590,7 +631,8 @@ async function frontCard(entry, variant) {
       className: 'figure--card',
     })
     : '';
-  return `<article class="card card--${variant} reveal">
+  const accent = ACCENTS.has(entry.accent) ? ` accent-${entry.accent}` : '';
+  return `<article class="card card--${variant} reveal${accent}">
   ${img}
   <p class="eyebrow"><span class="eyebrow__no">Nº ${entry.number}</span> · ${esc(label)}</p>
   <h3 class="card__title"><a href="${entry.url}">${esc(entry.title)}</a></h3>
@@ -662,11 +704,28 @@ async function frontPage(all, social) {
   const lead = featured ? await frontCard(featured, 'lead') : '';
   const secondary = rest[0] ? await frontCard(rest[0], 'secondary') : '';
   const third = rest[1] ? await frontCard(rest[1], 'tertiary') : '';
+  // The band is the front page's change of pace: one story set as pure
+  // typography at full width, so the eye is not asked to read four
+  // identically-weighted cards in a row. A real front page does not give
+  // every story the same box.
+  const banded = rest[2] || null;
+
+  const railIndex = all.length > 1 ? `<nav class="rail-index" aria-label="Índice">
+    <p class="rail-index__head">En este número</p>
+    <ol class="rows rows--rail">${all.map((e) => `<li${ACCENTS.has(e.accent) ? ` class="accent-${e.accent}"` : ''}>
+      <a href="${e.url}" data-archive-row="${esc(e.slug)}">
+        <span class="row__no">${e.number}</span>
+        <span class="row__title">${esc(e.title)}</span>
+        <span class="row__read" data-read-mark aria-hidden="true">○</span>
+      </a></li>`).join('')}</ol>
+    <p class="rail-index__more"><a href="/archivo.html">Todo el archivo →</a></p>
+  </nav>` : '';
 
   const blocks = [];
   if (lead || secondary) {
-    blocks.push(`<section class="front-lead">${lead}<div class="front-lead__side">${secondary}${third}</div></section>`);
+    blocks.push(`<section class="front-lead">${lead}<div class="front-lead__side">${secondary}${third}${railIndex}</div></section>`);
   }
+  if (banded) blocks.push(bandCard(banded));
 
   blocks.push(aboutBlock());
   blocks.push(await meanwhileStrip(bySection('en-movimiento'), social));
@@ -685,21 +744,6 @@ async function frontPage(all, social) {
     </section>`);
   }
 
-  const recent = all.slice(0, 8).map((e) => `<li>
-    <a href="${e.url}" data-archive-row="${esc(e.slug)}">
-      <span class="row__no">${e.number}</span>
-      <span class="row__title">${esc(e.title)}</span>
-      <span class="row__date">${fmtShort(e.date)}</span>
-      <span class="row__read" data-read-mark aria-hidden="true">○</span>
-    </a></li>`).join('');
-
-  blocks.push(`<section class="section-block reveal" aria-labelledby="s-archivo">
-    <div class="section-head">
-      <h2 id="s-archivo"><a href="/archivo.html">Archivo</a></h2>
-      <p>Todo lo publicado</p>
-    </div>
-    <ol class="rows">${recent}</ol>
-  </section>`);
 
   blocks.push(`<section class="whatsapp reveal" id="whatsapp">
     <p class="label">Avisos</p>

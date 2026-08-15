@@ -49,3 +49,17 @@ desde otra máquina en un `.zip` con una nota editorial (`EDITORIAL-NOTES.txt`
 — qué es cada foto y qué papel se propone para ella) y entregarlo directamente
 a la sesión. Funcionó bien y es repetible para #005. La ingesta automática
 sigue sin construirse: primero la evidencia, después la automatización.
+
+## Pendiente: fotografías de #001, #002 y #003
+
+Están en Drive y no en el repositorio. La sesión que hizo esta pasada
+visual pudo enumerarlas (nombres, tamaños y fechas están anotados en el
+README de cada carpeta) pero no descargarlas: la política de red del entorno
+deniega `drive.google.com`, `drive.usercontent.google.com` y
+`lh3.googleusercontent.com`, y el conector solo devuelve los binarios en
+base64, que a 2–4 MB por archivo no cabe por esa vía.
+
+La ruta que ya funcionó con #004: exportar las fotos elegidas desde otra
+máquina en un `.zip` junto a una nota editorial breve y entregarlo a la
+sesión. Mientras tanto, los tres relatos se publican como piezas de texto con
+su cita destacada, no como galerías vacías.
