@@ -133,12 +133,25 @@ done
 # --- content, not just endpoints -------------------------------------------
 # The published words themselves. Each string is paired with the copy it
 # replaced, so a stale deploy fails loudly instead of passing on status codes.
-echo "--- live content: homepage ---"
+echo "--- live content: canonical titles ---"
+# The four titles exactly as they stand in the Google Docs that are now the
+# editorial source. Paired with the copy each one replaced, so a stale deploy
+# fails loudly instead of passing on status codes.
+expect_text "$BASE/" present "El avión se fue sin mí"
+expect_text "$BASE/" present "Aprender Santiago desde el manillar"
 expect_text "$BASE/" present "El plan era pasar desapercibido"
-expect_text "$BASE/" present "Santiago desde el manillar"
+expect_text "$BASE/" present "La diplomacia también se come"
 expect_text "$BASE/" absent  "El plan era no llamar la atención"
 expect_text "$BASE/" absent  "Aprenderse Santiago en bicicleta"
 expect_text "$BASE/" absent  "De cómo"
+
+echo "--- live content: canonical bodies ---"
+# A sentence unique to each Doc, so the check fails if a body did not update.
+expect_text "$BASE/relatos/001-no-parti-el-dia-previsto.html" present "Venía de una semana en Lituania"
+expect_text "$BASE/relatos/002-una-bicicleta-ordeno-santiago.html" present "un timbre con brújula"
+expect_text "$BASE/relatos/003-dificil-arte-estarse-quieto.html" present "la residencia de la Embajada de Bélgica"
+expect_text "$BASE/relatos/004-la-diplomacia-tambien-se-come.html" present "una estrella Michelin"
+expect_text "$BASE/relatos/004-la-diplomacia-tambien-se-come.html" absent  "patata negra"
 
 echo "--- live content: about block ---"
 expect_text "$BASE/" present "Durante seis meses vivo en Santiago"
@@ -152,6 +165,10 @@ expect_text "$BASE/relatos/003-dificil-arte-estarse-quieto.html" present "El pla
 expect_text "$BASE/archivo.html" present "Santiago desde el manillar"
 expect_text "$BASE/this-definitely-does-not-exist" present "Página perdida"
 expect_text "$BASE/this-definitely-does-not-exist" absent  "Aquí no hay nada"
+
+# The illustrated masthead, both responsive sources.
+expect_asset "$BASE/assets/banner-1672.jpg" "image/" ""
+expect_asset "$BASE/assets/banner-836.jpg" "image/" ""
 
 expect_healthy "https://asensios.com/"
 expect_healthy "https://www.asensios.com/"
