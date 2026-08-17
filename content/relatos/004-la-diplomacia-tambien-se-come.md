@@ -6,7 +6,7 @@ type: cronica-visual
 section: cronicas
 accent: wine
 location: "Santiago de Chile"
-summary: "Fui a una cena de embajada en lugar de un compañero y me acabé acordando sobre todo del conejo."
+summary: "Una invitación prestada y mi primera cena cocinada por un chef con estrella Michelin."
 featured: true
 draft: false
 cover: "/media/004/portada-servicio.jpg"
@@ -22,25 +22,45 @@ media:
     alt: "Un plato hondo y calado, servido esa noche, sobre el suelo ajedrezado de la residencia"
 ---
 
-Mi compañero no pudo ir. Le acababa de nacer un hijo, que es de las poquísimas razones que en esta vida le ganan por goleada a cualquier acto oficial. Así que la invitación cambió de manos y llegó a la mía con esa mezcla de suerte y de responsabilidad que tienen las cosas que uno no había pedido.
+La invitación no era mía.
 
-Fui solo, que en un salón donde todo el mundo se conoce es una manera muy educada de estar de pie. Uno aprende deprisa a sostener la copa con la izquierda para dejar libre la derecha, y a leer una sala como quien lee un plano: dónde está la puerta, dónde está la mesa, quién decide.
+Un compañero tenía que quedarse cuidando a su hijo de cinco meses y me ofreció ocupar su lugar en una cena en la residencia de la Embajada Argentina. Llevaba poco tiempo en Santiago, no conocía a ninguno de los invitados y tampoco sabía muy bien qué iba a encontrarme.
+
+Fui igualmente.
+
+Entrar solo en una recepción tiene algo de examen oral. Durante los primeros minutos uno sonríe, se presenta y espera que nadie le pregunte por alguien a quien debería conocer.
 
 [[sala]]
 
-Hubo discursos, claro, y agradecimientos. Y hubo algo que no siempre aparece en los actos y que aquella noche estaba por todas partes: orgullo. Se habló de la tierra y de quien la trabaja. Se habló de fútbol, porque hay países donde el fútbol no es un tema de conversación sino una manera de decir *nosotros*.
+Los argentinos, por suerte, ayudan a llenar silencios.
 
-Después me tocó hablar con uno de los ponentes, un hombre de Mendoza. Contaba su región como la cuenta la gente que viene de un sitio con nombre propio: sin vender nada, dando por sentado que uno ya sabe que aquello es bueno. Me quedé con esa forma suya de defender un lugar, que consistía sobre todo en no defenderlo.
+No hace falta preguntar demasiado para que aparezcan Argentina, Messi, Mendoza, la carne o alguna teoría general sobre por qué determinada cosa se hace mejor allí. Su capacidad para promocionar el país podría ahorrar bastante presupuesto a cualquier oficina de turismo.
 
-Y luego salió la comida, que era la parte de la noche que nadie había ensayado.
+En algún momento hablé con un hombre de Mendoza. Me contó un poco de su tierra y yo la añadí mentalmente a la lista de lugares que visitar. Él cumplió con Mendoza. Yo cumplí escuchando.
 
-Conejo. Un ragú lento, oscuro, hecho con la paciencia de quien no tiene ninguna prisa, con pistachos por encima que crujían justo cuando ya habías dejado de esperarlo. Debajo, un queso crema que no venía a suavizar nada sino a poner el suelo. Y arriba, apoyada con una insolencia perfecta, una lámina de patata negra fina como un naipe.
+La verdadera sorpresa estaba en la cocina. El chef tenía una estrella Michelin.
+
+Nunca había comido nada preparado por un cocinero con una, así que mi estreno en la alta gastronomía llegó de una manera bastante menos ceremoniosa de lo previsto. Sin reserva, sin plan y gracias a que un bebé necesitaba que su padre se quedara en casa.
+
+Entre los platos apareció un conejo con pistachos.
 
 [[plato]]
 
-Se rompía con un sonido pequeño y muy satisfactorio. Lo probé, dejé de hablar y me quedé mirando el plato como se mira a alguien que acaba de decir algo inteligente.
+Lo miré unos segundos con el respeto que merece algo que alguien ha tardado mucho en preparar y uno muy poco en comerse.
 
-Sigo dándole vueltas a por qué aquello ordenó la noche entera. Supongo que un discurso se escribe con tiempo y se corrige, y en cambio a nadie se le ocurre mentir en un plato: alguien decidió cocer ese conejo durante horas, alguien eligió pistacho en lugar de almendra, alguien pensó que allí hacía falta una textura que se rompiera. Son decisiones pequeñas, tomadas en una cocina, y cuentan de un país bastante más de lo que uno esperaría.
+Estaba espectacular.
+
+Alrededor seguían las conversaciones, las presentaciones y esa liturgia amable de las recepciones. Yo había entrado sin conocer a nadie y fui pasando la noche hablando con desconocidos alrededor de una mesa.
+
+La diplomacia, vista desde allí, parecía bastante menos misteriosa. Gente reunida en una casa grande, conversación educada y comida lo bastante buena como para que nadie tenga prisa por irse.
+
+Los argentinos habían entendido bien esa parte.
+
+Y también la de recordar, cada cierto tiempo, que aquello era Argentina.
+
+Por si se nos olvidaba.
+
+Al salir conocía algunos nombres nuevos, tenía Mendoza marcada en el mapa y podía apuntarme mi primera cena Michelin en unas circunstancias bastante improbables.
 
 No salí de allí con ningún gran acuerdo internacional.
 

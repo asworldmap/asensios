@@ -425,7 +425,14 @@ function masthead({ compact = false, edition = '' } = {}) {
     <p class="utility__note">Santiago de Chile</p>
   </nav>
   <div class="masthead__brand">
-    <${tag} class="wordmark"><a href="/">Relatos<span class="wordmark__break"> </span>desde Santiago</a></${tag}>
+    ${compact ? `<${tag} class="wordmark"><a href="/">Relatos<span class="wordmark__break"> </span>desde Santiago</a></${tag}>`
+      : `<${tag} class="wordmark wordmark--banner"><a href="/">
+      <picture>
+        <source media="(max-width: 760px)" srcset="/assets/banner-836.jpg">
+        <img src="/assets/banner-1672.jpg" width="1672" height="712"
+             alt="${esc(SITE.name)}" fetchpriority="high" decoding="async">
+      </picture>
+    </a></${tag}>`}
     <p class="wordmark__sub">${esc(SITE.tagline)}</p>
   </div>
   ${edition ? `<p class="edition">${edition}</p>` : ''}
