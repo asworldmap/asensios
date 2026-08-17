@@ -19,6 +19,7 @@ import { join, dirname, extname, basename, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { marked } from 'marked';
 import yaml from 'js-yaml';
+import { nameplateScene } from './masthead.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, '..', '..');
@@ -471,14 +472,8 @@ function masthead({ compact = false, edition = '' } = {}) {
     </p>
   </nav>
   <div class="masthead__brand">
-    ${compact ? `<${tag} class="wordmark"><a href="/">Relatos<span class="wordmark__break"> </span>desde Santiago</a></${tag}>`
-      : `<${tag} class="wordmark wordmark--banner"><a href="/">
-      <picture>
-        <source media="(max-width: 760px)" srcset="/assets/banner-836.jpg">
-        <img src="/assets/banner-1672.jpg" width="1672" height="557"
-             alt="${esc(SITE.name)}" fetchpriority="high" decoding="async">
-      </picture>
-    </a></${tag}>`}
+    <${tag} class="wordmark${compact ? '' : ' wordmark--plate'}"><a href="/">Relatos<span class="wordmark__break"> </span>desde Santiago</a></${tag}>
+    ${compact ? '' : nameplateScene()}
     <p class="wordmark__sub">${esc(SITE.tagline)}</p>
   </div>
   ${edition ? `<p class="edition" data-folio>${edition}</p>` : ''}
@@ -489,6 +484,7 @@ function footer() {
   return `<footer class="site-footer">
   <p class="site-footer__id"><strong>${esc(SITE.name)}</strong> · <a href="${esc(SITE.homepage)}">${esc(SITE.author)} · asensios.com</a></p>
   <p>Publicación personal. Las opiniones son mías; ninguna institución ni empleador responde por ellas.</p>
+  ${cartaGeneral()}
   <p class="site-footer__links"><a href="/archivo.html">Archivo</a> · <a href="/feed.xml">RSS</a></p>
 </footer>
 <div class="consent" role="dialog" aria-live="polite" aria-label="Analítica" hidden>
@@ -640,25 +636,58 @@ function colofon() {
 </aside>`;
 }
 
+const BUZON = 'hola@asensios.com';
+
+/**
+ * A mailto the generator writes in full, so the letter needs no JavaScript,
+ * no endpoint and no third party. Nothing is stored anywhere: the message
+ * goes from the reader's own mail client straight to a personal inbox.
+ */
+function mailto(subject, lines) {
+  const q = (s) => encodeURIComponent(s).replace(/'/g, '%27');
+  return `mailto:${BUZON}?subject=${q(subject)}&body=${q(lines.join('\n'))}`;
+}
+
+/** The article colophon: one editorial line, the address visible beside it. */
 function cartaBlock(entry) {
   if (entry.carta === false) return '';
-  return `<section class="carta" id="carta" data-carta>
-  <div class="carta__intro">
-    <h2>Escríbeme</h2>
-    <p>Si esto te ha recordado a algo, cuéntamelo. No se publica en ningún sitio.</p>
-  </div>
-  <form class="carta__form" data-carta-form novalidate>
-    <label for="carta-msg">Mensaje</label>
-    <textarea id="carta-msg" name="message" rows="5" required></textarea>
-    <label for="carta-name">Nombre <span class="opt">(opcional)</span></label>
-    <input id="carta-name" name="name" type="text" autocomplete="name">
-    <input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" class="hp">
-    <input type="hidden" name="t" value="">
-    <input type="hidden" name="relato" value="${esc(entry.slug)}">
-    <button type="submit" class="btn btn--primary">Enviar</button>
-    <p class="carta__status" data-carta-status role="status"></p>
-  </form>
-</section>`;
+  const href = mailto(`Carta al autor — ${entry.title}`, [
+    'Hola Asensio,',
+    '',
+    `Te escribo sobre “${entry.title}”:`,
+    '',
+    '[Escribe aquí]',
+    '',
+    '—',
+    'Relato:',
+    `${SITE.origin}${entry.url}`,
+  ]);
+  return `<aside class="carta" id="carta">
+  <p class="carta__line">
+    <span class="carta__mark" aria-hidden="true">✉</span>
+    <a class="carta__link" href="${esc(href)}">Escríbeme un mensaje</a>
+  </p>
+  <p class="carta__note">Si esto te ha recordado a algo, cuéntamelo. Llega a mi correo,
+    <a href="mailto:${BUZON}">${BUZON}</a>, y no se publica en ningún sitio.</p>
+</aside>`;
+}
+
+/** The same invitation, unattached to any one relato, for the colophon. */
+function cartaGeneral() {
+  const href = mailto('Carta desde Relatos de Santiago', [
+    'Hola Asensio,',
+    '',
+    '[Escribe aquí]',
+    '',
+    '—',
+    'Relatos desde Santiago',
+    SITE.origin,
+  ]);
+  return `<p class="site-footer__carta">
+  <span class="carta__mark" aria-hidden="true">✉</span>
+  <a class="carta__link" href="${esc(href)}">Escríbeme un mensaje</a>
+  <span class="site-footer__buzon"><a href="mailto:${BUZON}">${BUZON}</a></span>
+</p>`;
 }
 
 // --- front page -------------------------------------------------------------

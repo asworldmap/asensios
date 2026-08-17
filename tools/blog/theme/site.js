@@ -6,11 +6,6 @@
 
   var CONFIG = {
     GA_MEASUREMENT_ID: 'G-7V5M9TTKGV',
-    // Cartas al autor: set to an HTTPS endpoint that accepts JSON POSTs to
-    // enable the form. Left null on purpose — a form that silently drops
-    // messages is worse than an honest closed sign. See
-    // docs/BLOG-V3-ARCHITECTURE.md for the recommended minimal backend.
-    CARTAS_ENDPOINT: null
   };
 
   var READ_KEY = 'relatos_leidos';
@@ -230,53 +225,9 @@
   }
 
   // ------------------------------------------------------- cartas al autor
-  function setupCarta() {
-    var section = document.querySelector('[data-carta]');
-    if (!section) return;
-    var form = section.querySelector('[data-carta-form]');
-    var status = section.querySelector('[data-carta-status]');
-    if (!form || !status) return;
-
-    var stamp = form.querySelector('input[name="t"]');
-    if (stamp) stamp.value = String(Date.now());
-
-    if (!CONFIG.CARTAS_ENDPOINT) {
-      section.setAttribute('data-disabled', '');
-      form.setAttribute('aria-disabled', 'true');
-      status.textContent = 'El buzón está cerrado por ahora. Pronto podrás escribir desde aquí.';
-      form.addEventListener('submit', function (e) { e.preventDefault(); });
-      return;
-    }
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var data = new FormData(form);
-      if (data.get('company')) return;                       // honeypot
-      if (Date.now() - Number(data.get('t') || 0) < 3000) {  // too fast to be human
-        status.textContent = 'Tómate un momento y vuelve a enviarlo.';
-        return;
-      }
-      var message = String(data.get('message') || '').trim();
-      if (message.length < 4) { status.textContent = 'Escribe un mensaje primero.'; return; }
-
-      status.textContent = 'Enviando…';
-      fetch(CONFIG.CARTAS_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: message,
-          name: String(data.get('name') || '').trim(),
-          relato: String(data.get('relato') || '')
-        })
-      }).then(function (r) {
-        if (!r.ok) throw new Error('bad status');
-        form.reset();
-        status.textContent = 'Gracias. Lo leeré.';
-      }).catch(function () {
-        status.textContent = 'No se pudo enviar. Inténtalo más tarde.';
-      });
-    });
-  }
+  // The letter is a mailto the generator writes in full. There is no form,
+  // no endpoint and nothing to submit, so there is nothing to wire up here —
+  // the link works with JavaScript switched off.
 
   // ------------------------------------------------------- edición nocturna
   var THEME_KEY = 'relatos_edicion';
@@ -398,6 +349,42 @@
     window.setTimeout(function () { layer.remove(); }, 2600);
   }
 
+  // ------------------------------------------------------ santiago de noche
+  /**
+   * Three quick taps on the Gran Torre and the drawing has a night of its own:
+   * the city lights go down, stars come out over the Andes and the coordinates
+   * surface for a moment. It is a secret inside the illustration, nothing more
+   * — it does not touch the global edition, the stylesheet does all the work,
+   * and one attribute is added and removed again.
+   *
+   * Pointer-only and inside an aria-hidden drawing, so it never appears in the
+   * tab order and cannot confuse anyone reading with a keyboard or a screen
+   * reader. Under reduced motion the coordinates simply show, unanimated.
+   */
+  function setupTorre() {
+    var towers = [].slice.call(document.querySelectorAll('[data-torre]'));
+    if (!towers.length) return;
+    var plate = document.querySelector('.np');
+    if (!plate) return;
+
+    var taps = 0, tapTimer = null, backTimer = null;
+    towers.forEach(function (tower) {
+      tower.addEventListener('click', function () {
+        taps++;
+        window.clearTimeout(tapTimer);
+        tapTimer = window.setTimeout(function () { taps = 0; }, 520);
+        if (taps < 3) return;
+        taps = 0;
+        if (plate.hasAttribute('data-noche')) return;   // already dark
+        plate.setAttribute('data-noche', '');
+        window.clearTimeout(backTimer);
+        backTimer = window.setTimeout(function () {
+          plate.removeAttribute('data-noche');
+        }, reduceMotion.matches ? 1500 : 2100);
+      });
+    });
+  }
+
   function setupFolio() {
     var folio = document.querySelector('[data-folio]');
     if (!folio) return;
@@ -425,8 +412,8 @@
     safely('reveal', setupReveal);
     safely('readingEvents', setupReadingEvents);
     safely('mediaEvents', setupMediaEvents);
-    safely('carta', setupCarta);
     safely('folio', setupFolio);
+    safely('torre', setupTorre);
   }
 
   if (document.readyState === 'loading') {
