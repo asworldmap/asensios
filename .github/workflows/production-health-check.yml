@@ -6,11 +6,18 @@ name: Production health check
 # the 2026-08-14 key-rotation incident as a standing check.
 on:
   workflow_dispatch:
+  # Deliberately NOT triggered by changes to deploy/blog/verify-public.sh.
+  # That path also triggers deploy-blog.yml, and both workflows start from the
+  # same push: this one would query production while the deploy is still
+  # rsyncing and report a failure against the previous release. That happened
+  # once, flagging the new banner as a 404 six seconds before it was uploaded.
+  # Post-deploy verification belongs to the deploy job, which runs the same
+  # script after rsync. This workflow answers "is production healthy right
+  # now?" on demand and independently of any deploy.
   push:
     branches: [main]
     paths:
       - ".github/workflows/production-health-check.yml"
-      - "deploy/blog/verify-public.sh"
 
 jobs:
   check:
