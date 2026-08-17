@@ -202,8 +202,27 @@ function readExifOrientation(buf, tiffStart, segEnd) {
   return null;
 }
 
+/** portrait | landscape | square — from the file's own dimensions. */
+function orientationOf(dims) {
+  if (!dims || !dims.w || !dims.h) return 'unknown';
+  const r = dims.w / dims.h;
+  if (r < 0.92) return 'portrait';
+  if (r > 1.12) return 'landscape';
+  return 'square';
+}
+
 /** <picture>/<img> with srcset when sibling variants exist, always with dimensions. */
-async function renderImage(src, { alt = '', caption = '', className = '', eager = false } = {}) {
+/* Narrow copies committed beside each original (see content/media/README.md).
+   The build only references them; it never resizes anything itself, so the
+   generator keeps its two dependencies. */
+const DERIVATIVE_WIDTHS = [640, 1000];
+
+async function renderImage(src, {
+  alt = '', caption = '', className = '', eager = false,
+  // What the picture will actually occupy. The default covers the article
+  // column: the full screen on a phone, a capped measure on a desktop.
+  sizes = '(max-width: 640px) 100vw, 620px',
+} = {}) {
   const abs = join(CONTENT, src.replace(/^\//, ''));
   const dims = await imageSize(abs);
   const base = src.replace(/\.[^.]+$/, '');
@@ -213,8 +232,22 @@ async function renderImage(src, { alt = '', caption = '', className = '', eager 
       sources.push(`<source srcset="${esc(base)}.${ext}" type="${type}">`);
     }
   }
+  // Responsive widths, if the narrow copies were generated next to the
+  // original. A phone was downloading the full 1351px-wide frame for a
+  // 390px column: ~2.4MB a page, almost all of it pixels nobody could see.
+  const srcset = [];
+  for (const w of DERIVATIVE_WIDTHS) {
+    const rel = `${base}-${w}.jpg`;
+    if (dims && dims.w > w && existsSync(join(CONTENT, rel.replace(/^\//, '')))) {
+      srcset.push(`${esc(rel)} ${w}w`);
+    }
+  }
+  if (srcset.length && dims) srcset.push(`${esc(src)} ${dims.w}w`);
+
   const attrs = [
     `src="${esc(src)}"`,
+    srcset.length ? `srcset="${srcset.join(', ')}"` : '',
+    srcset.length ? `sizes="${esc(sizes)}"` : '',
     `alt="${esc(alt)}"`,
     'loading="' + (eager ? 'eager' : 'lazy') + '"',
     'decoding="async"',
@@ -222,7 +255,10 @@ async function renderImage(src, { alt = '', caption = '', className = '', eager 
   ].filter(Boolean).join(' ');
   const img = `<img ${attrs}>`;
   const media = sources.length ? `<picture>${sources.join('')}${img}</picture>` : img;
-  return `<figure class="figure ${className}">${media}${
+  // The build already knows the real dimensions, so the author never has to
+  // classify a photograph: the layout adapts to what came off the phone.
+  const shape = orientationOf(dims);
+  return `<figure class="figure ${className}" data-shape="${shape}">${media}${
     caption ? `<figcaption>${esc(caption)}</figcaption>` : ''
   }</figure>`;
 }
@@ -397,6 +433,10 @@ function head({ title, description, canonical, ogType = 'article', image, bodyCl
 <link rel="icon" href="data:image/svg+xml,${FAVICON}">
 <link rel="stylesheet" href="${ASSETS.css}">
 <link rel="alternate" type="application/rss+xml" title="${esc(SITE.name)}" href="/feed.xml">
+<script>/* Chosen edition, before first paint, so a reader who picked the night
+   edition is not flashed a white page on every navigation. Sets one attribute
+   and nothing else; if it throws, the paper edition simply renders. */
+try{var e=localStorage.getItem('relatos_edicion');if(!e&&matchMedia('(prefers-color-scheme: dark)').matches)e='noche';if(e)document.documentElement.setAttribute('data-edicion',e);}catch(_){}</script>
 <script defer src="${ASSETS.js}"></script>
 <meta property="og:type" content="${ogType}">
 <meta property="og:site_name" content="${esc(SITE.name)}">
@@ -422,20 +462,26 @@ function masthead({ compact = false, edition = '' } = {}) {
       <li><a href="/#sobre">Quién escribe</a></li>
       <li><a href="/#whatsapp">WhatsApp</a></li>
     </ul>
-    <p class="utility__note">Santiago de Chile</p>
+    <p class="utility__note">
+      <span class="utility__place">Santiago de Chile</span>
+      <button type="button" class="moon" data-theme-toggle aria-pressed="false"
+              aria-label="Activar edición nocturna" title="Activar edición nocturna">
+        <span aria-hidden="true">&#9790;</span>
+      </button>
+    </p>
   </nav>
   <div class="masthead__brand">
     ${compact ? `<${tag} class="wordmark"><a href="/">Relatos<span class="wordmark__break"> </span>desde Santiago</a></${tag}>`
       : `<${tag} class="wordmark wordmark--banner"><a href="/">
       <picture>
         <source media="(max-width: 760px)" srcset="/assets/banner-836.jpg">
-        <img src="/assets/banner-1672.jpg" width="1672" height="712"
+        <img src="/assets/banner-1672.jpg" width="1672" height="557"
              alt="${esc(SITE.name)}" fetchpriority="high" decoding="async">
       </picture>
     </a></${tag}>`}
     <p class="wordmark__sub">${esc(SITE.tagline)}</p>
   </div>
-  ${edition ? `<p class="edition">${edition}</p>` : ''}
+  ${edition ? `<p class="edition" data-folio>${edition}</p>` : ''}
 </header>`;
 }
 
@@ -533,7 +579,10 @@ async function storyPage(entry) {
   const label = SECTIONS.find((s) => s.id === entry.section)?.label || 'Relato';
   const accent = ACCENTS.has(entry.accent) ? `accent-${entry.accent}` : '';
   const cover = entry.cover
-    ? await renderImage(entry.cover, { alt: entry.coverAlt || entry.title, className: 'figure--cover', eager: true })
+    ? await renderImage(entry.cover, {
+      alt: entry.coverAlt || entry.title, className: 'figure--cover', eager: true,
+      sizes: '(max-width: 640px) 100vw, 560px',
+    })
     : '';
   const nav = `<nav class="story-nav" aria-label="Navegación entre relatos">
     <div>${entry.prev ? `<a href="${entry.prev.url}"><span>← Anterior</span><b>${esc(entry.prev.title)}</b></a>` : ''}</div>
@@ -623,7 +672,10 @@ async function bandCard(entry) {
   const label = SECTIONS.find((s) => s.id === entry.section)?.label || '';
   const accent = ACCENTS.has(entry.accent) ? ` accent-${entry.accent}` : '';
   const img = entry.cover
-    ? await renderImage(entry.cover, { alt: entry.coverAlt || entry.title, className: 'figure--band' })
+    ? await renderImage(entry.cover, {
+      alt: entry.coverAlt || entry.title, className: 'figure--band',
+      sizes: '(max-width: 640px) 100vw, 400px',
+    })
     : '';
   return `<section class="band reveal${accent}">
   ${img}
@@ -646,10 +698,16 @@ async function frontCard(entry, variant) {
       alt: entry.coverAlt || entry.title,
       eager: variant === 'lead',
       className: 'figure--card',
+      // The lead runs about half the front page; the side column is a
+      // narrow rail of thumbnails.
+      sizes: variant === 'lead'
+        ? '(max-width: 640px) 100vw, (max-width: 980px) 50vw, 380px'
+        : '(max-width: 640px) 100vw, 230px',
     })
     : '';
   const accent = ACCENTS.has(entry.accent) ? ` accent-${entry.accent}` : '';
-  return `<article class="card card--${variant} reveal${accent}">
+  const shape = entry.cover ? orientationOf(await imageSize(join(CONTENT, entry.cover.replace(/^\//, '')))) : 'none';
+  return `<article class="card card--${variant} card--${shape} reveal${accent}">
   ${img}
   <p class="eyebrow"><span class="eyebrow__no">Nº ${entry.number}</span> · ${esc(label)}</p>
   <h3 class="card__title"><a href="${entry.url}">${esc(entry.title)}</a></h3>
@@ -740,7 +798,11 @@ async function frontPage(all, social) {
 
   const blocks = [];
   if (lead || secondary) {
-    blocks.push(`<section class="front-lead">${lead}<div class="front-lead__side">${secondary}${third}${railIndex}</div></section>`);
+    // The index sits under the lead, not under the side cards. The side
+    // column carries two stories to the lead's one, so putting the index
+    // there too left the lead column ending 1500px short — a page and a half
+    // of blank paper beside the busiest part of the front page.
+    blocks.push(`<section class="front-lead"><div class="front-lead__main">${lead}${railIndex}</div><div class="front-lead__side">${secondary}${third}</div></section>`);
   }
   if (banded) blocks.push(await bandCard(banded));
 
@@ -954,6 +1016,7 @@ async function copyTheme() {
 async function copyFonts() {
   const wanted = [
     ['@fontsource/instrument-serif', /latin-400-(normal|italic)\.woff2$/],
+    ['@fontsource/source-serif-4', /latin-(400-(normal|italic)|600-normal)\.woff2$/],
     ['@fontsource/ibm-plex-mono', /latin-(400|600)-normal\.woff2$/],
   ];
   const dest = join(OUT, 'assets', 'fonts');

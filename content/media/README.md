@@ -59,3 +59,48 @@ Los originales de cámara pesaban 33 MB en total; publicados pesan 6,7 MB.
 
 Ese paso se hace una vez, al importar, y el resultado se versiona. El
 generador sigue sin depender de ninguna librería de imagen.
+
+## Copias responsive (`-640`, `-1000`)
+
+Junto a cada fotografía se guardan dos versiones estrechas con el mismo
+nombre y un sufijo de anchura:
+
+```
+content/media/002/bicicleta.jpg        ← original (el máster, no se toca)
+content/media/002/bicicleta-640.jpg
+content/media/002/bicicleta-1000.jpg
+```
+
+El generador las detecta solo: si existen, emite `srcset` y `sizes`; si no
+existen, publica el original y no pasa nada. No hay que declararlas en el
+frontmatter.
+
+Sin esto un teléfono descargaba el fotograma completo de 1351 px para una
+columna de 390 px: unos 2,4 MB por página. Con las copias, un escritorio baja
+905 kB en vez de 2,5 MB.
+
+Para regenerarlas después de añadir fotos nuevas (Pillow es una herramienta
+de importación, **no** una dependencia del build):
+
+```bash
+python3 - <<'PY'
+from PIL import Image, ImageOps
+from pathlib import Path
+for src in sorted(Path('content/media').glob('*/*.jpg')):
+    if any(src.stem.endswith(f'-{w}') for w in (640, 1000)):
+        continue
+    im = ImageOps.exif_transpose(Image.open(src))
+    for w in (640, 1000):
+        if im.width <= w:
+            continue
+        out = src.with_name(f'{src.stem}-{w}.jpg')
+        if out.exists():
+            continue
+        r = im.resize((w, round(im.height * w / im.width)), Image.LANCZOS).convert('RGB')
+        r.save(out, 'JPEG', quality=82, optimize=True, progressive=True)
+        print(out)
+PY
+```
+
+`exif_transpose` importa: los originales vienen del teléfono con la
+orientación en los metadatos, y al reescalar hay que fijarla en los píxeles.
