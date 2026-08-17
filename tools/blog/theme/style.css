@@ -24,6 +24,24 @@
   src: url('/assets/fonts/instrument-serif-latin-400-italic.woff2') format('woff2');
   font-weight: 400; font-style: italic; font-display: swap;
 }
+/* Source Serif 4 (OFL-1.1), self-hosted. The reading voice: a text face cut
+   for continuous prose rather than the system book faces we borrowed before,
+   which differ on every machine. Instrument Serif keeps the display work. */
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/assets/fonts/source-serif-4-latin-400-normal.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/assets/fonts/source-serif-4-latin-400-italic.woff2') format('woff2');
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/assets/fonts/source-serif-4-latin-600-normal.woff2') format('woff2');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
 @font-face {
   font-family: 'IBM Plex Mono';
   src: url('/assets/fonts/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
@@ -55,11 +73,11 @@
   --accent-soft: rgba(125, 34, 49, .1);
 
   --display: 'Instrument Serif', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
-  --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
+  --serif: 'Source Serif 4', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
   --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --max: 1200px;
-  --measure: 66ch;
+  --measure: 62ch;
   --gap: clamp(22px, 3vw, 40px);
   --edge: clamp(20px, 4vw, 40px);
 }
@@ -126,7 +144,7 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 .utility a:hover { border-bottom-color: var(--accent); color: var(--accent); }
 .utility__note { margin: 0; color: var(--muted); font-weight: 400; }
 
-.masthead__brand { text-align: center; padding: clamp(26px, 4.2vw, 54px) 0 16px; }
+.masthead__brand { text-align: center; padding: clamp(18px, 2.6vw, 30px) 0 14px; }
 
 .wordmark {
   margin: 0;
@@ -145,9 +163,16 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
    readable to a screen reader and to search. Story pages keep the small set
    wordmark, where a banner would overwhelm the article.
 
-   It is 2.35:1, so at 390px it stands about 166px tall: wide and short enough
-   that no crop is needed and nothing of the drawing is lost. */
-.wordmark--banner { font-size: 0; line-height: 0; margin-inline: calc(var(--edge) * -.5); }
+   A masthead strip, not a hero: the 3:1 artwork is capped so it occupies
+   roughly 160-220px of the first screen rather than most of it, with thin
+   rules above and below the way a printed nameplate sits on the page.
+
+   The strip is sized by capping its WIDTH, never by capping its height with
+   object-fit: cover. The nameplate text sits in the middle of the artwork,
+   and a cover crop on a box wider than 3:1 trims top and bottom -- it was
+   cutting 37% of the height, straight through the title. Width 660 puts the
+   3:1 artwork at 220px tall, inside the target band, with nothing cropped. */
+.wordmark--banner { font-size: 0; line-height: 0; margin: 0 auto; max-width: 660px; }
 .wordmark--banner a { display: block; }
 .wordmark--banner img { width: 100%; height: auto; }
 
@@ -181,6 +206,7 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   padding: clamp(30px, 4vw, 54px) 0 clamp(28px, 3.6vw, 46px);
   border-bottom: 3px double var(--ink);
 }
+.front-lead__main { display: flex; flex-direction: column; gap: clamp(26px, 3vw, 40px); }
 .front-lead__side {
   display: flex; flex-direction: column; gap: 26px;
   border-left: 1px solid var(--rule); padding-left: clamp(20px, 2.4vw, 34px);
@@ -204,9 +230,25 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 .card--postal .card__title, .card--dispatch .card__title { font-size: clamp(20px, 2.2vw, 25px); }
 .card--secondary .card__deck, .card--tertiary .card__deck { font-size: 16px; }
 
-.figure--card img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; object-position: center 32%; }
-.card--lead .figure--card img { aspect-ratio: 16 / 9; }
-.front-lead__side .figure--card img { aspect-ratio: 2 / 1; }
+/* Photographs keep the shape they were taken in. No house ratio, no cover
+   crop: the layout is built around the picture instead of the picture being
+   cut to fit the layout. The generator tags each figure with its own
+   orientation, so this needs nothing from the author. */
+.figure--card img { width: auto; max-width: 100%; height: auto; }
+/* A phone portrait as the lead: it sits beside the headline rather than
+   being stretched across the column. The height cap is ratio-safe only
+   because width is auto -- with width:100% the browser clamps the height and
+   leaves the width alone, which squashes the picture. */
+.card--lead.card--portrait { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr); gap: clamp(22px, 2.8vw, 40px); align-items: start; }
+.card--lead.card--portrait .figure--card { grid-row: span 4; }
+.card--lead.card--portrait .figure--card img { max-height: 84vh; }
+
+/* The lead carries the front page's largest photograph; the side column runs
+   thumbnails. Without these caps the two secondary portraits plus the index
+   made the side column 1500px taller than the lead, so the most important
+   story on the page was also the smallest thing on it. The caps are height
+   caps on auto-width images, so every ratio is still the camera's. */
+.front-lead__side .figure--card img { max-height: 42vh; }
 .js .card .figure img { transition: transform .6s cubic-bezier(.22,.61,.36,1); }
 .js .card:hover .figure img { transform: scale(1.015); }
 
@@ -226,7 +268,7 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   padding-left: clamp(20px, 3vw, 40px);
 }
 .band .figure--band { margin: 0; }
-.band .figure--band img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: center 30%; }
+.band .figure--band img { width: auto; max-width: 100%; height: auto; max-height: 66vh; }
 .js .band .figure img { transition: transform .6s cubic-bezier(.22,.61,.36,1); }
 .js .band:hover .figure img { transform: scale(1.012); }
 .band__title { margin: 0 0 14px; font-size: clamp(30px, 4.4vw, 54px); line-height: 1.02; letter-spacing: -.03em; max-width: 20ch; }
@@ -374,7 +416,11 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   color: var(--accent); font-weight: 600;
 }
 .figure--cover { margin: 6px 0 clamp(26px, 3.4vw, 44px); }
-.figure--cover img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: center 32%; }
+.figure--cover img { width: auto; max-width: 100%; height: auto; }
+/* A vertical photograph is not enlarged until it fills a desktop screen: it
+   is given a column of its own and paper around it. */
+.figure--cover[data-shape="portrait"] { max-width: 560px; margin-inline: auto; }
+.figure--cover[data-shape="square"] { max-width: 680px; margin-inline: auto; }
 
 .story-body {
   display: grid; grid-template-columns: minmax(0, var(--measure)) minmax(0, 1fr);
@@ -410,8 +456,10 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 .plate--inset { max-width: var(--measure); }
 .plate--wide { max-width: 900px; }
 .plate--full { max-width: none; }
-.plate img { width: 100%; max-height: 78vh; object-fit: cover; }
-.plate--inset img, .plate--wide img { max-height: 72vh; }
+.plate img { width: auto; max-width: 100%; height: auto; margin-inline: auto; }
+.plate[data-shape="portrait"], .plate .figure[data-shape="portrait"] { }
+.plate--wide:has([data-shape="portrait"]), .plate--full:has([data-shape="portrait"]) { max-width: 600px; }
+.plate--inset:has([data-shape="portrait"]) { max-width: 520px; }
 .plate figcaption { margin-inline: auto; max-width: var(--measure); }
 
 .side-column { border-left: 1px solid var(--rule); padding-left: 24px; }
@@ -538,12 +586,10 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 
 /* ------------------------------------------------------------- motion */
 .reveal { opacity: 1; }
-.js .reveal { opacity: 0; transform: translateY(12px); }
-.js .reveal.is-in { opacity: 1; transform: none; transition: opacity .55s ease, transform .55s cubic-bezier(.22,.61,.36,1); }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .js .reveal, .js .reveal.is-in { opacity: 1; transform: none; transition: none; }
+  .reveal, .reveal--armed, .reveal--armed.is-in { opacity: 1; transform: none; transition: none; }
   .js .card:hover .figure img,
   .js .strip__rail:hover .strip__item,
   .js .strip__rail .strip__item:hover { transform: none; }
@@ -572,8 +618,8 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   .masthead__brand { padding: 22px 0 12px; }
   .wordmark { font-size: clamp(34px, 11vw, 46px); line-height: .94; }
   /* Edge to edge on a small screen: the drawing is the identity, and side
-     margins only shrink it further. */
-  .wordmark--banner { margin-inline: calc(50% - 50vw); width: 100vw; }
+     margins only shrink it further. At 3:1 that is ~130px tall on a phone. */
+  .wordmark--banner { margin-inline: calc(50% - 50vw); width: 100vw; max-width: none; }
   .wordmark__sub { margin-top: 12px; font-size: 15px; max-width: 30ch; }
   .edition { font-size: 9px; letter-spacing: .12em; padding: 9px 0; border-top-width: 2px; }
 
@@ -583,7 +629,7 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   .card--secondary .card__title, .card--tertiary .card__title { font-size: 22px; }
 
   .band { grid-template-columns: 1fr; gap: 18px; padding: 24px 0; padding-left: 16px; border-left-width: 3px; }
-  .band .figure--band img { aspect-ratio: 3 / 2; }
+  .band .figure--band img { max-height: 56vh; }
   .band__title { font-size: clamp(26px, 7.6vw, 34px); max-width: none; }
   .band__deck { font-size: 17px; }
 
@@ -593,11 +639,21 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   .prose > p:first-of-type::first-letter { font-size: 3.4em; padding-right: 8px; }
 
   /* Margin, not transform: a transform moves the paint but leaves the layout
-     box behind, which pushes the document's scroll width past the viewport. */
-  .figure--cover, .plate { width: 100vw; margin-left: calc(50% - 50vw); }
-  .figure--cover img { aspect-ratio: 4 / 3; }
+     box behind, which pushes the document's scroll width past the viewport.
+     Only landscape photographs go edge to edge; a vertical one stays inside
+     the column, because a full-bleed portrait swallows the whole screen.
+     The [data-shape] selectors below outrank this one, so the full-bleed
+     margin has to be restated there or the box keeps the column's offset
+     while the width jumps to 100vw — that was an 18px horizontal scroll. */
+  .plate { width: 100vw; margin-left: calc(50% - 50vw); }
+  .figure--cover[data-shape="landscape"], .figure--cover[data-shape="unknown"] {
+    width: 100vw; margin-left: calc(50% - 50vw); margin-right: 0;
+  }
   .plate img { max-height: 74vh; }
-  .figure--cover figcaption, .plate figcaption { margin-inline: var(--edge); font-size: 13.5px; }
+  .figure--cover[data-shape="landscape"] figcaption,
+  .figure--cover[data-shape="unknown"] figcaption,
+  .plate figcaption { margin-inline: var(--edge); font-size: 13.5px; }
+  .figure--cover figcaption { font-size: 13.5px; }
   .figure--cover { margin-bottom: 26px; }
   .plate { margin-block: 28px; }
 
@@ -619,4 +675,112 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   .consent, .utility, .story-nav, .carta, .read-toggle, .whatsapp { display: none; }
   body { background: #fff; }
   .plate img, .figure--cover img { max-height: none; }
+}
+
+/* ==========================================================================
+   EDICIÓN NOCTURNA
+   The same newspaper at night, not a generic dark theme: warm charcoal paper,
+   ivory ink, parchment rules, and the story accents desaturated so they stay
+   themselves without glowing. Photographs are never altered.
+
+   The paper edition stays the default. prefers-color-scheme is honoured by
+   the script only for readers who have never chosen, so nobody's familiar
+   page changes on them unannounced.
+   ========================================================================== */
+[data-edicion="noche"] {
+  --paper: #17150f;
+  --paper-deep: #100e0a;
+  --ink: #f2e9d8;
+  --ink-soft: #ddd2be;
+  --muted: #9c9081;
+  --rule: #4a4235;
+  --rule-soft: #322c23;
+
+  --wine: #c9788a;
+  --verde: #8bb191;
+  --cobalto: #8fb0dd;
+  --ocre: #d9b268;
+  --terracota: #dd9678;
+  --accent: var(--wine);
+}
+[data-edicion="noche"] .accent-wine      { --accent: var(--wine); }
+[data-edicion="noche"] .accent-verde     { --accent: var(--verde); }
+[data-edicion="noche"] .accent-cobalto   { --accent: var(--cobalto); }
+[data-edicion="noche"] .accent-ocre      { --accent: var(--ocre); }
+[data-edicion="noche"] .accent-terracota { --accent: var(--terracota); }
+/* The grain multiplies against light paper; at night it would only smother. */
+[data-edicion="noche"] body::before { mix-blend-mode: overlay; opacity: .22; }
+[data-edicion="noche"] .consent { background: #201d15; }
+[data-edicion="noche"] .btn--primary { background: var(--ink); color: var(--paper); }
+[data-edicion="noche"] .carta__form textarea,
+[data-edicion="noche"] .carta__form input[type="text"] { background: rgba(255,255,255,.05); }
+/* The nameplate is a printed object; it keeps its paper, just a little
+   quieter so it does not glare out of a dark page. */
+[data-edicion="noche"] .wordmark--banner img { filter: brightness(.86) saturate(.9); }
+
+/* The control itself: a small moon in the masthead furniture, nothing more. */
+.utility__note { display: inline-flex; align-items: center; gap: 12px; }
+.moon {
+  background: none; border: 0; padding: 4px 2px; cursor: pointer; line-height: 1;
+  font-size: 15px; color: var(--muted);
+  transition: color .2s ease, transform .3s cubic-bezier(.22,.61,.36,1);
+}
+.moon:hover { color: var(--accent); }
+.moon[aria-pressed="true"] { color: var(--ocre); transform: rotate(-18deg); }
+
+/* --- burning the paper ---------------------------------------------------
+   A brief char at the edges as the night edition comes up underneath. It is
+   an overlay and nothing else: it never hides, moves or removes content, and
+   never touches scrolling. */
+.burn {
+  position: fixed; inset: 0; z-index: 60; pointer-events: none;
+  animation: burn-away 1200ms ease-out forwards;
+  background:
+    radial-gradient(120% 100% at 50% 50%, transparent 38%, rgba(120,50,20,.5) 62%, rgba(30,12,5,.92) 78%),
+    radial-gradient(90% 70% at 8% 12%, rgba(255,150,40,.55), transparent 48%),
+    radial-gradient(90% 70% at 92% 88%, rgba(255,120,30,.5), transparent 48%);
+  mix-blend-mode: multiply;
+}
+@keyframes burn-away {
+  0%   { opacity: 0; transform: scale(1.12); }
+  22%  { opacity: 1; }
+  70%  { opacity: .85; }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+/* --- a few drawings fall out of the paper -------------------------------- */
+.folio-drop { position: fixed; inset: 0; z-index: 55; pointer-events: none; overflow: hidden; }
+.folio-drop__item {
+  position: absolute; top: -8vh; width: 26px; height: 26px;
+  fill: none; stroke: var(--ink-soft); stroke-width: 1.4;
+  stroke-linecap: round; stroke-linejoin: round;
+  opacity: 0; animation: folio-fall 2200ms cubic-bezier(.35,.05,.6,1) var(--d, 0s) forwards;
+}
+@keyframes folio-fall {
+  0%   { opacity: 0;  transform: translateY(0) rotate(0) scale(var(--s, 1)); }
+  12%  { opacity: .78; }
+  85%  { opacity: .55; }
+  100% { opacity: 0;  transform: translateY(108vh) rotate(var(--r, 40deg)) scale(var(--s, 1)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .burn { display: none; }
+  .folio-drop { display: none; }
+  .moon[aria-pressed="true"] { transform: none; }
+}
+
+/* Reveal is armed by the script, element by element, never by a blanket rule
+   keyed on a class the script adds — see setupReveal() for why. */
+.reveal--armed { opacity: 0; transform: translateY(12px); }
+.reveal--armed.is-in { opacity: 1; transform: none; transition: opacity .55s ease, transform .55s cubic-bezier(.22,.61,.36,1); }
+
+@media (max-width: 980px) {
+  .card--lead.card--portrait { grid-template-columns: 1fr; }
+  .card--lead.card--portrait .figure--card img { max-height: 62vh; }
+}
+@media (max-width: 640px) {
+  /* Photographs use the natural width of the screen and keep their ratio. */
+  .figure--cover[data-shape="portrait"], .figure--cover[data-shape="square"] { max-width: none; }
+  .plate--wide:has([data-shape="portrait"]), .plate--full:has([data-shape="portrait"]),
+  .plate--inset:has([data-shape="portrait"]) { max-width: none; }
 }
