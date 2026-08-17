@@ -118,7 +118,10 @@ for slug in 001-no-parti-el-dia-previsto \
             003-dificil-arte-estarse-quieto \
             004-la-diplomacia-tambien-se-come; do
   page=$(curl -sS --max-time 25 "$BASE/relatos/$slug.html" 2>/dev/null)
-  imgs=$(printf '%s' "$page" | grep -o '/media/[^"]*' | sort -u)
+  # Stop at a quote, comma or space: srcset packs several URLs and their
+  # width descriptors into one attribute, and [^"]* would swallow the lot
+  # into a single bogus path that 404s.
+  imgs=$(printf '%s' "$page" | grep -o '/media/[^",[:space:]]*' | sort -u)
   count=$(printf '%s' "$imgs" | grep -c . )
   echo "--- $slug: $count image reference(s) ---"
   if [ "$count" -lt 1 ]; then
