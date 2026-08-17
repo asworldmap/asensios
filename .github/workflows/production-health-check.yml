@@ -14,6 +14,10 @@ on:
   # Post-deploy verification belongs to the deploy job, which runs the same
   # script after rsync. This workflow answers "is production healthy right
   # now?" on demand and independently of any deploy.
+  #
+  # Fired manually on 2026-08-17 via this comment touch to diagnose a
+  # reported ERR_TIMED_OUT against blog.asensios.com from a desktop browser;
+  # workflow_dispatch was unavailable to the calling session.
   push:
     branches: [main]
     paths:
