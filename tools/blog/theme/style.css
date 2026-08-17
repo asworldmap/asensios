@@ -157,24 +157,67 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
   margin: 16px auto 0; max-width: 44ch; text-wrap: balance;
   font-style: italic; font-size: clamp(15px, 1.5vw, 18px); color: var(--muted);
 }
-/* The illustrated masthead. The banner already carries the publication's
-   name, so on the front page it *is* the h1 — the drawn title replaces the
-   set one instead of appearing beside it, and the alt text keeps the heading
-   readable to a screen reader and to search. Story pages keep the small set
-   wordmark, where a banner would overwhelm the article.
+/* The masthead: set title over a drawn Santiago.
+   ------------------------------------------------------------------------
+   The name is real text and the panorama is real geometry. The raster banner
+   this replaces could not be both full-width on a desktop and uncropped on a
+   phone — every attempt was another object-fit compromise, and the last one
+   was cutting through the nameplate itself. Neither problem exists once the
+   drawing is drawn rather than photographed.
 
-   A masthead strip, not a hero: the 3:1 artwork is capped so it occupies
-   roughly 160-220px of the first screen rather than most of it, with thin
-   rules above and below the way a printed nameplate sits on the page.
+   Title above, vignette below: they read as one nameplate, but they never
+   fight for the same pixels, so the title can never be clipped by the
+   artwork or the artwork by the title. */
+/* Sized to span the measure, the way a nameplate does — the old raster
+   banner never could, which is half of why it read as a hero image. */
+.wordmark--plate { margin: 0; font-size: clamp(38px, 7.4vw, 92px); line-height: .94; letter-spacing: -.035em; }
+.wordmark--plate a { text-decoration: none; }
 
-   The strip is sized by capping its WIDTH, never by capping its height with
-   object-fit: cover. The nameplate text sits in the middle of the artwork,
-   and a cover crop on a box wider than 3:1 trims top and bottom -- it was
-   cutting 37% of the height, straight through the title. Width 660 puts the
-   3:1 artwork at 220px tall, inside the target band, with nothing cropped. */
-.wordmark--banner { font-size: 0; line-height: 0; margin: 0 auto; max-width: 660px; }
-.wordmark--banner a { display: block; }
-.wordmark--banner img { width: 100%; height: auto; }
+.np { margin: 10px 0 0; }
+/* No text selection: the tower's secret is a triple click, and a triple click
+   inside a drawing that contains a <text> node otherwise selects it. */
+.np__scene {
+  display: block; width: 100%; height: auto; pointer-events: none;
+  user-select: none; -webkit-user-select: none;
+}
+.np__scene--narrow { display: none; }
+
+.np__ridge--far  { fill: var(--rule-soft); }
+.np__ridge--near { fill: var(--rule); }
+.np__city   { fill: var(--muted); }
+.np__torre  { fill: var(--ink-soft); pointer-events: auto; }
+.np__mast   { stroke: var(--ink-soft); stroke-width: 1.4; fill: none; }
+.np__lights { fill: var(--ocre); opacity: .75; }
+.np__palm, .np__bici {
+  fill: none; stroke: var(--muted); stroke-width: 1.6;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.np__bici circle { fill: none; }
+
+/* Both hidden until the tower is tapped three times. */
+.np__stars  { fill: var(--ink-soft); opacity: 0; }
+.np__coords {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .14em;
+  fill: var(--muted); opacity: 0;
+}
+
+.np[data-noche] .np__stars  { opacity: .62; }
+.np[data-noche] .np__coords { opacity: .85; }
+.np[data-noche] .np__lights { opacity: .12; }
+.np[data-noche] .np__city   { fill: var(--ink-soft); }
+
+/* The transition is on the drawing only, so nothing else on the page moves. */
+.np__stars, .np__coords, .np__lights, .np__city { transition: opacity .5s ease, fill .5s ease; }
+
+/* The bicycle arrives once and then stays put. Written so the resting state
+   is the final state and the animation only displaces the *start*: if it
+   never runs — reduced motion, an old engine, anything — the bicycle is
+   simply already where it belongs, rather than stuck off to one side. */
+@keyframes np-bici-in {
+  from { transform: translateX(-26px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+.np__bici { animation: np-bici-in 1s cubic-bezier(.22,.61,.36,1) 1 both; }
 
 .masthead--compact .wordmark { font-size: clamp(23px, 3.2vw, 32px); }
 .masthead--compact .wordmark__sub { display: none; }
@@ -525,28 +568,28 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 .story-nav b { font-family: var(--display); font-weight: 400; font-size: 20px; line-height: 1.15; }
 .story-nav a:hover b { color: var(--accent); }
 
-/* carta al autor */
+/* carta al autor
+   A colophon line, not a contact form. The letter leaves in the reader's own
+   mail client and arrives in a personal inbox: nothing is posted, stored or
+   published, so there is no form to style and no endpoint to depend on. */
 .carta {
-  display: grid; grid-template-columns: minmax(160px, .55fr) minmax(0, 1.45fr);
-  gap: var(--gap); padding: clamp(26px, 3.6vw, 44px) 0; border-bottom: 1px solid var(--rule);
+  padding: clamp(24px, 3.2vw, 38px) 0; border-bottom: 1px solid var(--rule);
 }
-.carta h2 { margin: 0 0 8px; font-size: clamp(21px, 2.4vw, 28px); }
-.carta__intro p { margin: 0; color: var(--muted); font-size: 16px; max-width: 38ch; }
-.carta__form { display: grid; gap: 8px; max-width: 44ch; }
-.carta__form label { font: 600 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-.carta__form .opt { text-transform: none; letter-spacing: 0; }
-.carta__form textarea, .carta__form input[type="text"] {
-  font: inherit; font-size: 16px; padding: 11px 13px;
-  border: 1px solid var(--rule); background: rgba(255,255,255,.4); color: var(--ink);
-  border-radius: 0;
+.carta__line { margin: 0 0 7px; font-family: var(--display); font-size: clamp(21px, 2.4vw, 27px); }
+.carta__mark { color: var(--accent); margin-right: 9px; font-size: .82em; }
+.carta__link {
+  color: inherit; text-decoration: underline;
+  text-decoration-color: var(--rule); text-underline-offset: 5px;
 }
-.carta__form textarea:focus, .carta__form input[type="text"]:focus { border-color: var(--accent); }
-.carta__form textarea { resize: vertical; }
-.carta__form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
-.carta__status { margin: 4px 0 0; font-size: 14px; color: var(--muted); min-height: 1.2em; }
-.carta[data-disabled] .carta__form textarea,
-.carta[data-disabled] .carta__form input[type="text"],
-.carta[data-disabled] .carta__form button { opacity: .5; pointer-events: none; }
+.carta__link:hover { color: var(--accent); text-decoration-color: currentColor; }
+.carta__note { margin: 0; color: var(--muted); font-size: 15px; max-width: 46ch; }
+.carta__note a { color: inherit; text-decoration-color: var(--rule); }
+.carta__note a:hover { color: var(--accent); }
+
+.site-footer__carta { margin: 12px 0 !important; font-size: 14px; }
+.site-footer__carta .carta__link { font-family: var(--display); font-size: 17px; }
+.site-footer__buzon { margin-left: 12px; color: var(--muted); }
+.site-footer__buzon a { color: inherit; }
 
 .btn {
   font: 600 10px var(--mono); letter-spacing: .1em; text-transform: uppercase;
@@ -613,14 +656,21 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 
   .utility { font-size: 10px; letter-spacing: .05em; padding: 11px 0 9px; }
   .utility ul { gap: 15px; }
-  .utility__note { display: none; }
+  /* The moon stays reachable on a phone; only the place name goes, because
+     it is what pushed the utility bar onto a second line. */
+  .utility__place { display: none; }
+  .utility__note { gap: 0; }
+  .utility ul { gap: 14px; }
 
-  .masthead__brand { padding: 22px 0 12px; }
+  .masthead__brand { padding: 20px 0 12px; }
   .wordmark { font-size: clamp(34px, 11vw, 46px); line-height: .94; }
-  /* Edge to edge on a small screen: the drawing is the identity, and side
-     margins only shrink it further. At 3:1 that is ~130px tall on a phone. */
-  .wordmark--banner { margin-inline: calc(50% - 50vw); width: 100vw; max-width: none; }
-  .wordmark__sub { margin-top: 12px; font-size: 15px; max-width: 30ch; }
+  /* The narrow composition, edge to edge. Not the desktop panorama scaled
+     down — a redrawn one: fewer peaks, a tighter skyline, no bicycle. */
+  .np { margin-inline: calc(50% - 50vw); width: 100vw; margin-top: 8px; }
+  .np__scene--wide { display: none; }
+  .np__scene--narrow { display: block; }
+  .np__coords { font-size: 8px; letter-spacing: .1em; }
+  .wordmark__sub { margin-top: 10px; font-size: 15px; max-width: 30ch; }
   .edition { font-size: 9px; letter-spacing: .12em; padding: 9px 0; border-top-width: 2px; }
 
   .front-lead { padding: 22px 0; border-bottom-width: 1px; border-bottom-style: solid; }
@@ -712,11 +762,9 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 [data-edicion="noche"] body::before { mix-blend-mode: overlay; opacity: .22; }
 [data-edicion="noche"] .consent { background: #201d15; }
 [data-edicion="noche"] .btn--primary { background: var(--ink); color: var(--paper); }
-[data-edicion="noche"] .carta__form textarea,
-[data-edicion="noche"] .carta__form input[type="text"] { background: rgba(255,255,255,.05); }
-/* The nameplate is a printed object; it keeps its paper, just a little
-   quieter so it does not glare out of a dark page. */
-[data-edicion="noche"] .wordmark--banner img { filter: brightness(.86) saturate(.9); }
+/* The drawing is geometry, so the night edition simply repaints it from the
+   same variables — no filter, no inversion, nothing to wash out. */
+[data-edicion="noche"] .np__lights { opacity: .5; }
 
 /* The control itself: a small moon in the masthead furniture, nothing more. */
 .utility__note { display: inline-flex; align-items: center; gap: 12px; }

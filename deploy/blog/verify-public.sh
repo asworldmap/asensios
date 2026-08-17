@@ -169,9 +169,18 @@ expect_text "$BASE/archivo.html" present "Santiago desde el manillar"
 expect_text "$BASE/this-definitely-does-not-exist" present "Página perdida"
 expect_text "$BASE/this-definitely-does-not-exist" absent  "Aquí no hay nada"
 
-# The illustrated masthead, both responsive sources.
-expect_asset "$BASE/assets/banner-1672.jpg" "image/" ""
-expect_asset "$BASE/assets/banner-836.jpg" "image/" ""
+# The masthead is drawn in code now, so there is no raster banner to fetch.
+# What has to be true is that the name is real text and both compositions
+# shipped — a missing one would silently leave a phone or a desktop bare.
+expect_text "$BASE/" present "np__scene--wide"
+expect_text "$BASE/" present "np__scene--narrow"
+expect_text "$BASE/" absent  "banner-1672.jpg"
+
+# Cartas al autor: a mailto the generator writes, not a form.
+expect_text "$BASE/" present "hola@asensios.com"
+expect_text "$BASE/" present "Escríbeme un mensaje"
+expect_text "$BASE/relatos/001-no-parti-el-dia-previsto.html" present "Carta%20al%20autor"
+expect_text "$BASE/relatos/001-no-parti-el-dia-previsto.html" present "hola@asensios.com"
 
 expect_healthy "https://asensios.com/"
 expect_healthy "https://www.asensios.com/"

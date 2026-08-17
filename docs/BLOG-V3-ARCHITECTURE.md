@@ -109,16 +109,19 @@ blog-dist/                              generated, gitignored
 
 ## Cartas al autor
 
-Built as a complete, accessible frontend component that is **disabled by
-default** (`CARTAS_ENDPOINT: null` in the theme config). It renders an
-honest "temporarily closed" state rather than a form that silently drops
-messages. No insecure mailto relay, no unvetted third-party form service,
-no backend introduced just for this.
+A `mailto:` the generator writes in full at build time — subject, greeting
+and the canonical URL of the relato it belongs to. There is no form, no
+endpoint, no database and no third-party form service, so the link works
+with JavaScript switched off and nothing is stored anywhere: the letter
+goes from the reader's own mail client to a personal inbox.
 
-Recommendation when it is wanted: a single Cloudflare Worker (or Formspree
-on a paid tier) accepting POSTs, rate-limited by IP, with a honeypot field
-and a timestamp check — the component already emits both. Setting the
-endpoint in the theme config is then the only change needed.
+Presented as a colophon line ("Escríbeme un mensaje"), not a comment box.
+Nothing a reader sends is published, and the address is shown in plain text
+beside the link so a browser that cannot open a mail client still leaves
+them somewhere to write to.
+
+The form this replaced was permanently disabled — a component waiting for a
+backend that was never going to be worth running for a personal newspaper.
 
 ## Instagram
 
