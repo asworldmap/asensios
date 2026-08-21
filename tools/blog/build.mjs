@@ -264,6 +264,42 @@ async function renderImage(src, {
   }</figure>`;
 }
 
+/**
+ * Two related photographs shown together, each keeping its own orientation —
+ * neither is cropped or stretched to match the other.
+ */
+async function renderDiptych(items = []) {
+  const figs = [];
+  for (const it of items) {
+    figs.push(await renderImage(it.src, {
+      alt: it.alt || '', caption: it.caption,
+      sizes: '(max-width: 640px) 100vw, 440px',
+    }));
+  }
+  return `<div class="diptych">${figs.join('')}</div>`;
+}
+
+/**
+ * "Carrete del fin de semana": a contact sheet for the photographs that are
+ * real and selected but would slow the story down if they were all placed
+ * inline. A CSS column flow, not a cropped grid — every photograph keeps the
+ * ratio it was taken in, same as everywhere else on the page. Static: the
+ * site has no lightbox, and this does not introduce one.
+ */
+async function renderCarrete(items = [], label = 'Carrete del fin de semana') {
+  const figs = [];
+  for (const it of items) {
+    figs.push(await renderImage(it.src, {
+      alt: it.alt || '', caption: it.caption,
+      sizes: '(max-width: 640px) 50vw, 220px',
+    }));
+  }
+  return `<section class="carrete" aria-label="${esc(label)}">
+  <p class="carrete__head">${esc(label)}</p>
+  <div class="carrete__grid">${figs.join('')}</div>
+</section>`;
+}
+
 async function renderVideo(item) {
   const poster = item.poster ? ` poster="${esc(item.poster)}"` : '';
   return `<figure class="figure figure--video">
@@ -280,10 +316,16 @@ async function renderMediaItems(media = []) {
   const out = [];
   for (const raw of media) {
     const item = typeof raw === 'string' ? { src: raw } : raw;
-    if (!item.src) continue;
-    const html = /\.(mp4|webm|mov)$/i.test(item.src)
-      ? await renderVideo(item)
-      : await renderImage(item.src, item);
+    let html;
+    if (item.items) {
+      html = await renderDiptych(item.items);
+    } else if (item.gallery) {
+      html = await renderCarrete(item.gallery, item.label);
+    } else if (item.src) {
+      html = /\.(mp4|webm|mov)$/i.test(item.src) ? await renderVideo(item) : await renderImage(item.src, item);
+    } else {
+      continue;
+    }
     out.push({ anchor: item.anchor || null, size: item.size || 'wide', html });
   }
   return out;
@@ -335,6 +377,8 @@ function assertMediaPresent(entry) {
   if (entry.cover) refs.push(entry.cover);
   for (const raw of entry.media || []) {
     const item = typeof raw === 'string' ? { src: raw } : raw;
+    if (item.items) { for (const sub of item.items) if (sub.src) refs.push(sub.src); continue; }
+    if (item.gallery) { for (const sub of item.gallery) if (sub.src) refs.push(sub.src); continue; }
     if (item.src) refs.push(item.src);
     if (item.poster) refs.push(item.poster);
   }

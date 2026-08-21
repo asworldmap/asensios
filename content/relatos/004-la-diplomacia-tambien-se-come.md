@@ -7,7 +7,7 @@ section: cronicas
 accent: wine
 location: "Santiago de Chile"
 summary: "Una invitación prestada y mi primera cena cocinada por un chef con estrella Michelin."
-featured: true
+featured: false
 draft: false
 cover: "/media/004/portada-servicio.jpg"
 coverAlt: "Dos camareros terminan de emplatar en la terraza de la residencia, de noche"
