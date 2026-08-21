@@ -505,6 +505,43 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; letter-spacing: 
 .plate--inset:has([data-shape="portrait"]) { max-width: 520px; }
 .plate figcaption { margin-inline: auto; max-width: var(--measure); }
 
+/* The portrait narrowing above is sized for one photograph filling the
+   plate; a diptych or the carrete's grid manage their own width. */
+.plate:has(.diptych) { max-width: 900px; }
+.plate:has(.carrete) { max-width: none; }
+
+/* Two related photographs shown together. Each keeps the ratio it was taken
+   in -- neither is cropped or stretched to match the other, so a portrait
+   beside a portrait sits at its own height, not a shared one. */
+.diptych { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(14px, 2vw, 26px); align-items: start; }
+.diptych .figure { margin: 0; }
+/* auto width, not 100%: a fixed width fights the mobile max-height cap below
+   (74vh) because the browser can no longer shrink both dimensions together
+   to satisfy it -- that mismatch is what squashed every mobile plate before
+   this file's own .plate img rule was written the same way. */
+.diptych img { width: auto; max-width: 100%; height: auto; }
+@media (max-width: 640px) {
+  .diptych { grid-template-columns: 1fr; gap: 22px; }
+}
+
+/* Carrete del fin de semana: a contact sheet, not a carousel. CSS columns
+   rather than a cropped grid, so every photograph keeps its own ratio --
+   the same hard rule that governs every other image in the story. No
+   lightbox: the site does not have one, and this does not add one. */
+.carrete__head {
+  margin: 0 0 20px; font: 600 11px/1.3 var(--mono); letter-spacing: .14em;
+  text-transform: uppercase; color: var(--muted);
+  border-top: 1px solid var(--rule); padding-top: 16px;
+}
+.carrete__grid { columns: 3 210px; column-gap: clamp(14px, 2vw, 22px); }
+.carrete__grid .figure { margin: 0 0 clamp(14px, 2vw, 22px); break-inside: avoid; }
+.carrete__grid img { width: auto; max-width: 100%; height: auto; }
+.carrete__grid figcaption { font-size: 12px; }
+@media (max-width: 640px) {
+  .carrete__grid { columns: 2 130px; column-gap: 10px; }
+  .carrete__grid .figure { margin-bottom: 10px; }
+}
+
 .side-column { border-left: 1px solid var(--rule); padding-left: 24px; }
 .margin-note {
   position: sticky; top: 24px;
