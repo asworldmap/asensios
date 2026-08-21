@@ -81,6 +81,7 @@ expect "$BASE/relatos/001-no-parti-el-dia-previsto.html" 200
 expect "$BASE/relatos/002-una-bicicleta-ordeno-santiago.html" 200
 expect "$BASE/relatos/003-dificil-arte-estarse-quieto.html" 200
 expect "$BASE/relatos/004-la-diplomacia-tambien-se-come.html" 200
+expect "$BASE/relatos/005-un-cumpleanos-en-la-bomba.html" 200
 expect "$BASE/archivo.html" 200
 expect "$BASE/robots.txt" 200
 expect "$BASE/sitemap.xml" 200
@@ -116,7 +117,8 @@ fi
 for slug in 001-no-parti-el-dia-previsto \
             002-una-bicicleta-ordeno-santiago \
             003-dificil-arte-estarse-quieto \
-            004-la-diplomacia-tambien-se-come; do
+            004-la-diplomacia-tambien-se-come \
+            005-un-cumpleanos-en-la-bomba; do
   page=$(curl -sS --max-time 25 "$BASE/relatos/$slug.html" 2>/dev/null)
   # Stop at a quote, comma or space: srcset packs several URLs and their
   # width descriptors into one attribute, and [^"]* would swallow the lot
@@ -144,6 +146,7 @@ expect_text "$BASE/" present "El avión se fue sin mí"
 expect_text "$BASE/" present "Aprender Santiago desde el manillar"
 expect_text "$BASE/" present "El plan era pasar desapercibido"
 expect_text "$BASE/" present "La diplomacia también se come"
+expect_text "$BASE/" present "Un cumpleaños en la Bomba"
 expect_text "$BASE/" absent  "El plan era no llamar la atención"
 expect_text "$BASE/" absent  "Aprenderse Santiago en bicicleta"
 expect_text "$BASE/" absent  "De cómo"
