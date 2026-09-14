@@ -7,7 +7,7 @@ section: cronicas
 accent: ocre
 location: "Valparaíso y Viña del Mar"
 summary: "Un fin de semana en Valparaíso, una compañía de bomberos, un “carrete” y la sensación de haber entrado por unas horas en la vida de otra ciudad."
-featured: true
+featured: false
 draft: false
 cover: "/media/005/portada.jpg"
 coverAlt: "Una estatua de bombero junto a la entrada de un cuartel, con los carros vistos a través de una puerta de cristal al fondo"
