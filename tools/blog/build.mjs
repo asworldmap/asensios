@@ -433,7 +433,11 @@ async function loadAll(includeDrafts) {
   // the reader can walk the story of the stay rather than one silo.
   const chrono = [...all].sort((a, b) => a.date - b.date || String(a.slug).localeCompare(String(b.slug)));
   chrono.forEach((e, i) => {
-    e.number = String(i + 1).padStart(3, '0');
+    // Auto-numbered by chronological order, unless the story reserves a
+    // specific edition number in its own frontmatter -- needed the one time
+    // a slug's number was chosen ahead of an issue that was never published,
+    // leaving a gap between the chronological count and the intended edition.
+    e.number = e.number != null ? String(e.number).padStart(3, '0') : String(i + 1).padStart(3, '0');
     e.prev = chrono[i - 1] || null;
     e.next = chrono[i + 1] || null;
   });
