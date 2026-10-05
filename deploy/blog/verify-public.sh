@@ -32,6 +32,23 @@ expect_healthy() {
   case "$code" in 2??) ;; *) echo "::error::expected a healthy 2xx from $1, got $code"; fail=1;; esac
 }
 
+# Asserts a URL issues a PERMANENT redirect (301/308) to exactly the given
+# Location, without following it -- a 200 or a temporary redirect would both
+# pass expect_healthy, which is not what a renumbered slug needs: the old
+# URL must never resolve content of its own again.
+expect_permanent_redirect() {
+  out=$(curl -sS -o /dev/null -w '%{http_code} %{redirect_url}' --max-time 25 "$1" 2>/dev/null)
+  out=${out:-000 }
+  code=${out%% *}
+  location=${out#* }
+  echo "$1 -> $code -> $location"
+  case "$code" in
+    301|308) ;;
+    *) echo "::error::expected a permanent redirect (301/308) from $1, got $code"; fail=1;;
+  esac
+  [ "$location" = "$2" ] || { echo "::error::$1 redirects to '$location', expected '$2'"; fail=1; }
+}
+
 # $1 url, $2 expected Content-Type substring, $3 string the body must contain
 expect_asset() {
   body=$(mktemp)
@@ -82,12 +99,18 @@ expect "$BASE/relatos/002-una-bicicleta-ordeno-santiago.html" 200
 expect "$BASE/relatos/003-dificil-arte-estarse-quieto.html" 200
 expect "$BASE/relatos/004-la-diplomacia-tambien-se-come.html" 200
 expect "$BASE/relatos/005-un-cumpleanos-en-la-bomba.html" 200
-expect "$BASE/relatos/007-una-invitacion-con-escala-en-murcia.html" 200
+expect "$BASE/relatos/006-una-invitacion-con-escala-en-murcia.html" 200
+expect "$BASE/relatos/007-mi-primer-dieciocho.html" 200
 expect "$BASE/archivo.html" 200
 expect "$BASE/robots.txt" 200
 expect "$BASE/sitemap.xml" 200
 expect "$BASE/feed.xml" 200
 expect "$BASE/this-definitely-does-not-exist" 404
+
+# "Una invitación con escala en Murcia" published briefly as #007 before the
+# numbering was corrected to #006 -- the old URL must permanently redirect,
+# not 404, since it may already be shared.
+expect_permanent_redirect "$BASE/relatos/007-una-invitacion-con-escala-en-murcia.html" "$BASE/relatos/006-una-invitacion-con-escala-en-murcia.html"
 
 # Read the fingerprinted asset URLs straight out of the live page, so this
 # checks exactly what a real browser would request.
@@ -120,7 +143,8 @@ for slug in 001-no-parti-el-dia-previsto \
             003-dificil-arte-estarse-quieto \
             004-la-diplomacia-tambien-se-come \
             005-un-cumpleanos-en-la-bomba \
-            007-una-invitacion-con-escala-en-murcia; do
+            006-una-invitacion-con-escala-en-murcia \
+            007-mi-primer-dieciocho; do
   page=$(curl -sS --max-time 25 "$BASE/relatos/$slug.html" 2>/dev/null)
   # Stop at a quote, comma or space: srcset packs several URLs and their
   # width descriptors into one attribute, and [^"]* would swallow the lot
@@ -150,6 +174,7 @@ expect_text "$BASE/" present "El plan era pasar desapercibido"
 expect_text "$BASE/" present "La diplomacia también se come"
 expect_text "$BASE/" present "Un cumpleaños en la Bomba"
 expect_text "$BASE/" present "Una invitación con escala en Murcia"
+expect_text "$BASE/" present "Mi primer dieciocho"
 expect_text "$BASE/" absent  "El plan era no llamar la atención"
 expect_text "$BASE/" absent  "Aprenderse Santiago en bicicleta"
 expect_text "$BASE/" absent  "De cómo"
