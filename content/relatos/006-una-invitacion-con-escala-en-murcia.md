@@ -1,32 +1,31 @@
 ---
 title: "Una invitación con escala en Murcia"
-slug: "007-una-invitacion-con-escala-en-murcia"
-number: 7
+slug: "006-una-invitacion-con-escala-en-murcia"
 date: 2026-09-12
 type: cronica-visual
 section: cronicas
 accent: wine
 location: "Santiago de Chile"
 summary: "Hay personas que uno conoce en una ciudad y que, sin saberlo, terminan abriéndole una puerta en otra."
-featured: true
+featured: false
 draft: false
-cover: "/media/007/portada.jpg"
+cover: "/media/006/portada.jpg"
 coverAlt: "Una mesa de postres decorada con flores y jaulas doradas, en la fiesta de una boda"
 media:
-  - src: "/media/007/mesa-capitan.jpg"
+  - src: "/media/006/mesa-capitan.jpg"
     anchor: mesa-capitan
     size: inset
     alt: "Una tarjeta de mesa con instrucciones y el nombre de los novios, con globos y una bola de discoteca dibujados alrededor"
     caption: "La tarjeta de la mesa, con los nombres de los novios y la fecha."
-  - src: "/media/007/baile.jpg"
+  - src: "/media/006/baile.jpg"
     anchor: baile
     size: inset
     alt: "Un invitado con gafas de fiesta en forma de corazón, bailando bajo luces de discoteca"
-  - src: "/media/007/coctel.jpg"
+  - src: "/media/006/coctel.jpg"
     anchor: coctel
     size: inset
     alt: "Tres cócteles de colores sobre una barra, en la fiesta"
-  - src: "/media/007/consome.jpg"
+  - src: "/media/006/consome.jpg"
     anchor: consome
     size: wide
     alt: "Dos manos sosteniendo tazas de consomé, con una pareja conversando al fondo"

@@ -3,6 +3,12 @@ blog.asensios.com {
 	encode zstd gzip
 	root * /var/www/blog.asensios.com
 
+	# "Una invitación con escala en Murcia" published briefly as #007 before
+	# the numbering was corrected to #006. The old URL may already be shared,
+	# so it redirects rather than 404s -- permanent (301), one entry per
+	# corrected slug, never touching any other route.
+	redir /relatos/007-una-invitacion-con-escala-en-murcia.html /relatos/006-una-invitacion-con-escala-en-murcia.html permanent
+
 	try_files {path} {path}.html
 	file_server
 
