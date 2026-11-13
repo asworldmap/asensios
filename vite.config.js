@@ -7,6 +7,7 @@ import { defineConfig } from 'vite';
 //   index.html            -> /
 //   trajectory/index.html -> /trajectory
 //   games/index.html      -> /games
+//   world/index.html      -> /world  (Pedal the World, experimental)
 export default defineConfig({
   appType: 'mpa',
   build: {
@@ -17,6 +18,7 @@ export default defineConfig({
         home: resolve(__dirname, 'index.html'),
         trajectory: resolve(__dirname, 'trajectory/index.html'),
         games: resolve(__dirname, 'games/index.html'),
+        world: resolve(__dirname, 'world/index.html'),
       },
     },
   },

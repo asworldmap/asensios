@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#e5d6bb" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0d0a" media="(prefers-color-scheme: dark)" />
+
+    <title data-i18n="world.meta.title">Pedal the World — Asensio Sabater</title>
+    <meta
+      name="description"
+      data-i18n-attr="content:world.meta.description"
+      content="Una historia jugable sobre una vida sin fronteras. Capítulo 1: Murcia, en bici."
+    />
+    <link rel="canonical" href="https://asensios.com/world" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Experimental prototype: not for indexing until it is approved. -->
+    <meta name="robots" content="noindex" />
+
+    <script>
+      try {
+        var t = localStorage.getItem('asensios.theme');
+        if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+      // Set before first paint so the plain index (the no-JS default) never
+      // flashes or starts downloading its photos when the 3D world will load.
+      document.documentElement.classList.add('has-js');
+    </script>
+  </head>
+
+  <body class="pw">
+    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Cambiar tema">
+      <span class="dot" aria-hidden="true"></span>
+      <span data-theme-label>Día</span>
+    </button>
+    <button
+      class="lang-toggle"
+      data-lang-toggle
+      type="button"
+      aria-label="Switch language / Cambiar idioma"
+    ><span data-lang-label>EN</span></button>
+
+    <!-- The world. Decorative for assistive tech: the same content lives in
+         the cards and in the plain index below. -->
+    <canvas class="pw-canvas" data-canvas aria-hidden="true" tabindex="-1"></canvas>
+    <div class="pw-bars" aria-hidden="true"><span></span><span></span></div>
+    <div class="pw-fade" data-fade aria-hidden="true"></div>
+
+    <!-- Cover: plain HTML, visible before any JavaScript or WebGL exists. -->
+    <section class="pw-cover" data-cover>
+      <div class="pw-cover-inner">
+        <a class="mono ln pw-cover-back" href="/" data-i18n="traj.back">← Asensio Sabater</a>
+        <p class="mono pw-kicker">
+          <span class="rule" aria-hidden="true"></span>
+          <span data-i18n="world.cover.kicker">Capítulo 01 · Murcia</span>
+        </p>
+        <h1 class="display pw-title">Pedal the <em>World</em></h1>
+        <p class="lead pw-tag" data-i18n="world.cover.tag">Una historia jugable sobre una vida sin fronteras.</p>
+
+        <div class="pw-cover-actions">
+          <button class="pw-start" type="button" data-start hidden disabled>
+            <span data-start-label data-i18n="world.cover.loading">Montando el valle…</span>
+            <span class="pw-start-bar" aria-hidden="true"><i data-progress></i></span>
+          </button>
+          <button class="pw-link" type="button" data-plain hidden data-i18n="world.cover.plain">Ver sin 3D</button>
+        </div>
+        <p class="pw-error" data-error hidden role="status">
+          <span data-i18n="world.cover.error">No se ha podido cargar el mundo en 3D en este dispositivo. El contenido está aquí debajo.</span>
+          <button class="pw-link" type="button" data-retry data-i18n="world.cover.retry">Reintentar</button>
+        </p>
+        <p class="mono pw-note" data-i18n="world.cover.note">Prototipo · capítulo 1 de 4</p>
+      </div>
+    </section>
+
+    <!-- HUD -->
+    <div class="pw-hud" data-hud hidden>
+      <header class="pw-top">
+        <a class="mono ln" href="/" data-i18n="traj.back">← Asensio Sabater</a>
+        <span class="mono pw-chapter" data-i18n="world.chapter">01 · Murcia — Donde empezó</span>
+      </header>
+
+      <div class="pw-modes" role="group" data-i18n-attr="aria-label:world.mode.label" aria-label="Modo">
+        <button type="button" data-mode="story" aria-pressed="true"><span data-i18n="world.mode.story">Historia</span></button>
+        <button type="button" data-mode="explore" aria-pressed="false"><span data-i18n="world.mode.explore">Explorar</span> <kbd>E</kbd></button>
+      </div>
+
+      <div class="pw-side">
+        <button class="pw-chip" type="button" data-menu-open aria-haspopup="dialog">
+          <span aria-hidden="true">◎</span> <span data-i18n="world.map">Mapa</span> <kbd>M</kbd>
+        </button>
+        <button class="pw-chip" type="button" data-return hidden>
+          <span aria-hidden="true">↺</span> <span data-i18n="world.return">Volver a la ruta</span> <kbd>R</kbd>
+        </button>
+        <span class="pw-chip pw-lemons" data-lemons hidden><span aria-hidden="true">●</span> <span data-lemon-count>0</span><span class="sr" data-i18n="world.lemons"> limones</span></span>
+      </div>
+
+      <!-- Story caption: the narration lives low on the frame, like a subtitle. -->
+      <div class="pw-caption" data-caption aria-live="polite">
+        <p class="mono pw-cap-meta" data-cap-meta></p>
+        <p class="display pw-cap-title" data-cap-title></p>
+        <p class="pw-cap-text" data-cap-text></p>
+        <div class="pw-cap-actions">
+          <button class="pw-open" type="button" data-open hidden>
+            <span data-open-label>Abrir ficha</span> <kbd>Enter</kbd>
+          </button>
+          <a class="pw-open" href="/trajectory/" data-cap-link hidden data-i18n="world.card.more">Ver la trayectoria completa →</a>
+        </div>
+      </div>
+
+      <div class="pw-story-nav" data-story-nav>
+        <button type="button" data-prev data-i18n-attr="aria-label:world.prev" aria-label="Anterior">↑</button>
+        <span class="pw-progress" aria-hidden="true"><i data-route-progress></i></span>
+        <button type="button" data-next data-i18n-attr="aria-label:world.next" aria-label="Siguiente">↓</button>
+      </div>
+
+      <p class="mono pw-hint" data-hint></p>
+
+      <!-- Touch controls (explore) -->
+      <div class="pw-joy" data-joy hidden aria-hidden="true"><span data-joy-knob></span></div>
+      <div class="pw-pad" data-pad hidden>
+        <button type="button" data-bell data-i18n-attr="aria-label:world.touch.bell" aria-label="Timbre">♪</button>
+        <button type="button" data-hop data-i18n-attr="aria-label:world.touch.hop" aria-label="Saltar">⤒</button>
+      </div>
+
+      <p class="pw-toast" data-toast role="status" aria-live="polite"></p>
+      <pre class="pw-stats mono" data-stats hidden></pre>
+    </div>
+
+    <!-- Project card -->
+    <div class="pw-modal" data-card hidden>
+      <div class="pw-modal-scrim" data-card-close></div>
+      <article class="pw-card" role="dialog" aria-modal="true" aria-labelledby="pw-card-title" tabindex="-1">
+        <button class="pw-x" type="button" data-card-close data-i18n-attr="aria-label:world.card.close" aria-label="Cerrar">×</button>
+        <figure class="pw-card-fig" data-card-fig>
+          <img data-card-img alt="" decoding="async" />
+          <figcaption class="mono" data-card-cap></figcaption>
+        </figure>
+        <div class="pw-card-body">
+          <p class="mono pw-card-meta" data-card-meta></p>
+          <h2 class="display" id="pw-card-title" data-card-title></h2>
+          <p class="pw-card-role mono" data-card-role hidden></p>
+          <p class="pw-card-text" data-card-text></p>
+          <ul class="pw-card-stats mono" data-card-stats hidden></ul>
+          <a class="pw-open" data-card-link href="/trajectory/"></a>
+        </div>
+      </article>
+    </div>
+
+    <!-- Map / menu -->
+    <div class="pw-modal" data-menu hidden>
+      <div class="pw-modal-scrim" data-menu-close></div>
+      <section class="pw-menu" role="dialog" aria-modal="true" aria-labelledby="pw-menu-title" tabindex="-1">
+        <button class="pw-x" type="button" data-menu-close data-i18n-attr="aria-label:world.card.close" aria-label="Cerrar">×</button>
+        <h2 class="display" id="pw-menu-title" data-i18n="world.ch1">Murcia — Donde empezó</h2>
+        <div class="pw-menu-grid">
+          <div>
+            <canvas class="pw-map" data-map width="440" height="440" aria-hidden="true"></canvas>
+          </div>
+          <div class="pw-menu-col">
+            <p class="mono pw-menu-h" data-i18n="world.menu.travel">Ir a</p>
+            <ol class="pw-travel" data-travel></ol>
+
+            <p class="mono pw-menu-h" data-i18n="world.menu.chapters">Capítulos</p>
+            <ol class="pw-chapters">
+              <li aria-current="true"><span class="mono">01</span> <span data-i18n="world.ch1">Murcia — Donde empezó</span></li>
+              <li class="is-soon"><span class="mono">02</span> <span data-i18n="world.ch2">Europa — Aprender haciendo</span> <em class="mono" data-i18n="world.menu.soon">en construcción</em></li>
+              <li class="is-soon"><span class="mono">03</span> <span data-i18n="world.ch3">Asia — Otra perspectiva</span> <em class="mono" data-i18n="world.menu.soon">en construcción</em></li>
+              <li class="is-soon"><span class="mono">04</span> <span data-i18n="world.ch4">Chile — Conectar mundos</span> <em class="mono" data-i18n="world.menu.soon">en construcción</em></li>
+            </ol>
+
+            <p class="mono pw-menu-h" data-i18n="world.menu.settings">Ajustes</p>
+            <div class="pw-settings">
+              <label><input type="checkbox" data-set-sound checked /> <span data-i18n="world.set.sound">Sonido</span></label>
+              <label><input type="checkbox" data-set-motion /> <span data-i18n="world.set.motion">Reducir movimiento</span></label>
+              <label><input type="checkbox" data-set-light /> <span data-i18n="world.set.light">Gráficos ligeros</span></label>
+            </div>
+
+            <nav class="pw-menu-links" aria-label="Portfolio">
+              <a class="ln" href="/trajectory/" data-i18n="world.menu.portfolio">Trayectoria y contacto →</a>
+              <a class="ln" href="/games/" data-i18n="nav.games">Playroom</a>
+              <a class="ln" href="mailto:hola@asensios.com" data-i18n="home.contact">Escríbeme</a>
+              <button class="pw-link" type="button" data-plain data-i18n="world.cover.plain">Ver sin 3D</button>
+            </nav>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- The same chapter as a plain page: the no-WebGL fallback, the
+         no-JavaScript default and the accessible reading of the world. -->
+    <main class="pw-index" data-index>
+      <div class="wrap">
+        <p class="mono pw-kicker">
+          <span class="rule" aria-hidden="true"></span>
+          <span data-i18n="world.cover.kicker">Capítulo 01 · Murcia</span>
+        </p>
+        <h2 class="display pw-index-title" data-i18n="world.index.title">Murcia, sin 3D.</h2>
+        <p class="lead" data-i18n="world.index.lead">Las mismas cuatro historias del recorrido, en formato página.</p>
+
+        <article class="pw-entry">
+          <img src="/media/divulgalo-muncyt.webp" loading="lazy" decoding="async" data-i18n-attr="alt:traj.ch1.caption" alt="Murcia · Divulgalo / CienciaClip" />
+          <div>
+            <p class="mono" data-i18n="traj.ch1.meta">Murcia · Divulgalo / CienciaClip</p>
+            <h3 class="display" data-i18n="traj.ch1.title">La primera vez que convertí una idea en algo real.</h3>
+            <p data-i18n="traj.ch1.text">Unos amigos y yo hicimos divulgación científica de verdad: contenido, formato, público. Nadie lo llamó emprender. Lo era.</p>
+          </div>
+        </article>
+        <article class="pw-entry">
+          <img src="/media/beemoney-byg-stage.webp" loading="lazy" decoding="async" data-i18n-attr="alt:traj.ch9.caption" alt="BeeMoney · BYG Social Challenge" />
+          <div>
+            <p class="mono" data-i18n="traj.ch9.meta">Murcia · BeeMoney / BYG Social Challenge</p>
+            <h3 class="display" data-i18n="traj.ch9.title">Si algo es complejo, que al menos sea usable.</h3>
+            <p data-i18n="traj.ch9.text">Un reto social, un prototipo y un equipo peleándose con una idea compleja hasta que alguien pudo usarla.</p>
+          </div>
+        </article>
+        <article class="pw-entry">
+          <img src="/media/mwy-community-360.webp" loading="lazy" decoding="async" data-i18n-attr="alt:traj.ch6.caption" alt="Murcia Welcomes You" />
+          <div>
+            <p class="mono" data-i18n="traj.ch6.meta">Murcia · Murcia Welcomes You · 2024–2026</p>
+            <h3 class="display" data-i18n="traj.ch6.title">Una comunidad no aparece. Se construye.</h3>
+            <p class="mono pw-card-role" data-i18n="world.card.mwy.role">Fundador y coordinador del proyecto · ene 2024 – ene 2026</p>
+            <p data-i18n="traj.ch6.text">Empezó con una hoja de cálculo y ningún presupuesto. Hoy son más de 1.000 personas y 30 nacionalidades, evento a evento, durante casi dos años.</p>
+            <ul class="pw-card-stats mono">
+              <li data-i18n="traj.ch6.stat1">1000+ participantes</li>
+              <li data-i18n="traj.ch6.stat2">60+ eventos</li>
+              <li data-i18n="traj.ch6.stat3">30+ nacionalidades</li>
+            </ul>
+          </div>
+        </article>
+        <article class="pw-entry">
+          <img src="/media/eu-parliament.webp" loading="lazy" decoding="async" data-i18n-attr="alt:traj.ch7.caption" alt="Parlamento Europeo" />
+          <div>
+            <p class="mono" data-i18n="traj.ch7.meta">Murcia · Oficina de Proyectos Europeos, Ayto. de Murcia · 2025</p>
+            <h3 class="display" data-i18n="traj.ch7.title">Las instituciones también son sistemas.</h3>
+            <p class="mono pw-card-role" data-i18n="world.card.eu.role">Prácticas · feb – mar 2025</p>
+            <p data-i18n="traj.ch7.text">Convocatorias europeas, propuestas, plazos. Por dentro, una institución funciona como cualquier equipo: reglas, incentivos y gente intentando que algo salga.</p>
+          </div>
+        </article>
+
+        <nav class="pw-index-links" aria-label="Portfolio">
+          <a class="ln" href="/trajectory/" data-i18n="world.card.more">Ver la trayectoria completa →</a>
+          <a class="ln" href="/games/" data-i18n="nav.games">Playroom</a>
+          <a class="ln" href="mailto:hola@asensios.com" data-i18n="home.contact">Escríbeme</a>
+          <a class="ln" href="/" data-i18n="traj.exit.home">Inicio</a>
+          <button class="pw-link" type="button" data-unplain hidden data-i18n="world.index.back">Volver al mundo 3D</button>
+        </nav>
+      </div>
+    </main>
+
+    <script type="module" src="/src/world.js" onerror="document.documentElement.classList.remove('has-js')"></script>
+  </body>
+</html>
