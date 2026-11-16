@@ -943,8 +943,50 @@
   border-radius: 0.5rem;
 }
 
-.is-changing .pw-fade {
+.is-changing:not(.is-handoff) .pw-fade,
+.pw-fade.is-splice {
   opacity: 1;
+}
+
+.is-handoff .pw-fade {
+  background: #101313;
+}
+
+.is-handoff .pw-fade[data-splice='light_flash_match'] {
+  background: #f1c49a;
+}
+
+.is-handoff .pw-fade[data-splice='white_out'] {
+  background: #f4f6f8;
+}
+
+.is-handoff .pw-fade[data-splice='horizon_hold'] {
+  background: rgba(16, 19, 19, 0.62);
+}
+
+.is-handoff .pw-fade[data-splice='horizon_hold']::after {
+  content: '';
+  position: absolute;
+  inset: 44% 17% auto;
+  height: 1px;
+  background: linear-gradient(#f1ede2, #f1ede2) left / 33.33% 1px no-repeat,
+    linear-gradient(#f1ede2, #f1ede2) right / 33.33% 1px no-repeat,
+    repeating-linear-gradient(to right, #f1ede2 0 5px, transparent 5px 10px) center / 33.33% 1px no-repeat;
+}
+
+.is-calm.is-handoff .pw-fade {
+  background: #2d3436;
+}
+
+.pw-handoff-skip {
+  position: fixed;
+  z-index: 21;
+  right: max(1.2rem, env(safe-area-inset-right));
+  bottom: max(1.2rem, env(safe-area-inset-bottom));
+}
+
+.pw-handoff-skip[hidden] {
+  display: none;
 }
 
 .pw-index-journey {

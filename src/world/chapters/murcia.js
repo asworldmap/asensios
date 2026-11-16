@@ -204,7 +204,7 @@ export async function build({ scene, tier, step, assets, shared }) {
     { t: mid, id: 'bridge', optional: true, cine: true, keys: own('bridge'), place: 'world.place.bridge' },
     { t: 0.66, id: 'mwy', poi: 'mwy', keys: tr('ch6'), place: 'world.place.mwy' },
     { t: 0.815, id: 'eu', optional: true, poi: 'eu', keys: tr('ch7'), place: 'world.place.eu' },
-    { t: 1, id: 'end', keys: own('end'), place: 'world.place.end', next: true },
+    { t: 1, id: 'end', keys: { ...own('end'), text: 'world.bridge.t01' }, place: 'world.place.end', next: true },
   ];
   const sideOf = (id) => Math.sign(nearest(sites[id].x, sites[id].z, _n).side) || 1;
   // Camera keyframes in the bike's frame: metres behind, to its left, above; look-ahead; lens.

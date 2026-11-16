@@ -34,6 +34,7 @@ const el = {
   error: $('[data-error]'),
   hud: $('[data-hud]'),
   fade: $('[data-fade]'),
+  skipHandoff: $('[data-skip-handoff]'),
   caption: $('[data-caption]'),
   capMeta: $('[data-cap-meta]'),
   capTitle: $('[data-cap-title]'),
@@ -133,7 +134,10 @@ function renderOpen() {
   el.open.hidden = !can;
   if (can) el.openLabel.textContent = tr(near === 'playroom' ? 'world.open.playroom' : 'world.open');
   el.capLink.hidden = !link;
-  if (link) el.capLink.href = link;
+  if (link) {
+    el.capLink.href = link;
+    el.capLink.textContent = tr(chapter.id === 'chile' ? 'world.closing.link' : 'world.card.more');
+  }
   el.chapterNext.hidden = !next;
   if (next) {
     el.chapterNext.textContent = tr('world.journey.continue');
@@ -153,6 +157,8 @@ async function chooseChapter(id, { fromStory = false } = {}) {
     if (!fromStory) $('[data-menu-open]').focus({ preventScroll: true });
   }
 }
+
+el.skipHandoff.addEventListener('click', () => game?.skipTransition());
 
 el.chapterNext.addEventListener('click', () => {
   const next = nextChapter();
@@ -248,8 +254,8 @@ function fillCard(id) {
   img.alt = tr(`${k}.caption`);
   $('[data-card-cap]').textContent = tr(`${k}.caption`);
   $('[data-card-meta]').textContent = tr(`${k}.meta`);
-  $('[data-card-title]').textContent = tr(`${k}.title`);
-  $('[data-card-text]').textContent = tr(`${k}.text`);
+  $('[data-card-title]').textContent = tr(`world.card.${id}.title`) || tr(`${k}.title`);
+  $('[data-card-text]').textContent = tr(`world.card.${id}.text`) || tr(`${k}.text`);
   const r = tr(`world.card.${id}.role`);
   role.hidden = !r;
   role.textContent = r;
@@ -531,9 +537,27 @@ function emit(type, value) {
     changing = value.active;
     clearTimeout(loadingNotice);
     el.loading.hidden = true;
-    if (changing) loadingNotice = setTimeout(() => { el.loading.hidden = false; }, value.fromStory ? 1100 : 550);
+    if (changing && !value.directed) loadingNotice = setTimeout(() => { el.loading.hidden = false; }, value.fromStory ? 1100 : 550);
+    el.body.classList.toggle('is-handoff', changing && value.directed);
     el.hud.inert = changing;
     el.body.classList.toggle('is-changing', changing);
+  } else if (type === 'handoff') {
+    el.skipHandoff.hidden = !value?.skippable;
+    if (value) {
+      el.body.dataset.handoff = value.id;
+      el.body.dataset.handoffPhase = value.phase;
+    } else {
+      delete el.body.dataset.handoff;
+      delete el.body.dataset.handoffPhase;
+    }
+  } else if (type === 'splice') {
+    if (value) el.fade.dataset.splice = value;
+    el.fade.classList.toggle('is-splice', !!value);
+    if (value) loadingNotice = setTimeout(() => { el.loading.hidden = false; }, 1100);
+    else {
+      clearTimeout(loadingNotice);
+      el.loading.hidden = true;
+    }
   } else if (type === 'chapterError') {
     toast('world.journey.error');
   } else if (type === 'mode') {

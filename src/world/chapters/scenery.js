@@ -21,6 +21,7 @@ export function scenery({ scene, assets, shared }, spec) {
   const batches = {
     static: new Batch({ jitter: 0 }), veg: new Batch({ sway: true, jitter: 0 }),
     window: new Batch({ jitter: 0 }), glow: new Batch({ jitter: 0 }),
+    cloud: new Batch({ jitter: 0 }),
   };
 
   function mesh(geometry, material) {
@@ -31,8 +32,8 @@ export function scenery({ scene, assets, shared }, spec) {
     return obj;
   }
 
-  function stamp(key, x, z, { y = spec.floor, yaw = 0, scale = 1, solid = false } = {}) {
-    const stamped = assets.stamp(key, batches, M(x, y, z, yaw, scale));
+  function stamp(key, x, z, { y = spec.floor, yaw = 0, scale = 1, solid = false, unlit = false } = {}) {
+    const stamped = assets.stamp(key, unlit ? { ...batches, static: batches.cloud } : batches, M(x, y, z, yaw, scale));
     if (solid) colliders.push(...stamped.colliders);
     return stamped.anchors;
   }
@@ -94,10 +95,10 @@ export function scenery({ scene, assets, shared }, spec) {
       const veg = kind === 'veg';
       const material = kind === 'static' || veg
         ? enhance(new THREE.MeshLambertMaterial({ vertexColors: true }), shared, { sway: veg, breakup: 0.12 })
-        : new THREE.MeshBasicMaterial({ color: '#ece4ce' });
+        : new THREE.MeshBasicMaterial(kind === 'cloud' ? { color: '#f4f6f8', vertexColors: true } : { color: '#ece4ce' });
       const obj = mesh(geometry, material);
       obj.castShadow = material.isMeshLambertMaterial;
-      if (!material.isMeshLambertMaterial) {
+      if (kind !== 'cloud' && !material.isMeshLambertMaterial) {
         atmosphere.onBlend((k) => material.color.set(kind === 'glow' ? '#ffe8ae' : k > 0.63 ? '#ffd687' : '#455a60'));
       }
     }
@@ -110,7 +111,7 @@ export function scenery({ scene, assets, shared }, spec) {
       id: id + '_discovery', t: spec.discoverAt, poi: id, keys: storyKeys(id + '_discovery'),
       place: 'world.leg.' + id + '.discovery',
     }];
-    const end = { id, t: spec.stop, poi: discovery.length ? null : id, keys: storyKeys(id), place: 'world.leg.' + id + '.stop', next: true, link: spec.link };
+    const end = { id, t: spec.stop, poi: discovery.length ? null : id, keys: { ...storyKeys(id), text: spec.exitCopy || 'world.leg.' + id + '.text' }, place: 'world.leg.' + id + '.stop', next: true, link: spec.link };
     return {
       id, group, route, pointAt, nearest, colliders, atmosphere,
       waterY: spec.water ? spec.floor : -30,

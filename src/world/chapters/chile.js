@@ -4,7 +4,7 @@ export async function build(ctx) {
   const s = scenery(ctx, {
     id: 'chile', points: [[-17, -29], [-15, -13], [-5, 5], [0, 22], [0, 37]],
     floor: -0.025, driveY: 0, ground: '#a69b75', stop: 1, radius: 8, bounds: 105,
-    link: '/trajectory/',
+    link: '/trajectory/', exitCopy: 'world.closing.invitation',
     card: { key: 'ch10', photo: '/media/eu-delegation-now.webp', href: '/trajectory/#ch10' },
     day: {
       skyTop: '#7a9cb7', skyMid: '#efd9c2', skyHorizon: '#f4c097', fog: '#e9ceb9',

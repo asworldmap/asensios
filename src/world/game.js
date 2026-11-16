@@ -17,6 +17,7 @@ import * as THREE from 'three';
 import { createAssets } from './assets.js';
 import { createShared } from './shading.js';
 import { createJourneyAudio } from './audio.js';
+import { findHandoff, matchShot, playShot } from './handoff.js';
 import { CHAPTERS, JOURNEY } from './chapters/index.js';
 import { getVehicle } from './vehicles/index.js';
 import { clamp, lerp, smooth, damp, dampAngle } from './kit.js';
@@ -52,6 +53,8 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   let transferAge = 0;
   let stayHere = false;
   let introSeconds = 3.4;
+  let handoff = null;
+  let handoffCamera = null;
   let isDark = dark;
   let calm = reduced;
   const audio = createJourneyAudio();
@@ -349,7 +352,12 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     }
 
     // Camera: every mode only states what it wants; one spring gets us there.
-    if (st.started && st.intro < 1) {
+    if (handoffCamera) {
+      want.pos.copy(handoffCamera.pos);
+      want.look.copy(handoffCamera.look);
+      want.fov = handoffCamera.fov;
+      cam.ready = false;
+    } else if (st.started && st.intro < 1) {
       st.intro = Math.min(1, st.intro + dt / introSeconds);
       const e = st.intro < 0.5 ? 4 * st.intro ** 3 : 1 - (-2 * st.intro + 2) ** 3 / 2;
       want.pos.lerpVectors(introFrom, want.pos, e);
@@ -376,9 +384,10 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     cam.look.z = damp(cam.look.z, want.look.z, lam + 2, dt);
     cam.fov = damp(cam.fov, want.fov, 3, dt);
     clearCamera(cam.pos);
-    const floor = world.heightAt(cam.pos.x, cam.pos.z) + 0.7;
-    if (cam.pos.y < floor) cam.pos.y = floor;
-    if (cam.pos.y < world.waterY + 0.7) cam.pos.y = world.waterY + 0.7;
+    if (!handoffCamera) {
+      const floor = Math.max(world.heightAt(cam.pos.x, cam.pos.z), world.waterY) + 0.7;
+      if (cam.pos.y < floor) cam.pos.y = floor;
+    }
     camera.position.copy(cam.pos);
     camera.lookAt(cam.look);
     if (Math.abs(camera.fov - cam.fov) > 0.01) {
@@ -533,7 +542,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
    * Load a chapter and its vehicle, disposing whatever was there before.
    * Used for the first load and for every chapter transition.
    */
-  async function loadChapter(id, { t = null, progress = () => {}, fromStory = false } = {}) {
+  async function loadChapter(id, { t = null, progress = () => {}, fromStory = false, directed = false } = {}) {
     const def = CHAPTERS[id];
     if (!def) throw new Error(`unknown chapter "${id}"`);
     const vdef = getVehicle(def.vehicle);
@@ -596,10 +605,10 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     const est = world.establishing || { from: [st.x + 40, st.y + 36, st.z + 30], look: [st.x, st.y, st.z] };
     introFrom.set(...est.from);
     if (calm || t) introFrom.copy(want.pos);
-    st.intro = calm || t ? 1 : 0;
+    st.intro = calm || t || directed ? 1 : 0;
     splashT = 1;
     splash.material.opacity = 0;
-    emit('cine', false);
+    if (!directed) emit('cine', false);
     cam.ready = false;
     renderer.compile(scene, camera);
     loading = false;
@@ -608,25 +617,72 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     progress(1, 'ready');
   }
 
-  /** Chapter-to-chapter transition: fade, swap, fade back. */
+  function skipTransition() {
+    if (handoff) handoff.skip = true;
+  }
+
+  async function directedHandoff(sequence, id) {
+    const skipped = () => handoff.skip;
+    const set = (shot) => { handoffCamera = shot; };
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const type = sequence.splice.type;
+    const getShot = (incoming) => matchShot(sequence, incoming, { world, vehicle, state: st });
+    const def = CHAPTERS[id];
+    handoff = { skip: false };
+    const preload = assets.load([...def.assets, ...getVehicle(def.vehicle).assets]).catch(() => {});
+    emit('cine', !calm);
+    emit('handoff', { id: sequence.id, phase: 'out', skippable: !calm });
+    vehicle.object.updateWorldMatrix(true, true);
+    const out = getShot(false);
+    if (!calm && out) await playShot(cam, out, sequence.splice.at_s * 0.34, set, skipped);
+    emit('splice', type);
+    if (!calm && !skipped()) await delay(type === 'horizon_hold' ? 540 : 260);
+    await preload;
+    await loadChapter(id, { fromStory: true, directed: true });
+    vehicle.place(st, world);
+    vehicle.object.updateWorldMatrix(true, true);
+    const next = getShot(true);
+    storyShot(st.t, want);
+    const normal = { pos: want.pos.clone(), look: want.look.clone(), fov: want.fov };
+    handoffCamera = !calm && !skipped() ? next : null;
+    if (handoffCamera) await new Promise(requestAnimationFrame);
+    emit('splice', null);
+    emit('handoff', { id: sequence.id, phase: 'in', skippable: !calm });
+    if (!calm && next) await playShot(next, normal, (sequence.duration_s - sequence.splice.at_s) * 0.28, set, skipped);
+    if (!skipped()) {
+      if (type === 'white_out') tone(1560, 0.055, 0.65);
+      else if (type === 'horizon_hold') tone(114, 0.037, 0.65, 'triangle', [1, 1.24]);
+      else if (type === 'match_cut_held_frame') tone(74, 0.044, 0.15, 'triangle', [1, 2]);
+    }
+  }
+
   async function travelToChapter(id, { fromStory = false } = {}) {
     if (loading || transitioning || id === chapterId || !Object.hasOwn(CHAPTERS, id)) return false;
     transitioning = true;
     const wasPaused = st.paused;
     st.paused = true;
     clearInput();
-    emit('loading', { active: true, fromStory });
-    if (!calm) {
-      await new Promise((r) => setTimeout(r, fromStory ? 330 : 280));
-    }
     try {
-      await loadChapter(id, { fromStory });
+      const sequence = fromStory && await findHandoff(chapterId, id);
+      emit('loading', { active: true, fromStory, directed: !!sequence });
+      if (sequence) await directedHandoff(sequence, id);
+      else {
+        if (!calm) await new Promise((r) => setTimeout(r, fromStory ? 330 : 280));
+        await loadChapter(id, { fromStory });
+      }
       return true;
     } catch (error) {
       console.warn('[pedal-the-world] chapter could not be loaded', error);
       emit('chapterError', id);
       return false;
     } finally {
+      if (handoff) {
+        handoff = null;
+        handoffCamera = null;
+        emit('splice', null);
+        emit('handoff', null);
+        emit('cine', false);
+      }
       transitioning = false;
       st.paused = wasPaused;
       emit('loading', { active: false, fromStory });
@@ -635,7 +691,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
 
   // ------------------------------------------------------------------- API
   function setMode(mode) {
-    if (mode === st.mode || !st.started || loading) return;
+    if (mode === st.mode || !st.started || loading || transitioning) return;
     st.mode = mode;
     vehicle.reset?.();
     clearInput();
@@ -764,7 +820,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   run();
 
   return {
-    start, setMode, nextBeat, travel, returnToRoute, action, setTheme, stats, dispose,
+    start, setMode, nextBeat, travel, returnToRoute, action, setTheme, stats, dispose, skipTransition,
     loadChapter: travelToChapter,
     setPaused(v) {
       st.paused = v;

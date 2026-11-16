@@ -70,6 +70,7 @@ export const CHAPTERS = {
     assets: [
       'asia/runway_light', 'asia/baggage_cart', 'asia_v2/control_tower', 'asia_v2/terminal_hall',
       'asia_v2/windsock', 'asia_v2/apron_tile', 'asia_v2/rain_tree', 'chile_v2/cordillera_backdrop',
+      'journey/cloud_bank', 'journey/cloud_sea',
     ],
     load: () => import('./flight.js'),
   },

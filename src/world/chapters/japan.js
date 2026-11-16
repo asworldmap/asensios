@@ -3,7 +3,7 @@ import { scenery, shots } from './scenery.js';
 export async function build(ctx) {
   const s = scenery(ctx, {
     id: 'japan', points: [[-24, -106], [-23, -40], [-36, 8], [-34, 49], [-24, 106]],
-    floor: 0, water: true, ground: '#4a8494', stop: 1, discoverAt: 0.56, radius: 20, storyRate: 1.45,
+    floor: 0, water: true, ground: '#4a8494', stop: 1, discoverAt: 0.56, radius: 20, storyRate: 1.45, exitCopy: 'world.bridge.t04',
     card: { key: 'ch8', photo: '/media/japan-fuji-swy.webp', href: '/trajectory/#ch8' },
     day: { skyTop: '#79a6be', skyHorizon: '#e8d5c2', fog: '#d7dde0', sunDir: [-0.55, 0.26, 0.62], fogNear: 140, fogFar: 460 },
     shots: shots([0, 44, 43, 16, 0, 6, 47], [0.48, 32, -57, 20, 0, 5.5, 48], [1, 41, 37, 19, 2, 5.2, 43]),
@@ -26,9 +26,9 @@ export async function build(ctx) {
       s.stamp('maritime/mooring_buoy', p.x, p.z, { y: 0 });
     }
   }
-  s.stamp('maritime_v2/lighthouse', 16, 139, { y: 0 });
+  const lighthouse = s.stamp('maritime_v2/lighthouse', 16, 139, { y: 0 }).find((a) => a.name === 'light');
   s.tile('maritime_v2/breakwater', 21, 139, 3, { y: 0, yaw: Math.PI / 2 });
   s.stamp('maritime_v2/horizon_islands', -112, 171, { y: 0, yaw: Math.PI * 0.87, scale: 4.5 });
   await ctx.step('scenery', 0.85);
-  return s.finish();
+  return { ...s.finish(), cineMarks: { lighthouse } };
 }
