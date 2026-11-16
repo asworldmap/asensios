@@ -170,7 +170,8 @@ function renderHint() {
   const suffix = coarse ? 'Touch' : '';
   const controls = { train: 'rail', bus: 'bus', airplane: 'flight', ship: 'ship', bicycle: 'explore' };
   const story = chapter.id === 'murcia' ? 'story' : 'journey';
-  const key = 'world.hint.' + (mode === 'story' ? story : controls[chapter.vehicle]) + suffix;
+  const key = mode === 'story' && !setMotion.checked ? 'world.hint.storyAuto'
+    : 'world.hint.' + (mode === 'story' ? story : controls[chapter.vehicle]) + suffix;
   el.hint.textContent = tr(key);
   el.hint.classList.toggle('is-on', !hintSeen[mode] && (mode !== 'story' || chapter.id === 'murcia'));
 }
@@ -243,17 +244,20 @@ function fillCard(id) {
     $('[data-card-title]').textContent = tr('games.title');
     $('[data-card-text]').textContent = tr('games.lead');
     role.hidden = stats.hidden = true;
+    link.hidden = false;
     link.textContent = `${tr('world.open.playroom')} →`;
     link.href = '/games/';
     return true;
   }
   const k = `traj.${poi.key}`;
-  fig.hidden = false;
-  const img = $('[data-card-img]');
-  if (img.getAttribute('src') !== poi.photo) img.src = poi.photo;
-  img.alt = tr(`${k}.caption`);
-  $('[data-card-cap]').textContent = tr(`${k}.caption`);
-  $('[data-card-meta]').textContent = tr(`${k}.meta`);
+  fig.hidden = !poi.photo;
+  if (poi.photo) {
+    const img = $('[data-card-img]');
+    if (img.getAttribute('src') !== poi.photo) img.src = poi.photo;
+    img.alt = tr(`${k}.caption`);
+    $('[data-card-cap]').textContent = tr(`${k}.caption`);
+  }
+  $('[data-card-meta]').textContent = tr(poi.meta || `${k}.meta`);
   $('[data-card-title]').textContent = tr(`world.card.${id}.title`) || tr(`${k}.title`);
   $('[data-card-text]').textContent = tr(`world.card.${id}.text`) || tr(`${k}.text`);
   const r = tr(`world.card.${id}.role`);
@@ -261,8 +265,10 @@ function fillCard(id) {
   role.textContent = r;
   stats.hidden = !poi.stats;
   if (poi.stats) stats.innerHTML = [1, 2, 3].map((n) => `<li>${tr(`${k}.stat${n}`)}</li>`).join('');
-  link.textContent = tr('world.card.more');
-  link.href = poi.href || '/trajectory/';
+  link.hidden = poi.href === null;
+  link.textContent = tr(poi.linkLabel || 'world.card.more');
+  if (link.hidden) link.removeAttribute('href');
+  else link.href = poi.href || '/trajectory/';
   return true;
 }
 function openCard(id = near) {

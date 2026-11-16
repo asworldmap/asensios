@@ -2,7 +2,7 @@ import { open } from './lib.mjs';
 const out = process.argv[2];
 const R = [];
 const ok = (name, cond, extra = '') => { R.push(`${cond ? 'PASS' : 'FAIL'}  ${name} ${extra}`); };
-const { b, p, errs, wait, st } = await open({ quality: 1 });
+const { b, p, errs, wait, st } = await open({ quality: 1, reduced: true });
 // --- story: wheel advances
 let s0 = await st();
 await p.mouse.move(640, 360);
@@ -18,7 +18,7 @@ ok('story: ArrowDown key goes back', s2.t < s1.t, `t ${s1.t} -> ${s2.t}`);
 await p.click('[data-next]'); await wait(5);
 let s3 = await st();
 ok('story: next-beat button reaches BeeMoney', Math.abs(s3.t - 0.335) < 0.01 && s3.near === 'beemoney', JSON.stringify(s3));
-ok('story: caption shows verified title', (await p.textContent('[data-cap-title]')).includes('Si algo es complejo'));
+ok('story: caption shows verified title', (await p.textContent('[data-cap-title]')).includes('Con BeeMoney'));
 // card
 await p.keyboard.press('Enter'); await p.waitForTimeout(600);
 ok('card: opens with Enter', await p.isVisible('.pw-card'));

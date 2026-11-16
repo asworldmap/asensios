@@ -33,6 +33,7 @@ export const CHAPTERS = {
   murcia: {
     id: 'murcia',
     order: 1,
+    storySeconds: 65,
     vehicle: 'bicycle',
     status: 'playable',
     label: 'world.chapter',
@@ -41,7 +42,8 @@ export const CHAPTERS = {
     load: () => import('./murcia.js'),
   },
   europe: {
-    id: 'europe', order: 2, vehicle: 'train', status: 'playable',
+    id: 'europe', order: 2,
+    storySeconds: 22, vehicle: 'train', status: 'playable',
     label: 'world.leg.europe.label', title: 'world.leg.europe.label',
     assets: [
       'europe/rail_track_straight', 'europe/rail_platform', 'europe/station_shelter',
@@ -52,7 +54,8 @@ export const CHAPTERS = {
     load: () => import('./europe.js'),
   },
   "europe-bus": {
-    id: 'europe-bus', order: 3, vehicle: 'bus', status: 'playable',
+    id: 'europe-bus', order: 3,
+    storySeconds: 21, vehicle: 'bus', status: 'playable',
     label: 'world.leg.europe-bus.label', title: 'world.leg.europe-bus.label',
     assets: [
       'europe/conifer',
@@ -65,7 +68,8 @@ export const CHAPTERS = {
     load: () => import('./europe-bus.js'),
   },
   flight: {
-    id: 'flight', order: 5, vehicle: 'airplane', status: 'playable',
+    id: 'flight', order: 5,
+    storySeconds: 33, vehicle: 'airplane', status: 'playable',
     label: 'world.leg.flight.label', title: 'world.leg.flight.label',
     assets: [
       'asia/runway_light', 'asia/baggage_cart', 'asia_v2/control_tower', 'asia_v2/terminal_hall',
@@ -75,7 +79,8 @@ export const CHAPTERS = {
     load: () => import('./flight.js'),
   },
   "japan": {
-    id: 'japan', order: 4, vehicle: 'ship', status: 'playable',
+    id: 'japan', order: 4,
+    storySeconds: 16, vehicle: 'ship', status: 'playable',
     label: 'world.leg.japan.label', title: 'world.leg.japan.label',
     assets: [
       'maritime/quay_section',
@@ -88,7 +93,8 @@ export const CHAPTERS = {
     load: () => import('./japan.js'),
   },
   chile: {
-    id: 'chile', order: 6, vehicle: 'bicycle', status: 'playable',
+    id: 'chile', order: 6,
+    storySeconds: 40, vehicle: 'bicycle', status: 'playable',
     label: 'world.leg.chile.label', title: 'world.leg.chile.label',
     assets: [
       'chile/rock_outcrop', 'chile/araucaria', 'chile/tussock_grass', 'common/park_bench', 'common/signpost',

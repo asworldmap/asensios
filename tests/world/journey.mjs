@@ -5,8 +5,8 @@ import { open } from './lib.mjs';
 
 const stages = [
   { id: 'europe', model: 'train_cab', part: 'PART_wheelset_front1', card: 'ch5' },
-  { id: 'europe-bus', model: 'coach_bus', part: 'PART_wheel_fl', card: 'ch7' },
-  { id: 'japan', model: 'passenger_ship', part: 'PART_propeller', card: 'ch8' },
+  { id: 'europe-bus', model: 'coach_bus', part: 'PART_wheel_fl', href: 'https://deamicitia.org/proyectos/' },
+  { id: 'japan', model: 'passenger_ship', part: 'PART_propeller', href: null },
   { id: 'flight', model: 'airliner', part: 'PART_gear_main_l', card: 'ch4' },
   { id: 'chile', model: 'city_bike', part: 'PART_wheel_front', card: 'ch10' },
 ];
@@ -172,8 +172,10 @@ try {
     await p.click('[data-menu-open]');
     await p.locator('[data-travel] button').nth(1).click();
     await p.locator('[data-open]').click();
-    assert.equal(await p.getAttribute('[data-card-link]', 'href'), '/trajectory/#' + stage.card);
-    assert.ok((await p.getAttribute('[data-card-img]', 'src')).endsWith('.webp'));
+    const href = stage.card ? '/trajectory/#' + stage.card : stage.href;
+    assert.equal(await p.getAttribute('[data-card-link]', 'href'), href);
+    assert.equal(await p.locator('[data-card-fig]').isVisible(), Boolean(stage.card));
+    if (stage.id === 'japan') assert.match(await p.locator('[data-card-title]').textContent(), /Viaje futuro/);
     await p.keyboard.press('Escape');
     const current = stages.indexOf(stage);
     if (current < stages.length - 1) {
@@ -230,9 +232,9 @@ try {
 const fallback = await open({ query: '?chapter=japan&nowebgl', start: false });
 try {
   const { p: no3D } = fallback;
-  assert.equal(await no3D.locator('[data-index] .pw-index-journey a').count(), stages.length);
+  assert.equal(await no3D.locator('[data-index] .pw-index-journey li').count(), stages.length);
   assert.equal(await no3D.locator('[data-canvas]').isVisible(), false);
-  assert.equal(await no3D.locator('[data-index] a[href="/trajectory/#ch8"]').isVisible(), true);
+  assert.ok(await no3D.locator('[data-index] .pw-index-journey').getByText('Japón · Viaje futuro').isVisible());
   assert.deepEqual(fallback.errs, []);
   console.log('PASS no-WebGL links to the journey');
 } finally {

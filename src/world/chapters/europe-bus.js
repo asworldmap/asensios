@@ -4,9 +4,9 @@ export async function build(ctx) {
   const s = scenery(ctx, {
     id: 'europe-bus', points: [[-25, -76], [-25, -30], [4, 5], [33, 16], [43, 49], [43, 82]],
     floor: -0.035, driveY: 0, ground: '#8e936e', stop: 0.93, discoverAt: 0.48, radius: 12, exitCopy: 'world.bridge.t03',
-    card: { key: 'ch7', photo: '/media/eu-parliament.webp', href: '/trajectory/#ch7' },
+    card: { meta: 'world.leg.europe-bus_discovery.meta', href: 'https://deamicitia.org/proyectos/', linkLabel: 'world.card.projectLink' },
     day: { skyTop: '#80aed1', sunDir: [-0.62, 0.48, -0.5], fog: '#dfeaf0' },
-    shots: shots([0, 13, 12, 7, 1, 2.6, 45], [0.4, 13, -12, 5.4, 3, 2.2, 46], [1, 12, 8, 5, 2, 2.2, 44]),
+    shots: shots([0, 13, 12, 7, 1, 2.6, 45], [0.4, 16, 6, 5.4, 3, 2.2, 46], [1, 12, 8, 5, 2, 2.2, 44]),
     establishing: { from: [-44, 11, -87], look: [-18, 3.7, -70] },
   });
   s.groundStrip('#666b62', 12, -0.015);

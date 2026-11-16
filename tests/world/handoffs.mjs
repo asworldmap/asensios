@@ -37,10 +37,10 @@ try {
   }
   await p.click('[data-menu-open]');
   await p.locator('[data-travel] button').last().click();
-  await p.waitForFunction(() => document.querySelector('[data-cap-text]').textContent.includes('Mi portfolio'));
+  await p.waitForFunction(() => document.querySelector('[data-cap-title]').textContent.includes('Empecé en una bici'));
   assert.equal(await p.getAttribute('[data-cap-link]', 'href'), '/trajectory/');
   await p.click('[data-lang-toggle]');
-  await p.waitForFunction(() => document.querySelector('[data-cap-text]').textContent.includes('My portfolio'));
+  await p.waitForFunction(() => document.querySelector('[data-cap-title]').textContent.includes('I started on a bike'));
   assert.deepEqual(errs, []);
   console.log('PASS bilingual Chile epilogue');
 } finally {

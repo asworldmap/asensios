@@ -14,7 +14,7 @@ export async function build(ctx) {
     card: { key: 'ch4', photo: '/media/korea-cherry-signpost.webp', href: '/trajectory/#ch4' },
     day: { skyTop: '#85aaca', fog: '#dad8d5', skyHorizon: '#ecd4ba', sunDir: [-0.8, 0.24, -0.42], fogNear: 150, fogFar: 520 },
     shots: shots([0, 30, 45, 12, 0, 3.5, 46], [0.18, 46, -22, 10, 4, 3.8, 49],
-      [0.5, 46, 45, 15, 4, 3.6, 45], [0.72, 42, 36, 13, 5, 3.2, 46],
+      [0.5, 42, 30, 12, 4, 3.6, 45], [0.72, 42, 36, 13, 5, 3.2, 46],
       [0.84, 24, -37, 7, 1, 3.1, 46], [1, 33, -32, 10, 5, 3.3, 45]),
     establishing: { from: [4, 12, -465], look: [-43, 4, -481] },
   });

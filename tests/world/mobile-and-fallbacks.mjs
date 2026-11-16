@@ -3,7 +3,7 @@ const out = process.argv[2];
 const R = []; const ok = (n, c, x = '') => R.push(`${c ? 'PASS' : 'FAIL'}  ${n} ${x}`);
 // ---- mobile
 {
-  const { b, p, errs, wait, st } = await open({ device: 'iPhone 13', quality: null });
+  const { b, p, errs, wait, st } = await open({ device: 'iPhone 13', quality: null, reduced: true });
   await wait(1.5);
   if (out) await p.screenshot({ path: `${out}-m-story.png` });
   // drag up to advance

@@ -6,7 +6,7 @@ export async function build(ctx) {
     ground: '#78816a', stop: 1, discoverAt: 0.60, radius: 11, exitCopy: 'world.bridge.t02',
     card: { key: 'ch5', photo: '/media/alpadia-field.webp', href: '/trajectory/#ch5' },
     day: { skyTop: '#80aed1', fog: '#dfeaf0', sunDir: [-0.62, 0.48, -0.5] },
-    shots: shots([0, 5, 8, 3.9, -10, 1.6, 49], [0.44, 8, 11, 4.1, -17, 2, 48], [1, 7, -10, 4.6, -7, 2.6, 44]),
+    shots: shots([0, 5, 8, 3.9, -10, 1.6, 49], [0.44, 9, -9, 4.1, -14, 2, 46], [1, 7, -10, 4.6, -7, 2.6, 44]),
     establishing: { from: [38, 18, -76], look: [0, 2, -101] },
   });
   s.tile('europe/rail_track_straight', 0, -145, 26, { y: 0 });

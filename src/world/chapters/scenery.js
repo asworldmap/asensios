@@ -123,7 +123,7 @@ export function scenery({ scene, assets, shared }, spec) {
         return Object.assign(out, { y: spec.driveY ?? spec.floor, t: n.t, routeD: n.d, water: !!spec.water, onRoad: n.d < 7 });
       },
       pois: [poi], beats: [opening, ...discovery, end],
-      shots: spec.shots, cine: [[0.09, spec.stop - 0.07]],
+      shots: spec.shots, cine: [],
       establishing: spec.establishing,
       storyRate: spec.storyRate,
       storySpeed: spec.storySpeed,

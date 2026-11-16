@@ -200,9 +200,9 @@ export async function build({ scene, tier, step, assets, shared }) {
   const beats = [
     { t: 0, id: 'start', keys: own('start'), place: 'world.place.start' },
     { t: 0.145, id: 'divulgalo', optional: true, poi: 'divulgalo', keys: tr('ch1'), place: 'world.place.divulgalo' },
-    { t: 0.335, id: 'beemoney', poi: 'beemoney', keys: tr('ch9'), place: 'world.place.beemoney' },
+    { t: 0.335, id: 'beemoney', poi: 'beemoney', keys: { ...tr('ch9'), title: 'world.beat.beemoney.title' }, place: 'world.place.beemoney' },
     { t: mid, id: 'bridge', optional: true, cine: true, keys: own('bridge'), place: 'world.place.bridge' },
-    { t: 0.66, id: 'mwy', poi: 'mwy', keys: tr('ch6'), place: 'world.place.mwy' },
+    { t: 0.66, id: 'mwy', poi: 'mwy', keys: { ...tr('ch6'), title: 'world.beat.mwy.title' }, place: 'world.place.mwy' },
     { t: 0.815, id: 'eu', optional: true, poi: 'eu', keys: tr('ch7'), place: 'world.place.eu' },
     { t: 1, id: 'end', keys: { ...own('end'), text: 'world.bridge.t01' }, place: 'world.place.end', next: true },
   ];
@@ -1419,7 +1419,7 @@ export async function build({ scene, tier, step, assets, shared }) {
     heard(kind, st) {
       if (kind !== 'bell' || Math.hypot(tower.x - st.x, tower.z - st.z) > 22) return null;
       scatterPigeons();
-      return { tone: [392, 0.16, 2.6], delay: 520, secret: 'bell' };
+      return { tone: [392, 0.028, 1.2, 'sine', [1, 1.46]], delay: 380, secret: 'bell' };
     },
     update,
     dispose,
