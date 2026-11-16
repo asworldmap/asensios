@@ -802,6 +802,459 @@
       "blender": "5.3.0"
     },
     {
+      "ref": "murcia_v2/acequia",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 580,
+      "bytes": 31328,
+      "materials": 5,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 2,
+      "import_check": {
+        "objects": 5,
+        "meshes": 1,
+        "vertices": 716
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/arcade_house",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [
+        "material \"M_cloth\" is double-sided; enable backface culling unless the mesh is a single open sheet"
+      ],
+      "class": "batched",
+      "triangles": 7121,
+      "bytes": 456712,
+      "materials": 9,
+      "parts": 0,
+      "colliders": 4,
+      "anchors": 4,
+      "import_check": {
+        "objects": 10,
+        "meshes": 1,
+        "vertices": 12645
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/bandstand",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [
+        "material \"M_metal\" is double-sided; enable backface culling unless the mesh is a single open sheet"
+      ],
+      "class": "batched",
+      "triangles": 2096,
+      "bytes": 135952,
+      "materials": 5,
+      "parts": 0,
+      "colliders": 7,
+      "anchors": 3,
+      "import_check": {
+        "objects": 12,
+        "meshes": 1,
+        "vertices": 3674
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/bougainvillea_pergola",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 2394,
+      "bytes": 110584,
+      "materials": 3,
+      "parts": 0,
+      "colliders": 4,
+      "anchors": 2,
+      "import_check": {
+        "objects": 8,
+        "meshes": 1,
+        "vertices": 2893
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/cafe_terrace",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [
+        "material \"M_cloth\" is double-sided; enable backface culling unless the mesh is a single open sheet"
+      ],
+      "class": "batched",
+      "triangles": 2216,
+      "bytes": 141652,
+      "materials": 7,
+      "parts": 0,
+      "colliders": 8,
+      "anchors": 2,
+      "import_check": {
+        "objects": 12,
+        "meshes": 1,
+        "vertices": 3793
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/church",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 6520,
+      "bytes": 406756,
+      "materials": 6,
+      "parts": 0,
+      "colliders": 4,
+      "anchors": 4,
+      "import_check": {
+        "objects": 10,
+        "meshes": 1,
+        "vertices": 11286
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/church_tower",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 3242,
+      "bytes": 172156,
+      "materials": 6,
+      "parts": 0,
+      "colliders": 4,
+      "anchors": 2,
+      "import_check": {
+        "objects": 8,
+        "meshes": 1,
+        "vertices": 4575
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/cypress_tall",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 668,
+      "bytes": 17940,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 0,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 365
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/fountain_plaza",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 644,
+      "bytes": 32624,
+      "materials": 3,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 2,
+      "import_check": {
+        "objects": 5,
+        "meshes": 1,
+        "vertices": 795
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/huerta_rows",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 2508,
+      "bytes": 99224,
+      "materials": 3,
+      "parts": 0,
+      "colliders": 0,
+      "anchors": 2,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 2537
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/laundry_line",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [
+        "material \"M_foliage\" is double-sided; enable backface culling unless the mesh is a single open sheet"
+      ],
+      "class": "batched",
+      "triangles": 340,
+      "bytes": 15544,
+      "materials": 3,
+      "parts": 0,
+      "colliders": 2,
+      "anchors": 0,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 321
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/market_stall",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [
+        "material \"M_cloth\" is double-sided; enable backface culling unless the mesh is a single open sheet"
+      ],
+      "class": "batched",
+      "triangles": 2187,
+      "bytes": 94384,
+      "materials": 4,
+      "parts": 0,
+      "colliders": 2,
+      "anchors": 2,
+      "import_check": {
+        "objects": 6,
+        "meshes": 1,
+        "vertices": 2404
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/noria",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 2796,
+      "bytes": 199892,
+      "materials": 4,
+      "parts": 0,
+      "colliders": 5,
+      "anchors": 4,
+      "import_check": {
+        "objects": 11,
+        "meshes": 1,
+        "vertices": 5568
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/notice_board",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 484,
+      "bytes": 36588,
+      "materials": 3,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 2,
+      "import_check": {
+        "objects": 5,
+        "meshes": 1,
+        "vertices": 948
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/olive_tree",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 1366,
+      "bytes": 52936,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 1,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 1325
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/orange_tree",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 1368,
+      "bytes": 39080,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 1,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 892
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/plaza_paving",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 3022,
+      "bytes": 212948,
+      "materials": 1,
+      "parts": 0,
+      "colliders": 0,
+      "anchors": 2,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 6044
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/prickly_pear",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 2220,
+      "bytes": 56404,
+      "materials": 1,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 0,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 1301
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/river_reeds",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 1240,
+      "bytes": 71928,
+      "materials": 1,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 0,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 1970
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/shop_house",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [
+        "material \"M_cloth\" is double-sided; enable backface culling unless the mesh is a single open sheet"
+      ],
+      "class": "batched",
+      "triangles": 5868,
+      "bytes": 329364,
+      "materials": 9,
+      "parts": 0,
+      "colliders": 4,
+      "anchors": 3,
+      "import_check": {
+        "objects": 9,
+        "meshes": 1,
+        "vertices": 8902
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia_v2/sierra_backdrop",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 1200,
+      "bytes": 32244,
+      "materials": 1,
+      "parts": 0,
+      "colliders": 0,
+      "anchors": 1,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 741
+      },
+      "blender": "5.3.0"
+    },
+    {
       "ref": "vehicles/airliner",
       "status": "skipped",
       "seconds": 0,
