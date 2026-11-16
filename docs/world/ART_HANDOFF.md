@@ -114,3 +114,91 @@ on mobile tiers.
   the market stall expose a point and facing where text or a photo can be drawn.
 - **Water anchors** (`kind: "water"` / `"emitter"`): fountain and channel surfaces are
   modelled flat in teal; the river shader could be reused on them.
+
+## Europe v2 — "The Railway Journey"
+
+Reference: `docs/world/scenes/europe_railway.webp`, layout `europe_railway.json`
+(178 placements). No new train: the scene uses `vehicles/train_cab` + `train_coach` and
+the existing `europe/` track, platform, masts and signals. The track is the z axis
+(x = 0, rail top y = 0); the layout can be laid along any straight of the route.
+
+| Asset | Tris | Size w × h × d (m) | Use |
+|---|---|---|---|
+| `station_building` | 6 872 | 24 × 11.5 × 8.2 | junction station: clock gable, slate roofs, brick arches. Origin at **platform level** (0.92 m above rail top), front = +z. `label_name`, `clock_front/back`, `door`, `platform_edge` |
+| `station_canopy` | 790 | 22.8 × 4.3 × 4.3 | iron-and-timber platform canopy. **Same position and yaw as the building**; `light_a/b` |
+| `platform_paving` | 1 052 | 6 × 1.8 × 10 tile | platform floor between `europe/rail_platform` and the station front; top y = 0, tiles on `next` |
+| `signal_box` | 1 504 | 6.6 × 6.6 × 4.6 | lineside cabin with stair; `label_name` |
+| `viaduct_arch` | 992 | 6.4 × 18 × 14 tile | one 14 m stone span, deck top = rail top, 17 m tall; tiles on `next`; `foot` marks the valley floor |
+| `tunnel_portal` | 1 357 | 30 × 11 × 17.8 | stone mouth, dark modelled bore (9 m) and the hill it enters; track enters along −z; `track_in`, `track_out`, `label_plaque` |
+| `meadow_hill` | 1 568 | 60 × 9.9 × 60 | painted field patchwork; overlap several, sink 1 m |
+| `broadleaf_tree` | 1 752 | ⌀ 11 × 10.9 | field tree |
+| `birch_tree` | 2 952 | ⌀ 5 × 12 | near the station, in groups |
+| `spruce_tall` | 2 062 | ⌀ 7.5 × 15–18 | valley sides, above the tunnel |
+| `hedgerow` | 884 | 2.6 × 2.5 × 10 tile | field boundaries |
+| `alps_backdrop` | 1 232 | 78 × 32 × 24 | snow range in two layers; scale 2.6 at ~290 m and 4.2 at ~420 m |
+
+Placement rules that matter:
+
+- Station: put `rail_platform` tiles along the track, then `platform_paving` at x = 8.87
+  (y = 0.92), then building + canopy at x = 12.5 (y = 0.92, yaw −π/2 for a station on the
+  +x side). The ground behind the station must be raised to 0.92 or the building floats.
+- Viaduct: the chapter terrain needs a valley at least 17 m deep under it
+  (`heightAt` ≈ −17 at mid-span); pier feet are buried where the valley is shallower.
+  The train simply keeps y = 0 — no engine change.
+- Tunnel: the bore is closed and dark, so the train can just be hidden (or the chapter
+  cut) once the cab passes `track_out`. Terrain must not rise through the mouth: keep
+  ground ≤ 0 within 4 m of the track until 10 m behind the portal.
+- Tree `y` values in the layout follow the render terrain; re-seat on `heightAt()`.
+- **Cinematic viewpoint for the train's arrival**: the layout's `camera` block (66 m west
+  of the line, 15 m up, looking up the valley, 24 mm). A short scripted camera hold here
+  as the train leaves the tunnel is the highest-value shot of the chapter.
+
+## Maritime v2 — "The Ocean Journey"
+
+Reference: `docs/world/scenes/port_departure.webp`, layout `port_departure.json`
+(79 placements). No new ship: the scene uses `vehicles/passenger_ship` and the existing
+`maritime/` quay, lights, buoys and crates. Waterline y = 0; quay and pier decks y = 1.6.
+
+| Asset | Tris | Size w × h × d (m) | Use |
+|---|---|---|---|
+| `lighthouse` | 2 272 | ⌀ 12 × 22 | mole-end light on a rock base; `light` (beam/flash source), `door` |
+| `pier_section` | 992 | 4.6 × 5.8 × 10 tile | timber pier on braced piles, one side railed; `next`, `surface`, `mooring` |
+| `pier_head` | 1 344 | 8.3 × 9.4 × 7.9 | pier end: beacon, bench, ladder, life ring; `view` (camera), `seat`, `light` |
+| `harbour_office` | 2 950 | 12 × 12.6 × 8.2 | harbour master / ticket hall with lookout and signal mast; `label_sign`, `label_timetable`, `flag`, `door` |
+| `breakwater` | 992 | 13.5 × 4.4 × 20 tile | rubble mole with walkway at y = 1.6; `next`, `surface` |
+| `gangway` | 478 | 9 × 4.1 × 1.5 | quay → ship, rises 2.8 m (1.6 → the ship's 4.4 m deck); `foot`, `head` |
+| `fishing_boat` | 640 | 3.2 × 6.2 × 8.5 | moored set dressing; `bob` (rock ±2°, 3 s), `light` |
+| `dock_clutter` | 920 | 5.2 × 2 × 2.9 | pots, net rack, fish boxes, barrel |
+| `deck_bench` | 284 | 1.9 × 1 × 0.7 | ship decks and pier; `seat` |
+| `deck_vent` | 208 | 1 × 2.3 × 1.1 | cowl ventilator for the ship's upper deck (y = 9.8) |
+| `coast_headland` | 3 220 | 61 × 19 × 35 | rock headland with pines; scale 1.4–1.6 behind the port, 2.2–2.6 across the bay |
+| `horizon_islands` | 288 | 78 × 10 × 18 | pale far islands; scale 5.5–7.5 at 550–750 m |
+
+Arrival and departure are the same layout: departure looks from the pier head back at
+the ship (the layout camera); for arrival, put the camera on the ship's `bridge_view`
+anchor heading in past the lighthouse with the pier to port.
+
+### Ocean technique for the web (to implement in the engine — nothing here changes it)
+
+The render's water is Cycles-only. What reads as "cinematic sea" there, and how to get
+it cheaply in the existing Three.js renderer, in order of value:
+
+1. **One large plane, vertex-displaced in the vertex shader.** Sum of 3–4 Gerstner waves
+   (wavelengths ≈ 60, 31, 18, 9 m; steepness 0.10–0.18; directions within ±25° of the
+   wind). ~128 × 128 grid following the camera, snapped to the grid spacing so it does
+   not swim. Amplitude ≤ 0.5 m in harbour, 1.2 m at sea. Expose the same function in JS
+   as `seaHeightAt(x, z, t)` so the ship and `fishing_boat` (`ANCHOR_bob`) can ride it.
+2. **Colour from depth and view angle, not a texture.** Deep `#17586c`, shallow
+   `#3f9f9a`, mixed by a `depth` vertex attribute or distance from shore; Fresnel
+   (`pow(1 − N·V, 4)`) mixes toward the sky's horizon colour. This single term is what
+   makes the horizon line disappear into the haze as in the reference.
+3. **Sun glitter.** A tight Blinn–Phong highlight (shininess ~200) on normals perturbed
+   by two scrolling analytic ripples; no normal map needed.
+4. **Foam where it matters only.** A soft white band where `depth < 0.6 m` (quay face,
+   breakwater rocks, hull waterline), animated with the wave phase; plus a wake: a
+   fading triangle-strip ribbon behind the ship's `stern` anchor.
+5. **Horizon.** Extend the plane to the fog distance and let the existing atmosphere fog
+   it; `horizon_islands` sit just inside the far plane and should receive full fog.
+
+No reflections, no render targets, no extra passes — it stays inside the current
+performance tiers. Low tier: steps 2 and 5 only (flat plane).

@@ -2,7 +2,196 @@
   "ok": true,
   "results": [
     {
-      "ref": "europe_v2/alps_backdrop",
+      "ref": "maritime_v2/breakwater",
+      "status": "built",
+      "seconds": 2.5,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 992,
+      "bytes": 100736,
+      "materials": 1,
+      "parts": 0,
+      "colliders": 2,
+      "anchors": 2,
+      "import_check": {
+        "objects": 6,
+        "meshes": 1,
+        "vertices": 2904
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "maritime_v2/coast_headland",
+      "status": "built",
+      "seconds": 2.4,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 3220,
+      "bytes": 102052,
+      "materials": 3,
+      "parts": 0,
+      "colliders": 0,
+      "anchors": 1,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 2488
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "maritime_v2/deck_bench",
+      "status": "built",
+      "seconds": 2.4,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 284,
+      "bytes": 23300,
+      "materials": 3,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 1,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 574
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "maritime_v2/deck_vent",
+      "status": "built",
+      "seconds": 2.0,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [
+        "material \"M_paint\" is double-sided; enable backface culling unless the mesh is a single open sheet"
+      ],
+      "class": "batched",
+      "triangles": 208,
+      "bytes": 13964,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 0,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 326
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "maritime_v2/dock_clutter",
+      "status": "built",
+      "seconds": 2.2,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [
+        "material \"M_cloth\" is double-sided; enable backface culling unless the mesh is a single open sheet"
+      ],
+      "class": "batched",
+      "triangles": 920,
+      "bytes": 64436,
+      "materials": 4,
+      "parts": 0,
+      "colliders": 2,
+      "anchors": 0,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 1713
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "maritime_v2/fishing_boat",
+      "status": "built",
+      "seconds": 2.5,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [
+        "material \"M_paint\" is double-sided; enable backface culling unless the mesh is a single open sheet",
+        "material \"M_wood\" is double-sided; enable backface culling unless the mesh is a single open sheet"
+      ],
+      "class": "batched",
+      "triangles": 640,
+      "bytes": 51940,
+      "materials": 8,
+      "parts": 0,
+      "colliders": 2,
+      "anchors": 2,
+      "import_check": {
+        "objects": 6,
+        "meshes": 1,
+        "vertices": 1256
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "maritime_v2/gangway",
+      "status": "built",
+      "seconds": 2.3,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [
+        "material \"M_metal\" is double-sided; enable backface culling unless the mesh is a single open sheet",
+        "material \"M_cloth\" is double-sided; enable backface culling unless the mesh is a single open sheet"
+      ],
+      "class": "batched",
+      "triangles": 478,
+      "bytes": 36256,
+      "materials": 3,
+      "parts": 0,
+      "colliders": 2,
+      "anchors": 2,
+      "import_check": {
+        "objects": 6,
+        "meshes": 1,
+        "vertices": 932
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "maritime_v2/harbour_office",
+      "status": "built",
+      "seconds": 2.4,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [
+        "material \"M_stone\" is double-sided; enable backface culling unless the mesh is a single open sheet",
+        "material \"M_cloth\" is double-sided; enable backface culling unless the mesh is a single open sheet"
+      ],
+      "class": "batched",
+      "triangles": 2950,
+      "bytes": 197872,
+      "materials": 7,
+      "parts": 0,
+      "colliders": 4,
+      "anchors": 4,
+      "import_check": {
+        "objects": 10,
+        "meshes": 1,
+        "vertices": 5399
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "maritime_v2/horizon_islands",
       "status": "built",
       "seconds": 2.0,
       "error": "",
@@ -10,21 +199,21 @@
       "errors": [],
       "warnings": [],
       "class": "batched",
-      "triangles": 1232,
-      "bytes": 51300,
+      "triangles": 288,
+      "bytes": 12200,
       "materials": 1,
       "parts": 0,
       "colliders": 0,
-      "anchors": 1,
+      "anchors": 0,
       "import_check": {
-        "objects": 3,
+        "objects": 2,
         "meshes": 1,
-        "vertices": 1329
+        "vertices": 288
       },
       "blender": "5.3.0"
     },
     {
-      "ref": "europe_v2/birch_tree",
+      "ref": "maritime_v2/lighthouse",
       "status": "built",
       "seconds": 2.3,
       "error": "",
@@ -32,43 +221,43 @@
       "errors": [],
       "warnings": [],
       "class": "batched",
-      "triangles": 2952,
-      "bytes": 95228,
-      "materials": 2,
+      "triangles": 2272,
+      "bytes": 128300,
+      "materials": 7,
       "parts": 0,
       "colliders": 1,
-      "anchors": 0,
+      "anchors": 2,
       "import_check": {
-        "objects": 3,
+        "objects": 5,
         "meshes": 1,
-        "vertices": 2351
+        "vertices": 3369
       },
       "blender": "5.3.0"
     },
     {
-      "ref": "europe_v2/broadleaf_tree",
+      "ref": "maritime_v2/pier_head",
       "status": "built",
-      "seconds": 2.2,
+      "seconds": 2.3,
       "error": "",
       "contract": "pass",
       "errors": [],
       "warnings": [],
       "class": "batched",
-      "triangles": 1752,
-      "bytes": 58676,
-      "materials": 2,
+      "triangles": 1344,
+      "bytes": 92452,
+      "materials": 4,
       "parts": 0,
-      "colliders": 1,
-      "anchors": 1,
+      "colliders": 2,
+      "anchors": 4,
       "import_check": {
-        "objects": 4,
+        "objects": 8,
         "meshes": 1,
-        "vertices": 1432
+        "vertices": 2483
       },
       "blender": "5.3.0"
     },
     {
-      "ref": "europe_v2/hedgerow",
+      "ref": "maritime_v2/pier_section",
       "status": "built",
       "seconds": 2.1,
       "error": "",
@@ -76,202 +265,16 @@
       "errors": [],
       "warnings": [],
       "class": "batched",
-      "triangles": 884,
-      "bytes": 26068,
-      "materials": 2,
-      "parts": 0,
-      "colliders": 1,
-      "anchors": 1,
-      "import_check": {
-        "objects": 4,
-        "meshes": 1,
-        "vertices": 576
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "europe_v2/meadow_hill",
-      "status": "built",
-      "seconds": 1.9,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [],
-      "class": "batched",
-      "triangles": 1568,
-      "bytes": 37644,
-      "materials": 1,
-      "parts": 0,
-      "colliders": 0,
-      "anchors": 1,
-      "import_check": {
-        "objects": 3,
-        "meshes": 1,
-        "vertices": 841
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "europe_v2/platform_paving",
-      "status": "built",
-      "seconds": 2.2,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [],
-      "class": "batched",
-      "triangles": 1052,
-      "bytes": 74988,
-      "materials": 1,
-      "parts": 0,
-      "colliders": 0,
-      "anchors": 1,
-      "import_check": {
-        "objects": 3,
-        "meshes": 1,
-        "vertices": 2104
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "europe_v2/signal_box",
-      "status": "built",
-      "seconds": 2.6,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [
-        "material \"M_stone\" is double-sided; enable backface culling unless the mesh is a single open sheet"
-      ],
-      "class": "batched",
-      "triangles": 1504,
-      "bytes": 90064,
-      "materials": 6,
-      "parts": 0,
-      "colliders": 4,
-      "anchors": 1,
-      "import_check": {
-        "objects": 7,
-        "meshes": 1,
-        "vertices": 2336
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "europe_v2/spruce_tall",
-      "status": "built",
-      "seconds": 2.3,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [],
-      "class": "batched",
-      "triangles": 2062,
-      "bytes": 116568,
-      "materials": 2,
-      "parts": 0,
-      "colliders": 1,
-      "anchors": 0,
-      "import_check": {
-        "objects": 3,
-        "meshes": 1,
-        "vertices": 3185
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "europe_v2/station_building",
-      "status": "built",
-      "seconds": 3.0,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [
-        "material \"M_stone\" is double-sided; enable backface culling unless the mesh is a single open sheet"
-      ],
-      "class": "batched",
-      "triangles": 6872,
-      "bytes": 443752,
-      "materials": 6,
-      "parts": 0,
-      "colliders": 4,
-      "anchors": 5,
-      "import_check": {
-        "objects": 11,
-        "meshes": 1,
-        "vertices": 12370
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "europe_v2/station_canopy",
-      "status": "built",
-      "seconds": 2.2,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [
-        "material \"M_stone\" is double-sided; enable backface culling unless the mesh is a single open sheet",
-        "material \"M_wood\" is double-sided; enable backface culling unless the mesh is a single open sheet"
-      ],
-      "class": "batched",
-      "triangles": 790,
-      "bytes": 48896,
+      "triangles": 992,
+      "bytes": 71064,
       "materials": 4,
       "parts": 0,
-      "colliders": 7,
+      "colliders": 1,
       "anchors": 3,
-      "import_check": {
-        "objects": 12,
-        "meshes": 1,
-        "vertices": 1214
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "europe_v2/tunnel_portal",
-      "status": "built",
-      "seconds": 2.2,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [
-        "material \"M_stone\" is double-sided; enable backface culling unless the mesh is a single open sheet",
-        "material \"M_earth\" is double-sided; enable backface culling unless the mesh is a single open sheet"
-      ],
-      "class": "batched",
-      "triangles": 1357,
-      "bytes": 60560,
-      "materials": 3,
-      "parts": 0,
-      "colliders": 2,
-      "anchors": 3,
-      "import_check": {
-        "objects": 7,
-        "meshes": 1,
-        "vertices": 1527
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "europe_v2/viaduct_arch",
-      "status": "built",
-      "seconds": 2.2,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [],
-      "class": "batched",
-      "triangles": 992,
-      "bytes": 73012,
-      "materials": 2,
-      "parts": 0,
-      "colliders": 2,
-      "anchors": 2,
       "import_check": {
         "objects": 6,
         "meshes": 1,
-        "vertices": 2016
+        "vertices": 1900
       },
       "blender": "5.3.0"
     }
