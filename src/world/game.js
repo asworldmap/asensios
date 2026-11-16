@@ -1,16 +1,23 @@
 // Pedal the World — engine.
 //
-// One world, two ways of moving through it:
-//   STORY    the bike rides the route; scroll / keys / drag move it along and
-//            the camera is directed shot by shot. No skill needed.
-//   EXPLORE  the same bike, the same place, driven freely with arcade physics.
+// The engine owns the loop, the camera spring, input, the two modes and the
+// loading and unloading of chapters. It knows nothing about Murcia or about
+// bicycles:
 //
-// The engine knows nothing about Murcia. A chapter module hands it a height
-// field, a route, colliders, points of interest and camera shots.
+//   a CHAPTER (chapters/*.js) supplies the place — height field, route,
+//   colliders, points of interest, camera shots, ambient life, light;
+//   a VEHICLE (vehicles/*.js) supplies how you move through it — model,
+//   animation, free-movement physics and its own chase camera.
+//
+// STORY    the vehicle follows the route; scroll / keys / drag move it along
+//          and the camera is directed shot by shot. No skill needed.
+// EXPLORE  the same vehicle in the same place, driven by its own physics.
 
 import * as THREE from 'three';
-import { createBike } from './bike.js';
-import { buildMurcia } from './murcia.js';
+import { createAssets } from './assets.js';
+import { createShared } from './shading.js';
+import { CHAPTERS } from './chapters/index.js';
+import { getVehicle } from './vehicles/index.js';
 import { clamp, lerp, smooth, damp, dampAngle } from './kit.js';
 
 const QUALITY = [
@@ -19,55 +26,62 @@ const QUALITY = [
   { dpr: 1.75, shadow: 1024 },
   { dpr: 2, shadow: 2048 },
 ];
+const PROGRESS_KEY = 'asensios.world.progress';
 
-export async function createGame({ canvas, tier, reduced, dark, onProgress, emit }) {
+export async function createGame({ canvas, tier, reduced, dark, onProgress, emit, chapter: firstChapter = 'murcia' }) {
   // ------------------------------------------------------------ Renderer
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: tier !== 'mobile', powerPreference: 'high-performance' });
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(46, 1, 0.3, 900);
+  const shared = createShared();
+  const assets = createAssets();
 
   let quality = tier === 'mobile' ? 1 : tier === 'tablet' ? 2 : 3;
   let autoQuality = true;
+  let world = null;
+  let vehicle = null;
+  let chapterId = null;
+  let loading = false;
+  let isDark = dark;
+  let calm = reduced;
+  let sound = true;
 
-  const step = (label, f) =>
-    new Promise((res) => {
-      onProgress(0.25 + f * 0.7, label);
-      requestAnimationFrame(() => res());
-    });
-
-  const world = await buildMurcia({ scene, tier, step });
-  const bike = createBike();
-  scene.add(bike.root);
-
-  // Shadow frustum travels with the bike so a small map stays sharp.
-  const sun = world.sun;
-  sun.shadow.camera.left = sun.shadow.camera.bottom = -30;
-  sun.shadow.camera.right = sun.shadow.camera.top = 30;
-  sun.shadow.camera.near = 1;
-  sun.shadow.camera.far = 170;
-  sun.shadow.bias = -0.0005;
-  sun.shadow.normalBias = 0.05;
-
-  const headlight = new THREE.SpotLight('#ffe9b0', 0, 22, 0.55, 0.7, 1.1);
-  headlight.position.set(0, 1, 0.5);
-  headlight.target.position.set(0, 0, 9);
-  bike.root.add(headlight, headlight.target);
+  // ---------------------------------------------------------------- State
+  const st = {
+    mode: 'story', started: false, paused: false,
+    x: 0, y: 0, z: 0, yaw: 0, speed: 0, vy: 0, airborne: false,
+    steer: 0, slope: 0, jolt: 0, pedal: 0,
+    t: 0, tTarget: 0, dir: 1, rejoin: 1,
+    intro: reduced ? 1 : 0,
+    near: null, beat: null, cine: false,
+    lemons: 0, stuck: 0, lock: 0, time: 0,
+  };
+  const input = { up: 0, down: 0, left: 0, right: 0, joyX: 0, joyY: 0, adv: 0, wheel: 0 };
+  const cam = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 46, yaw: 0, ready: false };
+  const want = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 46 };
+  const introFrom = new THREE.Vector3();
+  const focus = new THREE.Vector3();
+  const rp = {};
+  const g0 = {};
 
   function applyQuality() {
     const q = QUALITY[quality];
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, q.dpr));
-    const on = q.shadow > 0;
-    if (on && sun.shadow.mapSize.x !== q.shadow) {
-      sun.shadow.mapSize.set(q.shadow, q.shadow);
-      if (sun.shadow.map) {
-        sun.shadow.map.dispose();
-        sun.shadow.map = null;
+    if (world) {
+      const sun = world.atmosphere.sun;
+      const on = q.shadow > 0;
+      if (on && sun.shadow.mapSize.x !== q.shadow) {
+        sun.shadow.mapSize.set(q.shadow, q.shadow);
+        if (sun.shadow.map) {
+          sun.shadow.map.dispose();
+          sun.shadow.map = null;
+        }
       }
+      sun.castShadow = on;
+      vehicle.setShadowBlob(!on);
     }
-    sun.castShadow = on;
-    bike.setShadowBlob(!on);
     resize();
   }
 
@@ -79,54 +93,25 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     camera.updateProjectionMatrix();
   }
 
-  function setTheme(isDark) {
-    world.setTheme(isDark);
-    headlight.intensity = isDark ? 46 : 0;
-    bike.lamp.material.color.set(isDark ? '#fff3c4' : '#d8d0bd');
-    bike.mats.frame.color.set(isDark ? '#6fdc3c' : '#3fbf16');
+  function setTheme(v, instant = false) {
+    isDark = v;
+    if (!world) return;
+    world.atmosphere.setTheme(v, instant || calm);
+    vehicle.setTheme(v);
   }
-
-  // ---------------------------------------------------------------- State
-  const st = {
-    mode: 'story',
-    started: false,
-    paused: false,
-    x: 0, y: 0, z: 0, yaw: 0, speed: 0, vy: 0, airborne: false,
-    steer: 0, slope: 0, jolt: 0,
-    t: 0, tTarget: 0, dir: 1, rejoin: 1,
-    intro: reduced ? 1 : 0,
-    near: null, beat: null, cine: false,
-    lemons: 0, stuck: 0, lock: 0,
-    pedal: 0, time: 0,
-  };
-  const input = { up: 0, down: 0, left: 0, right: 0, joyX: 0, joyY: 0, adv: 0, wheel: 0 };
-  let calm = reduced;
-  let sound = true;
-
-  const start0 = world.pointAt(0);
-  st.x = start0.x;
-  st.z = start0.z;
-  st.y = start0.y + 0.05;
-  st.yaw = Math.atan2(start0.tx, start0.tz);
-
-  const cam = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 46, yaw: st.yaw, ready: false };
-  const want = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 46 };
-  const rp = {};
-  const g0 = {};
-  const g1 = {};
 
   // ---------------------------------------------------------------- Audio
   let ac = null;
-  function ding(freq = 1560, gain = 0.12, len = 1.1) {
+  function tone(freq, gain, len, type = 'sine', partials = [1, 2.76]) {
     if (!sound) return;
     try {
       ac = ac || new (window.AudioContext || window.webkitAudioContext)();
       if (ac.state === 'suspended') ac.resume();
       const now = ac.currentTime;
-      [1, 2.76].forEach((m, i) => {
+      partials.forEach((m, i) => {
         const o = ac.createOscillator();
         const g = ac.createGain();
-        o.type = 'sine';
+        o.type = type;
         o.frequency.value = freq * m;
         g.gain.setValueAtTime(gain / (i + 1), now);
         g.gain.exponentialRampToValueAtTime(0.0001, now + len / (i + 1));
@@ -135,22 +120,35 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
         o.stop(now + len);
       });
     } catch {
-      /* no audio — the bell is silent, nothing else changes */
+      /* no audio — nothing else changes */
     }
   }
 
-  function bell() {
-    if (!st.started) return;
-    ding(1560, 0.1, 0.9);
-    setTimeout(() => ding(1560, 0.08, 0.9), 150);
-    const d = Math.hypot(world.tower.x - st.x, world.tower.z - st.z);
-    if (d < 22) {
-      // The tower answers, and the pigeons have opinions about it.
-      setTimeout(() => ding(392, 0.16, 2.6), 520);
-      world.scatterPigeons();
-      emit('secret', 'bell');
-    }
-  }
+  // Services a vehicle or chapter may ask the engine for.
+  const fx = {
+    respawn,
+    splash(x, z) {
+      splash.position.set(x, world.waterY + 0.04, z);
+      splashT = 0;
+      emit('secret', 'splash');
+    },
+    bump(c, s) {
+      const what = world.bump?.(c, s);
+      if (what) emit('secret', what);
+    },
+    sound(kind) {
+      if (!st.started) return;
+      if (kind === 'bell') {
+        tone(1560, 0.1, 0.9);
+        setTimeout(() => tone(1560, 0.08, 0.9), 150);
+      } else if (kind === 'horn') tone(311, 0.09, 1.1, 'triangle', [1, 1.19]);
+      const reply = world.heard?.(kind, st);
+      if (reply) {
+        if (reply.tone) setTimeout(() => tone(...reply.tone), reply.delay || 0);
+        if (reply.secret) emit('secret', reply.secret);
+      }
+    },
+  };
 
   // ----------------------------------------------------------------- Story
   function storyShot(t, out) {
@@ -161,21 +159,21 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     const b = S[i + 1];
     const f = smooth(a.t, b.t, t);
     const p = world.pointAt(t, rp);
-    const back = lerp(a.back, b.back, f);
-    const side = lerp(a.side, b.side, f);
-    const up = lerp(a.up, b.up, f);
+    const portrait = camera.aspect < 0.8 ? 1 : 0;
+    const k = (1 + portrait * 0.28) * vehicle.storyScale;
+    const back = lerp(a.back, b.back, f) * k;
+    const side = lerp(a.side, b.side, f) * k;
+    const up = lerp(a.up, b.up, f) * k;
     const ahead = lerp(a.ahead, b.ahead, f);
     const ls = lerp(a.lookSide || 0, b.lookSide || 0, f);
-    const portrait = camera.aspect < 0.8 ? 1 : 0;
-    const k = 1 + portrait * 0.28;
-    out.pos.set(p.x - p.tx * back * k + p.tz * side * k, p.y + up * k, p.z - p.tz * back * k - p.tx * side * k);
+    out.pos.set(p.x - p.tx * back + p.tz * side, p.y + up, p.z - p.tz * back - p.tx * side);
     out.look.set(p.x + p.tx * ahead + p.tz * ls, p.y + lerp(a.lift, b.lift, f), p.z + p.tz * ahead - p.tx * ls);
     out.fov = lerp(a.fov, b.fov, f) + portrait * 12;
   }
 
   function updateStory(dt) {
     const hold = input.up - input.down + input.adv + (Math.abs(input.joyY) > 0.2 ? input.joyY : 0);
-    st.tTarget = clamp(st.tTarget + hold * 0.06 * dt + input.wheel, 0, 1);
+    st.tTarget = clamp(st.tTarget + (hold * 0.06 * dt * 230) / world.route.length + input.wheel, 0, 1);
     input.wheel = 0;
     const prev = st.t;
     st.t = damp(st.t, st.tTarget, 3.4, dt);
@@ -185,17 +183,18 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     else if (delta < -2e-5) st.dir = -1;
 
     const p = world.pointAt(st.t, rp);
-    const routeYaw = Math.atan2(p.tx, p.tz) + (st.dir < 0 ? Math.PI : 0);
+    // A bicycle turns round to ride back; a train simply reverses.
+    const routeYaw = Math.atan2(p.tx, p.tz) + (st.dir < 0 && !vehicle.onRails ? Math.PI : 0);
     const k = (st.rejoin = Math.min(1, st.rejoin + dt * 1.6));
     const e = k * k * (3 - 2 * k);
     st.x = lerp(st.x, p.x, e);
     st.z = lerp(st.z, p.z, e);
-    st.y = lerp(st.y, p.y + 0.05, e);
+    st.y = lerp(st.y, p.y + world.rideHeight, e);
     const prevYaw = st.yaw;
     st.yaw = dampAngle(st.yaw, routeYaw, 7, dt);
-    st.speed = (Math.abs(delta) * world.route.length) / Math.max(dt, 1e-4);
+    st.speed = ((Math.abs(delta) * world.route.length) / Math.max(dt, 1e-4)) * (vehicle.onRails ? st.dir : 1);
     st.steer = clamp(((st.yaw - prevYaw) / Math.max(dt, 1e-4)) * 0.55, -1, 1);
-    st.pedal = st.speed > 0.25 ? 1 : 0;
+    st.pedal = Math.abs(st.speed) > 0.25 ? 1 : 0;
     st.airborne = false;
 
     const p2 = world.pointAt(st.t + 0.004 * st.dir, g0);
@@ -203,7 +202,6 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
 
     storyShot(st.t, want);
 
-    // Which beat is on screen?
     let beat = null;
     for (const b of world.beats) if (Math.abs(st.t - b.t) < (b.cine ? 0.03 : 0.04)) beat = b;
     if (beat !== st.beat) {
@@ -211,12 +209,9 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
       emit('beat', beat ? beat.id : null);
       setNear(beat && beat.poi ? beat.poi : null);
     }
-    const [ba, bb] = world.route.bridgeT;
-    const cine = st.t > ba - 0.012 && st.t < bb + 0.012;
-    if (cine !== st.cine) {
-      st.cine = cine;
-      emit('cine', cine);
-    }
+    let cine = false;
+    for (const [a, b] of world.cine || []) if (st.t > a && st.t < b) cine = true;
+    if (cine !== st.cine) emit('cine', (st.cine = cine));
   }
 
   function setNear(id) {
@@ -226,25 +221,28 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   }
 
   // --------------------------------------------------------------- Explore
+  function placeOnRoute(t) {
+    const p = world.pointAt(t, rp);
+    st.x = p.x;
+    st.z = p.z;
+    st.y = p.y + world.rideHeight;
+    st.yaw = Math.atan2(p.tx, p.tz);
+    st.speed = 0;
+    st.vy = 0;
+    st.airborne = false;
+    st.t = st.tTarget = t;
+    st.stuck = 0;
+    cam.ready = false;
+  }
+
+  /** Fade, then put the vehicle back on the route — at t, or at the nearest safe point. */
   function respawn(reason, t) {
     if (st.lock > 0) return;
     st.lock = 0.7;
     emit('fade', reason || '');
     setTimeout(() => {
-      let tt = t != null ? t : world.nearest(st.x, st.z).t;
-      const [ba, bb] = world.route.bridgeT;
-      if (t == null && tt > ba - 0.01 && tt < bb + 0.01) tt = st.z > world.river(st.x) ? ba - 0.02 : bb + 0.02;
-      const p = world.pointAt(tt, rp);
-      st.x = p.x;
-      st.z = p.z;
-      st.y = p.y + 0.05;
-      st.yaw = Math.atan2(p.tx, p.tz);
-      st.speed = 0;
-      st.vy = 0;
-      st.airborne = false;
-      st.t = st.tTarget = tt;
-      st.stuck = 0;
-      cam.ready = false;
+      if (!world) return;
+      placeOnRoute(t != null ? t : world.safeT ? world.safeT(st.x, st.z) : world.nearest(st.x, st.z).t);
     }, 260);
   }
 
@@ -256,129 +254,35 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   scene.add(splash);
   let splashT = 1;
 
-  function hop() {
-    if (st.mode !== 'explore' || st.airborne || st.paused) return;
-    st.vy = 6.2;
-    st.airborne = true;
-  }
-
   function updateExplore(dt) {
-    const throttle = clamp(input.up - input.down + input.joyY, -1, 1);
-    const steerIn = clamp(input.left - input.right - input.joyX, -1, 1);
-    const g = world.groundAt(st.x, st.z, g0);
+    vehicle.drive(dt, input, world, st, fx);
 
-    // Drive
-    const max = g.onRoad ? 10 : 6.8;
-    if (throttle > 0.05) st.speed += 9.5 * throttle * dt * clamp(1 - st.speed / max, 0, 1);
-    else if (throttle < -0.05) st.speed += (st.speed > 0.4 ? 17 : 4) * throttle * dt;
-    st.speed -= st.speed * (g.onRoad ? 0.32 : 1.05) * dt;
-    // Gravity helps downhill and costs uphill, but a parked bike stays parked.
-    if (!st.airborne && (Math.abs(st.speed) > 0.7 || Math.abs(throttle) > 0.05)) st.speed -= Math.sin(st.slope) * 7 * dt;
-    else if (Math.abs(throttle) < 0.05) st.speed = damp(st.speed, 0, 8, dt);
-    st.speed = clamp(st.speed, -2.6, 13);
-    if (Math.abs(st.speed) < 0.04 && Math.abs(throttle) < 0.05) st.speed = 0;
-    st.pedal = throttle > 0.05 ? 1 : 0;
-
-    // Steer: quick at low speed, calmer at pace.
-    st.steer = damp(st.steer, steerIn, 8, dt);
-    const grip = clamp(Math.abs(st.speed) / 2.4, 0, 1) / (1 + Math.abs(st.speed) * 0.07);
-    st.yaw += st.steer * 2.6 * grip * dt * Math.sign(st.speed || 1);
-
-    let nx = st.x + Math.sin(st.yaw) * st.speed * dt;
-    let nz = st.z + Math.cos(st.yaw) * st.speed * dt;
-
-    // Collisions: circles, pushed out along the normal.
-    for (const c of world.colliders) {
-      const dx = nx - c.x;
-      const dz = nz - c.z;
-      const rr = c.r + 0.42;
-      const d2 = dx * dx + dz * dz;
-      if (d2 < rr * rr) {
-        const d = Math.sqrt(d2) || 0.001;
-        if (st.airborne && c.r < 0.4 && st.y - world.heightAt(c.x, c.z) > 1.2) continue;
-        nx = c.x + (dx / d) * rr;
-        nz = c.z + (dz / d) * rr;
-        const head = -((dx / d) * Math.sin(st.yaw) + (dz / d) * Math.cos(st.yaw)) * Math.sign(st.speed || 1);
-        if (head > 0.35 && Math.abs(st.speed) > 1.2) {
-          if (c.tree && world.dropLemon(c.tree, st.x, st.z)) emit('secret', 'tree');
-          st.jolt = Math.min(0.9, Math.abs(st.speed) * 0.09);
-          st.speed *= -0.22;
-        } else st.speed *= 1 - 1.5 * dt;
-      }
-    }
-    st.x = nx;
-    st.z = nz;
-
-    // Ground, hops and falls.
-    const gn = world.groundAt(st.x, st.z, g0);
-    if (st.airborne) {
-      st.vy -= 20 * dt;
-      st.y += st.vy * dt;
-      if (st.y <= gn.y) {
-        st.y = gn.y;
-        st.jolt = Math.min(1.1, Math.abs(st.vy) * 0.11);
-        st.vy = 0;
-        st.airborne = false;
-      }
-    } else if (st.y - gn.y > 0.45) {
-      st.airborne = true; // rode off an edge
-      st.vy = 0;
-    } else st.y = damp(st.y, gn.y, 26, dt);
-
-    const f = world.groundAt(st.x + Math.sin(st.yaw) * 0.54, st.z + Math.cos(st.yaw) * 0.54, g1).y;
-    const r = world.groundAt(st.x - Math.sin(st.yaw) * 0.54, st.z - Math.cos(st.yaw) * 0.54, g1).y;
-    st.slope = st.airborne ? clamp(-st.vy * 0.03, -0.3, 0.3) : clamp(Math.atan2(f - r, 1.08), -0.5, 0.5);
-
-    // Recovery: water, the edge of the valley, or simply being stuck.
-    if (gn.water && st.y < -0.35 && st.lock <= 0) {
-      splash.position.set(st.x, -0.46, st.z);
-      splashT = 0;
-      emit('secret', 'splash');
-      respawn('water');
-    } else if (Math.hypot(st.x, st.z) > world.bounds) respawn('edge');
-    if (throttle > 0.3 && Math.abs(st.speed) < 0.35) {
-      st.stuck += dt;
-      if (st.stuck > 1.6) respawn('stuck');
-    } else st.stuck = 0;
-
-    st.t = st.tTarget = gn.t;
-
-    // What is close enough to open?
     let near = null;
     let best = Infinity;
     for (const p of world.pois) {
-      const d = Math.hypot(p.focus.x - st.x, p.focus.z - st.z);
-      const d2 = Math.hypot(p.x - st.x, p.z - st.z);
-      const dd = Math.min(d, d2);
+      const dd = Math.min(Math.hypot(p.focus.x - st.x, p.focus.z - st.z), Math.hypot(p.x - st.x, p.z - st.z));
       if (dd < p.radius && dd < best) {
         best = dd;
         near = p.id;
       }
     }
     setNear(near);
-
-    // Chase camera
-    const portrait = camera.aspect < 0.8;
-    cam.yaw = dampAngle(cam.yaw, st.yaw + (st.speed < -0.3 ? 0 : 0), 3.2, dt);
-    const back = (portrait ? 8.6 : 6.6) + Math.abs(st.speed) * 0.12;
-    const up = portrait ? 4.6 : 3;
-    want.pos.set(st.x - Math.sin(cam.yaw) * back, st.y + up, st.z - Math.cos(cam.yaw) * back);
-    want.look.set(st.x + Math.sin(st.yaw) * 2.4, st.y + 1.15, st.z + Math.cos(st.yaw) * 2.4);
-    want.fov = (portrait ? 60 : 50) + (calm ? 0 : clamp(Math.abs(st.speed), 0, 12) * 0.8);
+    vehicle.chase(st, cam, want, { portrait: camera.aspect < 0.8, calm, dt });
   }
 
   // ------------------------------------------------------------------ Loop
   let raf = 0;
   let last = 0;
   let running = false;
+  let saveT = 0;
   const perf = { frames: 0, acc: 0, fps: 0, low: 0, min: Infinity, samples: [], warm: 0 };
-  const introFrom = new THREE.Vector3();
 
   function frame(now) {
     raf = requestAnimationFrame(frame);
     const real = (now - last) / 1000 || 0.016;
     const dt = Math.min(0.05, real);
     last = now;
+    if (!world || loading) return;
     st.time += dt;
     st.lock = Math.max(0, st.lock - dt);
 
@@ -391,20 +295,25 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
       st.pedal = 0;
     }
 
-    bike.root.position.set(st.x, st.y, st.z);
-    bike.root.rotation.y = st.yaw;
-    bike.update({ speed: st.speed, steer: st.steer, pedalling: st.pedal, slope: st.slope, jolt: st.jolt, dt, time: st.time, airborne: st.airborne, calm });
+    vehicle.place(st, world);
+    vehicle.animate({ dt, time: st.time, st, calm });
     st.jolt = 0;
+
+    focus.set(st.x, st.y + vehicle.focusHeight, st.z);
+    if (!calm) shared.uTime.value = st.time;
+    shared.uFocus.value.copy(focus);
+    shared.uSee.value = damp(shared.uSee.value, st.started && st.mode === 'explore' && !vehicle.onRails ? 1 : 0, 5, dt);
 
     const evs = world.update({ dt, time: st.time, x: st.x, z: st.z, speed: st.speed, vx: Math.sin(st.yaw) * st.speed, vz: Math.cos(st.yaw) * st.speed, calm, canCollect: st.started && st.mode === 'explore' });
     for (const e of evs) {
       if (e.type === 'lemon') {
         st.lemons++;
-        bike.setLemons(st.lemons);
-        ding(1960, 0.06, 0.4);
+        vehicle.setCargo(st.lemons);
+        tone(1960, 0.06, 0.4);
         emit('lemons', st.lemons);
-      } else if (e.type === 'pigeons') emit('secret', 'pigeons');
+      } else if (e.type === 'secret') emit('secret', e.id);
     }
+    world.atmosphere.update(dt, focus, calm);
 
     if (splashT < 1) {
       splashT += dt * 1.4;
@@ -420,7 +329,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
       want.fov = lerp(40, want.fov, e);
     } else if (!st.started) {
       want.pos.copy(introFrom);
-      want.look.set(st.x + 14, st.y - 2, st.z - 22);
+      if (world.establishing) want.look.set(...world.establishing.look);
       want.fov = 40;
     }
     if (!cam.ready) {
@@ -440,7 +349,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     cam.fov = damp(cam.fov, want.fov, 3, dt);
     const floor = world.heightAt(cam.pos.x, cam.pos.z) + 0.7;
     if (cam.pos.y < floor) cam.pos.y = floor;
-    if (cam.pos.y < 0.2) cam.pos.y = 0.2;
+    if (cam.pos.y < world.waterY + 0.7) cam.pos.y = world.waterY + 0.7;
     camera.position.copy(cam.pos);
     camera.lookAt(cam.look);
     if (Math.abs(camera.fov - cam.fov) > 0.01) {
@@ -448,10 +357,18 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
       camera.updateProjectionMatrix();
     }
 
-    sun.position.set(st.x + world.sunDir.x * 70, st.y + world.sunDir.y * 70, st.z + world.sunDir.z * 70);
-    sun.target.position.set(st.x, st.y, st.z);
-
     renderer.render(scene, camera);
+
+    // Checkpoint: where to come back to if the page is reloaded mid-ride.
+    saveT += real;
+    if (saveT > 2 && st.started) {
+      saveT = 0;
+      try {
+        sessionStorage.setItem(PROGRESS_KEY, JSON.stringify({ chapter: chapterId, t: +st.t.toFixed(4) }));
+      } catch {
+        /* storage unavailable — progress simply is not kept */
+      }
+    }
 
     // Honest frame accounting, and a one-way step down when the device struggles.
     perf.frames++;
@@ -504,31 +421,31 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
       e.preventDefault();
       return;
     }
-    if (!down || e.repeat || !st.started || st.paused) return;
+    if (!down || e.repeat || !st.started || st.paused || loading) return;
     if (e.code === 'Space') {
       e.preventDefault();
-      if (st.mode === 'explore') hop();
+      if (st.mode === 'explore') action('a');
       else nextBeat(1);
     } else if (e.code === 'PageDown') nextBeat(1);
     else if (e.code === 'PageUp') nextBeat(-1);
-    else if (e.code === 'KeyB') bell();
+    else if (e.code === 'KeyB') action('b');
     else if (e.code === 'KeyR') returnToRoute();
     else if (e.code === 'KeyE') setMode(st.mode === 'story' ? 'explore' : 'story');
   }
   function onWheel(e) {
     if (!st.started || st.paused) return;
     e.preventDefault();
-    if (st.mode !== 'story') return;
+    if (st.mode !== 'story' || !world) return;
     const px = e.deltaMode === 1 ? e.deltaY * 32 : e.deltaY;
-    input.wheel += clamp(px, -240, 240) * 0.00021;
+    input.wheel += (clamp(px, -240, 240) * 0.00021 * 230) / world.route.length;
   }
   let dragY = null;
   function onPointerDown(e) {
     if (st.mode === 'story' && st.started && !st.paused) dragY = e.clientY;
   }
   function onPointerMove(e) {
-    if (dragY == null) return;
-    input.wheel += (dragY - e.clientY) * 0.0011;
+    if (dragY == null || !world) return;
+    input.wheel += ((dragY - e.clientY) * 0.0011 * 230) / world.route.length;
     dragY = e.clientY;
   }
   function onPointerUp() {
@@ -537,13 +454,13 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   function clearInput() {
     input.up = input.down = input.left = input.right = input.joyX = input.joyY = input.adv = 0;
   }
+  let lost = false;
   function onVisibility() {
     if (document.hidden) {
       halt();
       clearInput();
     } else if (!lost) run();
   }
-  let lost = false;
   function onLost(e) {
     e.preventDefault();
     lost = true;
@@ -570,21 +487,86 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   canvas.addEventListener('webglcontextlost', onLost);
   canvas.addEventListener('webglcontextrestored', onRestored);
 
+  // -------------------------------------------------------------- Chapters
+  function unloadChapter() {
+    if (!world) return;
+    scene.remove(vehicle.object);
+    vehicle.dispose();
+    world.dispose();
+    world = null;
+    vehicle = null;
+  }
+
+  /**
+   * Load a chapter and its vehicle, disposing whatever was there before.
+   * Used for the first load and for every chapter transition.
+   */
+  async function loadChapter(id, { t = null, progress = () => {} } = {}) {
+    const def = CHAPTERS[id];
+    if (!def) throw new Error(`unknown chapter "${id}"`);
+    loading = true;
+    const vdef = getVehicle(def.vehicle);
+    unloadChapter();
+    renderer.renderLists.dispose();
+
+    await assets.load([...(def.assets || []), ...vdef.assets], (f) => progress(0.08 + f * 0.22, 'assets'));
+    const mod = await def.load();
+    const step = (label, f) =>
+      new Promise((res) => {
+        progress(0.3 + f * 0.66, label);
+        requestAnimationFrame(() => res());
+      });
+    world = await mod.build({ scene, tier, step, assets, shared });
+    vehicle = vdef.create({ assets, tier });
+    scene.add(vehicle.object);
+    chapterId = id;
+
+    Object.assign(st, { mode: 'story', speed: 0, vy: 0, airborne: false, steer: 0, slope: 0, dir: 1, rejoin: 1, near: null, beat: undefined, cine: false, lemons: 0, stuck: 0, lock: 0 });
+    placeOnRoute(t ?? 0);
+    cam.yaw = st.yaw;
+    shared.uSee.value = 0;
+    setTheme(isDark, true);
+    applyQuality();
+    storyShot(st.t, want);
+    const est = world.establishing || { from: [st.x + 40, st.y + 36, st.z + 30], look: [st.x, st.y, st.z] };
+    introFrom.set(...est.from);
+    if (calm || t) introFrom.copy(want.pos);
+    cam.ready = false;
+    renderer.compile(scene, camera);
+    loading = false;
+    emit('chapter', { id, vehicle: vdef.id, actions: vdef.actions, onRails: vdef.onRails });
+    if (st.started) emit('mode', st.mode);
+    progress(1, 'ready');
+  }
+
+  /** Chapter-to-chapter transition: fade, swap, fade back. */
+  async function travelToChapter(id) {
+    if (loading || id === chapterId) return;
+    emit('fade', 'chapter');
+    st.paused = true;
+    await new Promise((r) => setTimeout(r, 280));
+    emit('loading', true);
+    try {
+      await loadChapter(id);
+      st.intro = 1;
+    } finally {
+      st.paused = false;
+      emit('loading', false);
+    }
+  }
+
   // ------------------------------------------------------------------- API
   function setMode(mode) {
-    if (mode === st.mode || !st.started) return;
+    if (mode === st.mode || !st.started || loading) return;
     st.mode = mode;
     clearInput();
+    if (st.cine) emit('cine', (st.cine = false));
     if (mode === 'story') {
-      const n = world.nearest(st.x, st.z);
-      st.t = st.tTarget = n.t;
-      st.rejoin = 0;
+      st.t = st.tTarget = vehicle.onRails ? st.t : world.nearest(st.x, st.z).t;
+      st.rejoin = vehicle.onRails ? 1 : 0;
       st.dir = 1;
       st.beat = undefined;
-      if (st.cine) emit('cine', (st.cine = false));
     } else {
-      if (st.cine) emit('cine', (st.cine = false));
-      if (st.dir < 0) st.yaw += 0; // keep whatever way the rider was facing
       st.speed = Math.min(st.speed, 4);
       cam.yaw = st.yaw;
       emit('beat', null);
@@ -594,7 +576,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   }
 
   function nextBeat(dir) {
-    if (st.mode !== 'story') return;
+    if (st.mode !== 'story' || !world) return;
     const B = world.beats;
     const ref = st.tTarget;
     let target = dir > 0 ? 1 : 0;
@@ -613,7 +595,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   }
 
   function returnToRoute() {
-    if (st.mode === 'explore') respawn('route');
+    if (st.mode === 'explore' && !vehicle.onRails) respawn('route');
   }
 
   /** Fast travel to a story point (by poi or beat id). */
@@ -623,16 +605,15 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     if (st.mode === 'story') {
       if (Math.abs(b.t - st.t) > 0.18 && !calm) {
         emit('fade', 'travel');
-        setTimeout(() => {
-          st.t = st.tTarget = b.t;
-          const p = world.pointAt(b.t, rp);
-          st.x = p.x;
-          st.z = p.z;
-          st.y = p.y + 0.05;
-          cam.ready = false;
-        }, 260);
+        setTimeout(() => placeOnRoute(b.t), 260);
       } else st.tTarget = b.t;
-    } else respawn('travel', clamp(b.t - 0.012, 0, 1));
+    } else respawn('travel', clamp(b.t - (vehicle.onRails ? 0 : 0.012), 0, 1));
+  }
+
+  function action(slot) {
+    if (!st.started || st.paused || loading) return;
+    const id = getVehicle(CHAPTERS[chapterId].vehicle).actions[slot];
+    if (id) vehicle.action(id, st, fx);
   }
 
   function start() {
@@ -649,7 +630,8 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
       fps: +perf.fps.toFixed(1), avg: +avg.toFixed(1), min: perf.min === Infinity ? null : +perf.min.toFixed(1),
       calls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
       geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures,
-      quality, dpr: renderer.getPixelRatio(), shadows: sun.castShadow,
+      quality, dpr: renderer.getPixelRatio(), shadows: !!world?.atmosphere.sun.castShadow,
+      chapter: chapterId, assets: assets.loaded.length, assetBytes: assets.bytes,
     };
   }
 
@@ -663,27 +645,30 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     window.removeEventListener('pointermove', onPointerMove);
     window.removeEventListener('pointerup', onPointerUp);
     window.removeEventListener('pointercancel', onPointerUp);
-    world.dispose();
-    bike.dispose();
+    unloadChapter();
+    assets.dispose();
+    shared.dispose();
     splash.geometry.dispose();
     splash.material.dispose();
-    if (sun.shadow.map) sun.shadow.map.dispose();
     renderer.dispose();
     if (ac) ac.close().catch(() => {});
   }
 
-  // First frame: everything is built; compile, place the camera, draw once.
-  setTheme(dark);
-  applyQuality();
-  storyShot(0, want);
-  introFrom.set(st.x + 46, st.y + 40, st.z + 30);
-  if (reduced) introFrom.copy(want.pos);
-  renderer.compile(scene, camera);
+  // First chapter. A reload mid-ride resumes where the rider was.
+  let resume = null;
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(PROGRESS_KEY) || 'null');
+    if (saved && saved.chapter === firstChapter && saved.t > 0.03 && saved.t < 0.995) resume = saved.t;
+  } catch {
+    /* no saved progress */
+  }
+  await loadChapter(firstChapter, { t: resume, progress: onProgress });
+  if (resume) st.intro = 1;
   run();
-  onProgress(1, 'ready');
 
   return {
-    start, setMode, nextBeat, travel, returnToRoute, hop, bell, setTheme, stats, dispose,
+    start, setMode, nextBeat, travel, returnToRoute, action, setTheme, stats, dispose,
+    loadChapter: travelToChapter,
     setPaused(v) {
       st.paused = v;
       if (v) clearInput();
@@ -712,6 +697,16 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     get state() {
       return st;
     },
-    world,
+    get world() {
+      return world;
+    },
+    get vehicle() {
+      return vehicle;
+    },
+    get chapter() {
+      return chapterId;
+    },
+    assets,
+    resumed: !!resume,
   };
 }

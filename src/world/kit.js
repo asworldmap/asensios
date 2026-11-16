@@ -98,6 +98,8 @@ export class Batch {
       g.setAttribute('sway', new THREE.BufferAttribute(w, 1));
     }
 
+    // Primitives are faceted on purpose; authored assets keep their normals.
+    g.computeVertexNormals();
     if (matrix) g.applyMatrix4(matrix);
 
     _c.set(color);
@@ -113,6 +115,45 @@ export class Batch {
     return this;
   }
 
+  /**
+   * Add an authored (Blender) geometry that already carries vertex colours and
+   * normals. COLOR_0 alpha encodes wind: sway = 1 - alpha. `tint` multiplies.
+   */
+  addGeometry(geo, matrix, tint) {
+    const g = geo.index ? geo.toNonIndexed() : geo.clone();
+    for (const k of Object.keys(g.attributes)) if (!['position', 'normal', 'color'].includes(k)) g.deleteAttribute(k);
+    const n = g.attributes.position.count;
+    const src = g.attributes.color;
+    const col = new Float32Array(n * 3);
+    const w = this.sway ? new Float32Array(n) : null;
+    if (tint) _c.set(tint);
+    for (let i = 0; i < n; i++) {
+      let r = 1;
+      let gg = 1;
+      let b = 1;
+      if (src) {
+        r = src.getX(i);
+        gg = src.getY(i);
+        b = src.getZ(i);
+        if (w && src.itemSize === 4) w[i] = 1 - src.getW(i);
+      }
+      if (tint) {
+        r *= _c.r;
+        gg *= _c.g;
+        b *= _c.b;
+      }
+      col[i * 3] = r;
+      col[i * 3 + 1] = gg;
+      col[i * 3 + 2] = b;
+    }
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    if (w) g.setAttribute('sway', new THREE.BufferAttribute(w, 1));
+    if (!g.attributes.normal) g.computeVertexNormals();
+    if (matrix) g.applyMatrix4(matrix);
+    this.parts.push(g);
+    return this;
+  }
+
   get empty() {
     return this.parts.length === 0;
   }
@@ -122,7 +163,6 @@ export class Batch {
     const merged = mergeGeometries(this.parts, false);
     this.parts.forEach((g) => g.dispose());
     this.parts = [];
-    merged.computeVertexNormals();
     return merged;
   }
 }

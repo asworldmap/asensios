@@ -11,6 +11,7 @@ import { initTheme, currentTheme } from './lib/theme.js';
 import { initI18n, getLang } from './lib/i18n.js';
 import { prefersReducedMotion, deviceTier } from './lib/motion.js';
 import { dict } from './i18n/dict.js';
+import { CHAPTERS } from './world/chapters/index.js';
 
 initTheme();
 initI18n();
@@ -61,6 +62,7 @@ let mode = 'story';
 let near = null;
 let beat = null;
 let dialog = null; // { root, restore }
+let chapter = { id: 'murcia', vehicle: 'bicycle', actions: { a: 'hop', b: 'bell' }, onRails: false };
 const hintSeen = { story: false, explore: false };
 
 // ------------------------------------------------------------- Plain mode
@@ -99,30 +101,31 @@ function toast(key) {
 }
 
 // --------------------------------------------------------------- Captions
-const BEAT_KEYS = { divulgalo: 'ch1', beemoney: 'ch9', mwy: 'ch6', eu: 'ch7' };
+const beatInfo = () => (beat && game?.world ? game.world.beats.find((b) => b.id === beat) : null);
 
 function renderCaption() {
-  const show = mode === 'story' && beat;
-  el.caption.classList.toggle('is-on', !!show);
-  if (show) {
-    const ch = BEAT_KEYS[beat];
-    el.capMeta.textContent = ch ? tr(`traj.${ch}.meta`) : tr(`world.beat.${beat}.meta`);
-    el.capTitle.textContent = ch ? tr(`traj.${ch}.title`) : tr(`world.beat.${beat}.title`);
-    el.capText.textContent = ch ? '' : tr(`world.beat.${beat}.text`);
-    el.capLink.hidden = beat !== 'end';
+  const b = mode === 'story' ? beatInfo() : null;
+  el.caption.classList.toggle('is-on', !!b);
+  if (b) {
+    el.capMeta.textContent = tr(b.keys.meta);
+    el.capTitle.textContent = tr(b.keys.title);
+    el.capText.textContent = b.keys.text ? tr(b.keys.text) : '';
+    el.capLink.hidden = !b.link;
+    if (b.link) el.capLink.href = b.link;
   }
   renderOpen();
 }
 
 function renderOpen() {
-  const can = !!near && (mode === 'explore' || (beat && BEAT_KEYS[beat]));
+  const can = !!near && (mode === 'explore' || !!beatInfo()?.poi);
   el.open.hidden = !can;
   if (can) el.openLabel.textContent = tr(near === 'playroom' ? 'world.open.playroom' : 'world.open');
   el.body.classList.toggle('has-near', can && mode === 'explore');
 }
 
 function renderHint() {
-  const key = mode === 'story' ? (coarse ? 'world.hint.storyTouch' : 'world.hint.story') : coarse ? 'world.hint.exploreTouch' : 'world.hint.explore';
+  const free = chapter.onRails ? (coarse ? 'world.hint.railTouch' : 'world.hint.rail') : coarse ? 'world.hint.exploreTouch' : 'world.hint.explore';
+  const key = mode === 'story' ? (coarse ? 'world.hint.storyTouch' : 'world.hint.story') : free;
   el.hint.textContent = tr(key);
   el.hint.classList.toggle('is-on', !hintSeen[mode]);
 }
@@ -130,7 +133,7 @@ function renderHint() {
 function renderMode() {
   $$('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
   el.body.dataset.mode = mode;
-  el.ret.hidden = mode !== 'explore';
+  el.ret.hidden = mode !== 'explore' || chapter.onRails;
   el.storyNav.hidden = mode !== 'story';
   el.joy.hidden = el.pad.hidden = !(coarse && mode === 'explore');
   renderHint();
@@ -224,22 +227,42 @@ function openCard(id = near) {
 el.open.addEventListener('click', () => openCard());
 
 // ------------------------------------------------------------------- Menu
-const PLACES = ['start', 'divulgalo', 'beemoney', 'bridge', 'mwy', 'eu', 'end'];
 function renderTravel() {
   el.travel.innerHTML = '';
-  PLACES.forEach((id, i) => {
+  game.world.beats.filter((b) => b.place).forEach((beatDef, i) => {
     const li = document.createElement('li');
     const b = document.createElement('button');
     b.type = 'button';
     b.innerHTML = `<span class="mono">${String(i + 1).padStart(2, '0')}</span> <span></span>`;
-    b.lastElementChild.textContent = tr(`world.place.${id}`);
+    b.lastElementChild.textContent = tr(beatDef.place);
     b.addEventListener('click', () => {
       closeDialog();
-      game.travel(id);
+      game.travel(beatDef.id);
     });
     li.appendChild(b);
     el.travel.appendChild(li);
   });
+}
+
+/** The HUD follows whichever chapter and vehicle the engine has loaded. */
+function renderChapter() {
+  const def = CHAPTERS[chapter.id];
+  const labels = Array.from(document.querySelectorAll('.pw-chapter'));
+  labels.forEach((n) => n.setAttribute('data-i18n', def.label));
+  const title = document.getElementById('pw-menu-title');
+  title.setAttribute('data-i18n', def.title);
+  [...labels, title].forEach((n) => (n.textContent = tr(n.getAttribute('data-i18n'))));
+  for (const [slot, sel] of [['a', '[data-hop]'], ['b', '[data-bell]']]) {
+    const btn = document.querySelector(sel);
+    const id = chapter.actions[slot];
+    btn.hidden = !id;
+    if (id) {
+      btn.setAttribute('data-i18n-attr', `aria-label:world.touch.${id}`);
+      btn.setAttribute('aria-label', tr(`world.touch.${id}`));
+    }
+  }
+  el.lemons.hidden = true;
+  renderMode();
 }
 
 let mapTimer = 0;
@@ -252,24 +275,27 @@ function drawMap() {
   const css = getComputedStyle(document.documentElement);
   const ink = `rgb(${css.getPropertyValue('--ink-rgb')})`;
   const signal = css.getPropertyValue('--signal').trim();
-  const k = S / 176;
+  let ext = 40;
+  for (let i = 0; i < w.route.N; i += 8) ext = Math.max(ext, Math.abs(w.route.RX[i]), Math.abs(w.route.RZ[i]));
+  const k = S / ((ext + 14) * 2);
   const X = (x) => S / 2 + x * k;
-  const Y = (z) => S / 2 + z * k + 4 * k;
+  const Y = (z) => S / 2 + z * k;
   g.clearRect(0, 0, S, S);
   g.lineCap = g.lineJoin = 'round';
 
-  // River
-  g.strokeStyle = currentTheme() === 'dark' ? '#2f6a66' : '#6aa9a0';
-  g.lineWidth = 9 * k;
-  g.beginPath();
-  for (let x = -88; x <= 88; x += 4) g.lineTo(X(x), Y(w.river(x)));
-  g.stroke();
-
-  // Plaza
-  g.fillStyle = `rgba(${css.getPropertyValue('--ink-rgb')}, 0.12)`;
-  g.beginPath();
-  g.arc(X(w.plaza.x), Y(w.plaza.z), w.plaza.r * k, 0, Math.PI * 2);
-  g.fill();
+  if (w.river) {
+    g.strokeStyle = currentTheme() === 'dark' ? '#2f6a66' : '#6aa9a0';
+    g.lineWidth = 9 * k;
+    g.beginPath();
+    for (let x = -ext - 14; x <= ext + 14; x += 4) g.lineTo(X(x), Y(w.river(x)));
+    g.stroke();
+  }
+  if (w.plaza) {
+    g.fillStyle = `rgba(${css.getPropertyValue('--ink-rgb')}, 0.12)`;
+    g.beginPath();
+    g.arc(X(w.plaza.x), Y(w.plaza.z), w.plaza.r * k, 0, Math.PI * 2);
+    g.fill();
+  }
 
   // Route
   g.strokeStyle = ink;
@@ -368,8 +394,8 @@ function wireJoystick() {
   el.joy.addEventListener('pointercancel', end);
 }
 wireJoystick();
-$('[data-hop]').addEventListener('click', () => game?.hop());
-$('[data-bell]').addEventListener('click', () => game?.bell());
+$('[data-hop]').addEventListener('click', () => game?.action('a'));
+$('[data-bell]').addEventListener('click', () => game?.action('b'));
 
 // Hold-to-ride buttons for story mode (they also step beat by beat on tap).
 function holdButton(btn, dir) {
@@ -431,7 +457,12 @@ el.canvas.addEventListener('pointerdown', () => {
 // ------------------------------------------------------------ Game events
 const TOASTS = { water: 'world.toast.water', edge: 'world.toast.edge', stuck: 'world.toast.stuck' };
 function emit(type, value) {
-  if (type === 'mode') {
+  if (type === 'chapter') {
+    chapter = value;
+    near = null;
+    beat = null;
+    if (game) renderChapter();
+  } else if (type === 'mode') {
     mode = value;
     renderMode();
   } else if (type === 'beat') {
@@ -499,7 +530,9 @@ async function boot() {
       dark: currentTheme() === 'dark',
       onProgress,
       emit,
+      chapter: CHAPTERS[params.get('chapter')] ? params.get('chapter') : 'murcia',
     });
+    renderChapter();
   } catch (err) {
     console.error('[pedal-the-world]', err);
     game = null;

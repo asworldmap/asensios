@@ -11,3 +11,7 @@ dist/
 # Generated blog (tools/blog/build.mjs)
 blog-dist/
 blog-artifacts/
+
+# Blender backups and Python caches
+*.blend1
+__pycache__/

@@ -3,43 +3,45 @@
 // A compact diorama of the valley: the huerta (lemon orchards in rows) on the
 // south bank, the river Segura, a stone bridge, a plaza with a stylised tower,
 // and a mirador on the northern hill. Nothing here is a scan or a downloaded
-// model: terrain, buildings, trees and people are all generated below.
+// model: the land, the tower and the people are generated below; the bridge,
+// houses and lemon trees are our own Blender assets (see docs/world).
 //
 // The chapter owns its geography (height field + route), its props, its
 // colliders, its ambient life and its lighting. The engine (game.js) only
 // asks: "how high is the ground here?", "where is the road?", "what is near?".
 
 import * as THREE from 'three';
-import { Batch, M, P, rng, noise, clamp, lerp, smooth, between, textTexture } from './kit.js';
+import { Batch, M, P, rng, noise, clamp, lerp, smooth, between, textTexture } from '../kit.js';
+import { createRoute } from '../route.js';
+import { createAtmosphere, DEFAULT_PALETTE } from '../atmosphere.js';
+import { enhance, createWaterMaterial } from '../shading.js';
 
 const WATER_Y = -0.5;
 const ROAD_HALF = 1.7;
-const DECK_Y = 1.55;
-const SAMPLES = 640;
+const DECK_Y = 2.95; // the bridge asset needs this much air under its arches
+const DECK_HALF = 2.45; // rideable half-width between the parapets
 const BOUNDS = 74;
 
 // Route control points (x, z). South (+z) is the huerta, north the old town.
+// The three points around the river are collinear so the crossing is straight.
 const ROUTE = [
-  [-48, 56], [-37, 44], [-46, 30], [-31, 19], [-13, 22], [0, 12],
-  [4, -3], [7, -17], [15, -29], [11, -44], [22, -54], [36, -50], [45, -60],
+  [-48, 56], [-37, 44], [-46, 30], [-31, 19], [-13, 22], [1, 12],
+  [4, -3], [7, -18], [15, -29], [11, -44], [22, -54], [36, -50], [45, -60],
 ];
 
 const riverZ = (x) => -4 + 4 * Math.sin(x * 0.045 + 0.6);
 
-const PAL = {
-  day: {
-    skyTop: '#9cc3c4', skyHorizon: '#e5d6bb', fog: '#e5d6bb',
-    sun: '#fff0d2', sunI: 2.25, hemiSky: '#fbf1dc', hemiGround: '#b79a68', hemiI: 1.35,
-    water: '#5fa39a', window: '#3d4a4a', glow: 0, cloud: 0.92, orb: '#fff6dc',
-  },
-  night: {
-    skyTop: '#060a08', skyHorizon: '#13211a', fog: '#0c120e',
-    sun: '#9fc0d8', sunI: 0.75, hemiSky: '#3f5f66', hemiGround: '#10160f', hemiI: 0.95,
-    water: '#16302f', window: '#ffd98a', glow: 1, cloud: 0.16, orb: '#e9f2e4',
-  },
+// Late-afternoon Mediterranean light by day; moonlit town by night.
+const PALETTE = {
+  day: { ...DEFAULT_PALETTE.day },
+  night: { ...DEFAULT_PALETTE.night },
+};
+const THEME = {
+  day: { deep: '#3f8f88', shallow: '#8cc6b6', foam: '#f3efe0', window: '#3b4747', glow: 0, cloud: 0.9, lamp: '#f1e9d6', signal: '#3fbf16', paint: '#ffffff', glint: 0.36 },
+  night: { deep: '#0f2a2b', shallow: '#1f4a47', foam: '#6f8c86', window: '#ffd98a', glow: 1, cloud: 0.14, lamp: '#ffe1a0', signal: '#93f75a', paint: '#8f8a7c', glint: 0.14 },
 };
 
-export async function buildMurcia({ scene, tier, step }) {
+export async function build({ scene, tier, step, assets, shared }) {
   const R = rng(20260);
   const group = new THREE.Group();
   scene.add(group);
@@ -47,29 +49,9 @@ export async function buildMurcia({ scene, tier, step }) {
   const track = (o) => (disposables.push(o), o);
 
   // ------------------------------------------------------------------ Route
-  const curve = new THREE.CatmullRomCurve3(ROUTE.map(([x, z]) => new THREE.Vector3(x, 0, z)), false, 'centripetal');
-  const pts = curve.getSpacedPoints(SAMPLES);
-  const N = pts.length;
-  const length = curve.getLength();
-  const RX = new Float32Array(N);
-  const RZ = new Float32Array(N);
-  const TX = new Float32Array(N);
-  const TZ = new Float32Array(N);
-  const RY = new Float32Array(N);
+  const route = createRoute(ROUTE, { samples: 640 });
+  const { N, length, RX, RZ, TX, TZ, RY, nearest, pointAt, beside } = route;
   const bridge = new Uint8Array(N);
-  for (let i = 0; i < N; i++) {
-    RX[i] = pts[i].x;
-    RZ[i] = pts[i].z;
-  }
-  for (let i = 0; i < N; i++) {
-    const a = Math.max(0, i - 1);
-    const b = Math.min(N - 1, i + 1);
-    const dx = RX[b] - RX[a];
-    const dz = RZ[b] - RZ[a];
-    const l = Math.hypot(dx, dz) || 1;
-    TX[i] = dx / l;
-    TZ[i] = dz / l;
-  }
 
   function raw(x, z) {
     let h = 0.95 + 0.55 * noise(x * 0.045, z * 0.045) + 0.22 * noise(x * 0.13 + 7, z * 0.13 - 3);
@@ -81,101 +63,58 @@ export async function buildMurcia({ scene, tier, step }) {
   }
 
   const nearestOut = { i: 0, d: 0, t: 0, y: 0, side: 0, f: 0 };
-  /** Closest point on the route: distance, param t, road height, signed side. */
-  function nearest(x, z, out = nearestOut) {
-    let best = 0;
-    let bd = Infinity;
-    for (let i = 0; i < N; i += 2) {
-      const dx = x - RX[i];
-      const dz = z - RZ[i];
-      const d = dx * dx + dz * dz;
-      if (d < bd) {
-        bd = d;
-        best = i;
-      }
-    }
-    // Refine onto the neighbouring segments so d and t are continuous.
-    let bi = best;
-    let bf = 0;
-    bd = Infinity;
-    for (let s = Math.max(0, best - 2); s < Math.min(N - 1, best + 2); s++) {
-      const ax = RX[s];
-      const az = RZ[s];
-      const ex = RX[s + 1] - ax;
-      const ez = RZ[s + 1] - az;
-      const f = clamp(((x - ax) * ex + (z - az) * ez) / (ex * ex + ez * ez || 1));
-      const dx = x - (ax + ex * f);
-      const dz = z - (az + ez * f);
-      const d = dx * dx + dz * dz;
-      if (d < bd) {
-        bd = d;
-        bi = s;
-        bf = f;
-      }
-    }
-    out.i = bi;
-    out.f = bf;
-    out.d = Math.sqrt(bd);
-    out.t = (bi + bf) / (N - 1);
-    out.y = lerp(RY[bi], RY[bi + 1], bf);
-    out.side = (x - RX[bi]) * TZ[bi] - (z - RZ[bi]) * TX[bi]; // >0 = left of travel
-    return out;
-  }
-
-  /** Position/tangent/height on the route at param t (0..1). */
-  function pointAt(t, out = {}) {
-    const u = clamp(t) * (N - 1);
-    const i = Math.min(N - 2, Math.floor(u));
-    const f = u - i;
-    out.x = lerp(RX[i], RX[i + 1], f);
-    out.z = lerp(RZ[i], RZ[i + 1], f);
-    out.y = lerp(RY[i], RY[i + 1], f);
-    out.tx = lerp(TX[i], TX[i + 1], f);
-    out.tz = lerp(TZ[i], TZ[i + 1], f);
-    const l = Math.hypot(out.tx, out.tz) || 1;
-    out.tx /= l;
-    out.tz /= l;
-    return out;
-  }
-  /** A spot beside the road: `side` metres to the left (+) or right (-). */
-  const beside = (t, side) => {
-    const p = pointAt(t);
-    return { x: p.x + p.tz * side, z: p.z - p.tx * side, tx: p.tx, tz: p.tz, yaw: Math.atan2(p.tx, p.tz) };
-  };
 
   // Plaza: a paved disc the road runs through.
   const plazaAt = beside(0.66, 6.5);
   const plaza = { x: plazaAt.x, z: plazaAt.z, r: 11, y: raw(plazaAt.x, plazaAt.z) + 0.15 };
   const inPlaza = (x, z) => Math.hypot(x - plaza.x, z - plaza.z) < plaza.r;
 
+  // The bridge is a fixed-length asset: find the middle of the water crossing
+  // and give the deck exactly the span the asset has.
+  const bridgeLen = assets.get('murcia/bridge_segura').entry.params.length;
+  let w0 = -1;
+  let w1 = -1;
+  for (let i = 0; i < N; i++) {
+    if (raw(RX[i], RZ[i]) < 0.3) {
+      if (w0 < 0) w0 = i;
+      w1 = i;
+    }
+  }
+  const bMid = Math.round((w0 + w1) / 2);
+  const perSample = length / (N - 1);
+  const b0 = Math.max(0, Math.round(bMid - bridgeLen / 2 / perSample));
+  const b1 = Math.min(N - 1, Math.round(bMid + bridgeLen / 2 / perSample));
+  for (let i = b0; i <= b1; i++) bridge[i] = 1;
+  const bridgeT = [b0 / (N - 1), b1 / (N - 1)];
+
   // Road profile: follows the land, levels on the bridge and through the plaza.
   {
     const tmp = new Float32Array(N);
     for (let i = 0; i < N; i++) {
       const h = raw(RX[i], RZ[i]);
-      bridge[i] = h < 0.3 ? 1 : 0;
       RY[i] = bridge[i] ? DECK_Y : inPlaza(RX[i], RZ[i]) ? plaza.y : Math.max(h, 0.45);
     }
     for (let pass = 0; pass < 3; pass++) {
       for (let i = 0; i < N; i++) {
-        let s = 0;
+        let sum = 0;
         let n = 0;
         for (let k = -16; k <= 16; k++) {
-          const j = clamp(i + k, 0, N - 1);
-          s += RY[j];
+          sum += RY[clamp(i + k, 0, N - 1)];
           n++;
         }
-        tmp[i] = s / n;
+        tmp[i] = sum / n;
       }
       RY.set(tmp);
     }
+    // The deck itself is level; only the approaches ramp.
+    for (let i = b0; i <= b1; i++) RY[i] = DECK_Y;
+    for (let pass = 0; pass < 2; pass++) {
+      for (let i = 1; i < N - 1; i++) tmp[i] = bridge[i] ? DECK_Y : (RY[i - 1] + RY[i] * 2 + RY[i + 1]) / 4;
+      tmp[0] = RY[0];
+      tmp[N - 1] = RY[N - 1];
+      RY.set(tmp);
+    }
   }
-  let b0 = bridge.indexOf(1);
-  let b1 = bridge.lastIndexOf(1);
-  b0 = Math.max(0, b0 - 4);
-  b1 = Math.min(N - 1, b1 + 4);
-  for (let i = b0; i <= b1; i++) bridge[i] = 1;
-  const bridgeT = [b0 / (N - 1), b1 / (N - 1)];
 
   // Level pads for buildings and sets; filled in before the terrain is meshed.
   const pads = [plaza];
@@ -211,9 +150,10 @@ export async function buildMurcia({ scene, tier, step }) {
     out.t = n.t;
     out.onBridge = false;
     out.onRoad = n.d < ROAD_HALF + 0.3;
-    if (bridge[n.i] && n.d < ROAD_HALF + 0.45 && terr < n.y) {
-      out.y = n.y + 0.05;
+    if (bridge[n.i] && n.d < DECK_HALF + 0.3) {
+      out.y = DECK_Y + 0.05;
       out.onBridge = true;
+      out.onRoad = true;
     } else {
       out.y = lerp(terr, n.y + 0.05, 1 - smooth(ROAD_HALF, ROAD_HALF + 0.8, n.d));
       if (bridge[n.i]) out.y = terr;
@@ -255,14 +195,16 @@ export async function buildMurcia({ scene, tier, step }) {
 
   // ------------------------------------------------------------ Story data
   const mid = (bridgeT[0] + bridgeT[1]) / 2;
+  const tr = (ch) => ({ meta: `traj.${ch}.meta`, title: `traj.${ch}.title` });
+  const own = (id) => ({ meta: `world.beat.${id}.meta`, title: `world.beat.${id}.title`, text: `world.beat.${id}.text` });
   const beats = [
-    { t: 0, id: 'start' },
-    { t: 0.145, id: 'divulgalo', poi: 'divulgalo' },
-    { t: 0.335, id: 'beemoney', poi: 'beemoney' },
-    { t: mid, id: 'bridge', cine: true },
-    { t: 0.66, id: 'mwy', poi: 'mwy' },
-    { t: 0.815, id: 'eu', poi: 'eu' },
-    { t: 1, id: 'end' },
+    { t: 0, id: 'start', keys: own('start'), place: 'world.place.start' },
+    { t: 0.145, id: 'divulgalo', poi: 'divulgalo', keys: tr('ch1'), place: 'world.place.divulgalo' },
+    { t: 0.335, id: 'beemoney', poi: 'beemoney', keys: tr('ch9'), place: 'world.place.beemoney' },
+    { t: mid, id: 'bridge', cine: true, keys: own('bridge'), place: 'world.place.bridge' },
+    { t: 0.66, id: 'mwy', poi: 'mwy', keys: tr('ch6'), place: 'world.place.mwy' },
+    { t: 0.815, id: 'eu', poi: 'eu', keys: tr('ch7'), place: 'world.place.eu' },
+    { t: 1, id: 'end', keys: own('end'), place: 'world.place.end', link: '/trajectory/' },
   ];
   const sideOf = (id) => Math.sign(nearest(sites[id].x, sites[id].z, _n).side) || 1;
   // Camera keyframes in the bike's frame: metres behind, to its left, above; look-ahead; lens.
@@ -273,7 +215,7 @@ export async function buildMurcia({ scene, tier, step }) {
     { t: 0.24, back: 9.5, side: 0, up: 5.6, ahead: 5, lift: 0.6, fov: 48 },
     { t: 0.335, back: 6.4, side: -5 * sideOf('beemoney'), up: 2.7, ahead: 1.5, lift: 1.1, fov: 42 },
     { t: bridgeT[0] - 0.035, back: 7.5, side: 1.5, up: 3.2, ahead: 4, lift: 1, fov: 46 },
-    { t: mid, back: 0.5, side: 15, up: 2.7, ahead: 0.5, lift: 1.1, fov: 27 },
+    { t: mid, back: 0.5, side: 16, up: 3.5, ahead: 0.5, lift: 1.0, fov: 27 },
     { t: bridgeT[1] + 0.04, back: 8, side: -1.5, up: 3.6, ahead: 4, lift: 1, fov: 46 },
     { t: 0.66, back: 8.5, side: -7.5 * sideOf('mwy'), up: 6.6, ahead: 0, lift: 0.4, fov: 44, lookSide: 5 * sideOf('mwy') },
     { t: 0.745, back: 7.5, side: 0, up: 3.4, ahead: 4, lift: 1, fov: 46 },
@@ -303,43 +245,106 @@ export async function buildMurcia({ scene, tier, step }) {
     return false;
   };
 
+  // ------------------------------------------------------- Town planning
+  // Decided before the land is meshed, so every house gets level ground.
+  const HOUSES = ['murcia/townhouse_a', 'murcia/townhouse_b', 'murcia/townhouse_c'];
+  const TINTS = ['#ffffff', '#fbf3e4', '#f3ede0', '#fff7ea'];
+  const townPlan = [];
+  const plan = (x, z, yaw, key, pad) => {
+    townPlan.push({ x, z, yaw, key, tint: TINTS[townPlan.length % TINTS.length] });
+    addPad(x, z, pad);
+    reserved.push({ x, z, r: pad + 2 });
+  };
+  {
+    let made = 0;
+    for (let k = 0; k < 60 && made < 17; k++) {
+      const a = (k / 30) * Math.PI * 2 + R() * 0.3;
+      const r = plaza.r + 7.5 + (k % 3) * 6.5 + R() * 2.5;
+      const x = plaza.x + Math.cos(a) * r;
+      const z = plaza.z + Math.sin(a) * r;
+      if (!free(x, z, 6) || heightNoPads(x, z) > 4.5) continue;
+      if (townPlan.some((h) => Math.hypot(h.x - x, h.z - z) < 8.4)) continue;
+      plan(x, z, Math.atan2(plaza.x - x, plaza.z - z) + (R() - 0.5) * 0.4, HOUSES[made % 3], 3.3);
+      made++;
+    }
+    for (const [x, z, yaw] of [[-20, 37, 0.6], [14, 31, -0.4], [-66, 22, 1.2], [30, 13, 0.2]]) {
+      if (free(x, z, 6.5)) plan(x, z, yaw, 'murcia/farmhouse', 4.6);
+    }
+  }
+  // The start: a farmhouse beside the first metres of road, so the ride begins
+  // somewhere instead of on a bare hill.
+  // It sits just behind the start line, so the opening shot has a home in it.
+  {
+    const s0 = pointAt(0);
+    const hx = s0.x - s0.tx * 10.5 + s0.tz * 6.5;
+    const hz = s0.z - s0.tz * 10.5 - s0.tx * 6.5;
+    plan(hx, hz, Math.atan2(s0.x + s0.tx * 6 - hx, s0.z + s0.tz * 6 - hz), 'murcia/farmhouse', 4.8);
+  }
+
   await step('terrain', 0.15);
 
   // -------------------------------------------------------------- Terrain
+  // Smooth-shaded and painted per vertex: zones blend into each other the way
+  // land does, instead of changing colour along triangle edges.
+  const terrainMat = track(enhance(new THREE.MeshLambertMaterial({ vertexColors: true }), shared, { furrows: true, breakup: 0.2 }));
   {
     const SIZE = 280;
     const SEG = 140;
-    const geo = new THREE.PlaneGeometry(SIZE, SIZE, SEG, SEG);
+    const geo = track(new THREE.PlaneGeometry(SIZE, SIZE, SEG, SEG));
     geo.rotateX(-Math.PI / 2);
     const pos = geo.attributes.position;
-    for (let i = 0; i < pos.count; i++) pos.setY(i, heightAt(pos.getX(i), pos.getZ(i)));
-    const flat = geo.toNonIndexed();
-    geo.dispose();
-    const p = flat.attributes.position;
-    const col = new Float32Array(p.count * 3);
+    const col = new Float32Array(pos.count * 3);
+    const zone = new Float32Array(pos.count);
+    const C = (h) => new THREE.Color(h);
+    const K = {
+      huertaA: C('#93a956'), huertaB: C('#aab861'), dryA: C('#dcc590'), dryB: C('#cdb27c'), rockA: C('#c8ab7b'), rockB: C('#b6986c'),
+      scrub: C('#a8a66a'), sand: C('#dccb9a'), bed: C('#7e8c69'), plaza: C('#d9c8a3'), verge: C('#cdb88c'),
+    };
     const c = new THREE.Color();
-    for (let i = 0; i < p.count; i += 3) {
-      const x = (p.getX(i) + p.getX(i + 1) + p.getX(i + 2)) / 3;
-      const y = (p.getY(i) + p.getY(i + 1) + p.getY(i + 2)) / 3;
-      const z = (p.getZ(i) + p.getZ(i + 1) + p.getZ(i + 2)) / 3;
-      const rd = Math.abs(z - riverZ(x));
-      const south = z > riverZ(x);
-      if (y < WATER_Y) c.set('#8f9a72');
-      else if (rd < 10.5 && y < 0.75) c.set('#d6c493');
-      else if (Math.hypot(x - plaza.x, z - plaza.z) < plaza.r + 1.2) c.set((Math.floor(x / 2) + Math.floor(z / 2)) % 2 ? '#dccba6' : '#d3c099');
-      else if (y > 4.2) c.set(y > 7 ? '#bfa277' : '#c9ac7c');
-      else if (south) c.set(Math.floor((x + z * 0.35) / 5.2) % 2 ? '#9fb05c' : '#8ea552');
-      else c.set(noise(x * 0.09, z * 0.09) > 0.1 ? '#d9c28e' : '#d1b781');
-      c.offsetHSL(0, 0, (R() - 0.5) * 0.045 + noise(x * 0.2, z * 0.2) * 0.012);
-      for (let k = 0; k < 3; k++) {
-        col[(i + k) * 3] = c.r;
-        col[(i + k) * 3 + 1] = c.g;
-        col[(i + k) * 3 + 2] = c.b;
-      }
+    const t = new THREE.Color();
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const z = pos.getZ(i);
+      const y = heightAt(x, z);
+      pos.setY(i, y);
+      const rz = riverZ(x);
+      const rd = Math.abs(z - rz);
+      const n1 = noise(x * 0.06, z * 0.06) * 0.5 + 0.5;
+      const n2 = noise(x * 0.21 + 9, z * 0.21 - 4);
+      let zn = 0;
+      if (z > rz) {
+        c.lerpColors(K.huertaA, K.huertaB, n1);
+        zn = 1;
+      } else c.lerpColors(K.dryA, K.dryB, n1);
+      // Hills: scrub first, then bare rock.
+      const wS = smooth(2.8, 4.6, y);
+      const wH = smooth(4.4, 7.2, y);
+      if (wS > 0) c.lerp(K.scrub, wS * (z > rz ? 0.85 : 0.35));
+      if (wH > 0) c.lerp(t.lerpColors(K.rockA, K.rockB, n2 * 0.5 + 0.5), wH);
+      zn *= 1 - wS;
+      // River banks and bed.
+      const wB = (1 - smooth(8.5, 12.5, rd)) * (1 - smooth(0.35, 1.4, y));
+      if (wB > 0) c.lerp(K.sand, wB);
+      if (y < WATER_Y + 0.25) c.lerp(K.bed, smooth(WATER_Y + 0.25, WATER_Y - 0.5, y));
+      zn *= 1 - wB;
+      // Trodden ground beside the road, paving in the plaza.
+      const nr = nearest(x, z, _n);
+      const wR = bridge[nr.i] ? 0 : 1 - smooth(2.4, 5.6, nr.d);
+      if (wR > 0) c.lerp(K.verge, wR * 0.6);
+      zn *= 1 - wR;
+      const wP = 1 - smooth(plaza.r + 0.4, plaza.r + 3.2, Math.hypot(x - plaza.x, z - plaza.z));
+      if (wP > 0) c.lerp(K.plaza, wP);
+      zn *= 1 - wP;
+      const v = 1 + n2 * 0.05;
+      col[i * 3] = c.r * v;
+      col[i * 3 + 1] = c.g * v;
+      col[i * 3 + 2] = c.b * v;
+      zone[i] = zn;
     }
-    flat.setAttribute('color', new THREE.BufferAttribute(col, 3));
-    flat.computeVertexNormals();
-    const mesh = new THREE.Mesh(track(flat), track(new THREE.MeshLambertMaterial({ vertexColors: true })));
+    geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    geo.setAttribute('zone', new THREE.BufferAttribute(zone, 1));
+    geo.computeVertexNormals();
+    const mesh = new THREE.Mesh(geo, terrainMat);
     mesh.receiveShadow = true;
     group.add(mesh);
   }
@@ -351,13 +356,13 @@ export async function buildMurcia({ scene, tier, step }) {
   {
     const pos = [];
     const col = [];
-    const road = new THREE.Color('#8b7b68');
-    const edge = new THREE.Color('#a39178');
+    const road = new THREE.Color('#8f7f6b');
+    const edge = new THREE.Color('#b3a184');
     const push = (x, y, z, c) => {
       pos.push(x, y, z);
       col.push(c.r, c.g, c.b);
     };
-    const W = [-ROAD_HALF - 0.75, -ROAD_HALF, ROAD_HALF, ROAD_HALF + 0.75];
+    const W = [-ROAD_HALF - 0.72, -ROAD_HALF, ROAD_HALF, ROAD_HALF + 0.72];
     const D = [-0.3, 0, 0, -0.3];
     for (let i = 0; i < N - 1; i++) {
       for (let k = 0; k < 3; k++) {
@@ -372,7 +377,7 @@ export async function buildMurcia({ scene, tier, step }) {
     g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
     g.computeVertexNormals();
-    const mesh = new THREE.Mesh(track(g), track(new THREE.MeshLambertMaterial({ vertexColors: true })));
+    const mesh = new THREE.Mesh(track(g), track(enhance(new THREE.MeshLambertMaterial({ vertexColors: true }), shared, { breakup: 0.16 })));
     mesh.receiveShadow = true;
     group.add(mesh);
 
@@ -438,40 +443,15 @@ export async function buildMurcia({ scene, tier, step }) {
   const ROOFS = ['#b5573a', '#a94f35', '#c0623f'];
   const glowSpots = [];
 
-  function house(x, z, yaw, w, d, h, style) {
-    const y = heightAt(x, z);
-    const base = M(x, y, z, yaw);
-    const wall = WALLS[Math.floor(R() * WALLS.length)];
-    S.add(P.box, wall, local(base, 0, h / 2 - 0.4, 0, 0, w, h + 0.8, d));
-    if (style === 'flat') {
-      S.add(P.box, wall, local(base, 0, h + 0.12, 0, 0, w + 0.25, 0.24, d + 0.25));
-      S.add(P.box, WALLS[0], local(base, w * 0.2, h + 0.6, -d * 0.15, 0, w * 0.35, 0.9, d * 0.4));
-    } else {
-      S.add(prism, ROOFS[Math.floor(R() * ROOFS.length)], local(base, 0, h, 0, 0, w + 0.5, Math.min(w, d) * 0.42, d + 0.5));
-    }
-    const cols = Math.max(1, Math.round(w / 1.6));
-    const floors = Math.max(1, Math.round(h / 1.9));
-    for (let f = 0; f < floors; f++) {
-      for (let c = 0; c < cols; c++) {
-        const lx = (c - (cols - 1) / 2) * (w / cols);
-        const ly = 1.25 + f * 1.8;
-        if (f === 0 && c === Math.floor(cols / 2)) {
-          S.add(P.box, '#6b4a2e', local(base, lx, 0.75, d / 2 + 0.03, 0, 0.7, 1.5, 0.08));
-        } else {
-          Wn.add(P.box, '#ffffff', local(base, lx, ly, d / 2 + 0.03, 0, 0.5, 0.7, 0.06));
-          if (R() > 0.5) S.add(P.box, '#3f6b55', local(base, lx - 0.36, ly, d / 2 + 0.04, 0, 0.14, 0.74, 0.05));
-        }
-        if (R() > 0.4) Wn.add(P.box, '#ffffff', local(base, lx, ly, -d / 2 - 0.03, 0, 0.5, 0.7, 0.06));
-      }
-    }
-    solid(x, z, Math.max(w, d) * 0.56);
-    if (Math.min(w, d) / Math.max(w, d) < 0.72) {
-      const o = Math.abs(w - d) * 0.3;
-      const ax = w > d ? Math.cos(yaw) : Math.sin(yaw);
-      const az = w > d ? -Math.sin(yaw) : Math.cos(yaw);
-      solid(x + ax * o, z + az * o, Math.min(w, d) * 0.6);
-      solid(x - ax * o, z - az * o, Math.min(w, d) * 0.6);
-    }
+  const batches = { static: S, veg: V, window: Wn, glow: Lg };
+  /** Merge a Blender asset into the chapter's batches and register what it brings. */
+  function stamp(key, x, z, yaw, { y = heightAt(x, z), scale = 1, tint, ownColliders = true } = {}) {
+    const out = assets.stamp(key, batches, M(x, y, z, yaw, scale), { tint });
+    if (ownColliders) out.colliders.forEach((c) => colliders.push(c));
+    out.anchors.forEach((a) => {
+      if (a.kind === 'lamp') glowSpots.push([a.x, groundAt(a.x, a.z).y, a.z]);
+    });
+    return out;
   }
 
   function lamp(x, z) {
@@ -483,33 +463,11 @@ export async function buildMurcia({ scene, tier, step }) {
     solid(x, z, 0.18);
   }
 
-  // Bridge: deck, curbs and piers over the Segura.
+  // Bridge over the Segura: a Blender asset, set down along the crossing.
   {
-    const STONE = '#cdb48a';
-    for (let i = b0; i < b1; i += 4) {
-      const j = Math.min(b1, i + 4);
-      const a = new THREE.Vector3(RX[i], RY[i] - 0.3, RZ[i]);
-      const b = new THREE.Vector3(RX[j], RY[j] - 0.3, RZ[j]);
-      const yaw = Math.atan2(b.x - a.x, b.z - a.z);
-      const len = a.distanceTo(b) + 0.05;
-      const mid = a.clone().add(b).multiplyScalar(0.5);
-      S.add(P.box, STONE, M(mid.x, mid.y, mid.z, yaw, ROAD_HALF * 2 + 1.5, 0.6, len));
-      for (const s of [-1, 1]) {
-        const ox = Math.cos(yaw) * s * (ROAD_HALF + 0.55);
-        const oz = -Math.sin(yaw) * s * (ROAD_HALF + 0.55);
-        S.add(P.box, '#d9c39b', M(mid.x + ox, mid.y + 0.42, mid.z + oz, yaw, 0.32, 0.3, len));
-      }
-    }
-    const span = b1 - b0;
-    for (const f of [0.3, 0.7]) {
-      const i = Math.round(b0 + span * f);
-      const yaw = Math.atan2(TX[i], TZ[i]);
-      S.add(P.box, STONE, M(RX[i], (RY[i] - 2.2) / 2 - 0.3, RZ[i], yaw, ROAD_HALF * 2 + 2.1, RY[i] + 2.2, 1.3));
-      S.add(P.cyl8, STONE, M(RX[i], WATER_Y + 0.15, RZ[i], yaw, 1.1, 0.5, 1.1));
-    }
-    for (const i of [b0 + 2, b1 - 2]) {
-      for (const s of [-1, 1]) lamp(RX[i] + TZ[i] * s * (ROAD_HALF + 0.55), RZ[i] - TX[i] * s * (ROAD_HALF + 0.55));
-    }
+    const mx = (RX[b0] + RX[b1]) / 2;
+    const mz = (RZ[b0] + RZ[b1]) / 2;
+    stamp('murcia/bridge_segura', mx, mz, Math.atan2(RX[b1] - RX[b0], RZ[b1] - RZ[b0]), { y: DECK_Y });
   }
 
   // Tower and nave — inspired by a baroque bell tower, proportions invented.
@@ -549,29 +507,109 @@ export async function buildMurcia({ scene, tier, step }) {
     bell.y = y + 16.3;
   }
 
-  // Town: a loose ring of houses around the plaza, plus a few on the huerta.
+  // Town and farmhouses, where the plan put them.
+  for (const h of townPlan) stamp(h.key, h.x, h.z, h.yaw, { y: heightAt(h.x, h.z) - 0.06, tint: h.tint });
+  for (let k = 0; k < 6; k++) {
+    const a = (k / 6) * Math.PI * 2 + 0.5;
+    const lx = plaza.x + Math.cos(a) * (plaza.r - 0.6);
+    const lz = plaza.z + Math.sin(a) * (plaza.r - 0.6);
+    if (nearest(lx, lz, _n).d > 3) lamp(lx, lz);
+  }
+
+  // Plaza floor: rings of pavers, a star of pale stone where people gather.
   {
-    let made = 0;
-    for (let k = 0; k < 60 && made < 19; k++) {
-      const a = (k / 30) * Math.PI * 2 + R() * 0.3;
-      const r = plaza.r + 7 + (k % 3) * 6.5 + R() * 2.5;
-      const x = plaza.x + Math.cos(a) * r;
-      const z = plaza.z + Math.sin(a) * r;
-      if (!free(x, z, 5.5) || heightAt(x, z) > 4.5) continue;
-      if (colliders.some((c) => Math.hypot(c.x - x, c.z - z) < c.r + 4.4)) continue;
-      const w = 3.4 + R() * 2.6;
-      const d = 3.2 + R() * 1.6;
-      house(x, z, Math.atan2(plaza.x - x, plaza.z - z) + (R() - 0.5) * 0.5, w, d, 2.6 + Math.floor(R() * 3) * 1.5, R() > 0.62 ? 'flat' : 'gable');
-      made++;
+    const pos = [];
+    const col = [];
+    const c = new THREE.Color();
+    const tones = ['#dccba6', '#d2bf98', '#e2d3b1', '#c9b68f'];
+    const quad = (pts, hex, j = 0.05) => {
+      c.set(hex).offsetHSL(0, 0, (R() - 0.5) * j);
+      for (const k of [0, 1, 2, 0, 2, 3]) {
+        pos.push(pts[k][0], plaza.y + pts[k][1], pts[k][2]);
+        col.push(c.r, c.g, c.b);
+      }
+    };
+    for (let r0 = 0.6, ring = 0; r0 < plaza.r - 0.2; r0 += 1.15, ring++) {
+      const r1 = Math.min(plaza.r, r0 + 1.1);
+      const n = Math.max(8, Math.round((Math.PI * 2 * r1) / 1.5));
+      for (let k = 0; k < n; k++) {
+        const a0 = ((k + (ring % 2) * 0.5) / n) * Math.PI * 2;
+        const a1 = a0 + (Math.PI * 2) / n - 0.035 / r1;
+        const P2 = (r, a) => [plaza.x + Math.cos(a) * r, 0.02, plaza.z + Math.sin(a) * r];
+        quad([P2(r0, a0), P2(r0, a1), P2(r1, a1), P2(r1, a0)], tones[(ring + (k % 2)) % tones.length]);
+      }
     }
-    for (const [x, z, yaw] of [[-20, 36, 0.6], [14, 30, -0.4], [-66, 22, 1.2], [30, 12, 0.2]]) {
-      if (free(x, z, 5)) house(x, z, yaw, 5, 3.6, 2.6, 'gable');
+    const sx = sites.mwy.x;
+    const sz = sites.mwy.z;
+    for (let k = 0; k < 16; k++) {
+      const a0 = (k / 16) * Math.PI * 2;
+      const a1 = ((k + 1) / 16) * Math.PI * 2;
+      const r0 = k % 2 ? 1.05 : 2.5;
+      const r1 = k % 2 ? 2.5 : 1.05;
+      c.set(k % 4 < 2 ? '#efe4c9' : '#e6d6b4');
+      for (const [r, a] of [[0, 0], [r1, a1], [r0, a0]]) {
+        pos.push(sx + Math.cos(a) * r, plaza.y + 0.032, sz + Math.sin(a) * r);
+        col.push(c.r, c.g, c.b);
+      }
     }
-    for (let k = 0; k < 6; k++) {
-      const a = (k / 6) * Math.PI * 2 + 0.5;
-      const lx = plaza.x + Math.cos(a) * (plaza.r - 0.6);
-      const lz = plaza.z + Math.sin(a) * (plaza.r - 0.6);
-      if (nearest(lx, lz, _n).d > 3) lamp(lx, lz);
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    g.computeVertexNormals();
+    S.addGeometry(g);
+    g.dispose();
+    // Benches and planters round the edge.
+    for (const a of [1.45, 3.05, 4.6]) {
+      const bx = plaza.x + Math.cos(a) * (plaza.r - 1.6);
+      const bz = plaza.z + Math.sin(a) * (plaza.r - 1.6);
+      if (nearest(bx, bz, _n).d < 3.4 || inSight(bx, bz)) continue;
+      const base = M(bx, plaza.y, bz, -a + Math.PI / 2);
+      S.add(P.box, '#8a6a45', local(base, 0, 0.46, 0, 0, 1.9, 0.08, 0.5));
+      S.add(P.box, '#8a6a45', local(base, 0, 0.78, -0.24, 0, 1.9, 0.34, 0.06));
+      for (const o of [-0.8, 0.8]) S.add(P.box, '#cdb48a', local(base, o, 0.22, 0, 0, 0.16, 0.44, 0.5));
+      solid(bx, bz, 0.8);
+    }
+    for (const a of [0.15, 2.25, 3.85, 5.6]) {
+      const bx = plaza.x + Math.cos(a) * (plaza.r - 0.9);
+      const bz = plaza.z + Math.sin(a) * (plaza.r - 0.9);
+      if (nearest(bx, bz, _n).d < 3.2 || inSight(bx, bz)) continue;
+      S.add(P.cyl8, '#cdb48a', M(bx, plaza.y + 0.3, bz, 0, 0.62, 0.6, 0.62));
+      V.add(P.ico1, '#5c8c40', M(bx, plaza.y + 0.95, bz, R() * 3, 0.72, 0.6, 0.72), () => 0.4);
+      V.add(P.ico, '#c9463d', M(bx + 0.25, plaza.y + 1.25, bz + 0.1, 0, 0.2), () => 0.5);
+      V.add(P.ico, '#e08a9a', M(bx - 0.3, plaza.y + 1.15, bz - 0.2, 0, 0.17), () => 0.5);
+      solid(bx, bz, 0.7);
+    }
+  }
+
+  // The start line: a banner across the road, a milestone and dry-stone walls.
+  {
+    const a = pointAt(0.034);
+    const yaw = Math.atan2(a.tx, a.tz);
+    const base = M(a.x, a.y, a.z, yaw);
+    for (const o of [-2.75, 2.75]) {
+      S.add(P.cyl8, '#7a5a3a', local(base, o, 2.1, 0, 0, 0.09, 4.2, 0.09));
+      S.add(P.box, '#cdb48a', local(base, o, 0.22, 0, 0, 0.5, 0.44, 0.5));
+      const wp = new THREE.Vector3(o, 0, 0).applyMatrix4(base);
+      solid(wp.x, wp.z, 0.3);
+    }
+    S.add(P.box, '#27512f', local(base, 0, 3.75, 0, 0, 5.5, 0.62, 0.05));
+    const ms = beside(0.011, -2.6);
+    const my = heightAt(ms.x, ms.z);
+    S.add(P.box, '#e6dcc4', M(ms.x, my + 0.32, ms.z, ms.yaw, 0.4, 0.7, 0.24));
+    S.add(P.cyl8, '#b5573a', M(ms.x, my + 0.68, ms.z, ms.yaw, 0.2, 0.24, 0.12, 0, Math.PI / 2));
+    solid(ms.x, ms.z, 0.3);
+    // Walls of field stones, two courses, with gaps to ride through.
+    for (const [t0, t1, side] of [[0.042, 0.072, 3.3], [0.05, 0.1, -3.3], [0.105, 0.128, 3.3]]) {
+      let prev = null;
+      for (let t = t0; t < t1; t += 0.0031) {
+        const q = beside(t, side + (R() - 0.5) * 0.12);
+        const y = heightAt(q.x, q.z);
+        for (let course = 0; course < 2; course++) {
+          S.add(P.box, ['#cdb48a', '#bfa67c', '#d8c39a', '#b59b72'][Math.floor(R() * 4)], M(q.x, y + 0.2 + course * 0.36, q.z, q.yaw + (R() - 0.5) * 0.25, 0.42 + R() * 0.1, 0.34 + R() * 0.06, 0.6 + R() * 0.18));
+        }
+        if (prev) colliders.push({ type: 'segment', ax: prev.x, az: prev.z, bx: q.x, bz: q.z, r: 0.28, x: q.x, z: q.z });
+        prev = q;
+      }
     }
   }
 
@@ -580,21 +618,15 @@ export async function buildMurcia({ scene, tier, step }) {
   // ------------------------------------------------------------ Vegetation
   const lemonTrees = [];
   const swayTop = (y0, y1) => (y) => smooth(y0, y1, y);
+  const LEAF_TINTS = ['#ffffff', '#f2f6e6', '#fff6e2', '#e8f0dc', '#f6f1d8'];
   function lemonTree(x, z) {
     const y = heightAt(x, z);
-    const s = 0.85 + R() * 0.4;
-    const base = M(x, y, z, R() * 6, s);
-    V.add(P.cyl6, '#6b4a2e', local(base, 0, 0.7, 0, 0, 0.13, 1.5, 0.13));
-    const g1 = ['#4f7f3a', '#58893e', '#477436'][Math.floor(R() * 3)];
-    V.add(P.ico1, g1, local(base, 0, 2.1, 0, R() * 3, 1.25, 1.05, 1.25), swayTop(-1, 1));
-    V.add(P.ico, '#5f9143', local(base, 0.5, 2.6, 0.2, R() * 3, 0.75, 0.65, 0.75), swayTop(-1, 1));
-    for (let k = 0; k < 5; k++) {
-      const a = R() * 6.28;
-      V.add(P.ico, '#f2d024', local(base, Math.cos(a) * 1.05, 1.7 + R() * 0.8, Math.sin(a) * 1.05, 0, 0.11, 0.1, 0.14), () => 0.6);
-    }
-    const tree = { x, z, y: y + 2 * s, drops: 2, cool: 0 };
+    const s = 0.88 + R() * 0.3;
+    const close = nearest(x, z, _n).d < 15 || Object.values(sites).some((q) => Math.hypot(q.x - x, q.z - z) < 14);
+    stamp(close ? 'murcia/lemon_tree' : 'murcia/lemon_tree_far', x, z, R() * 6.28, { y: y - 0.04, scale: s, tint: LEAF_TINTS[Math.floor(R() * LEAF_TINTS.length)], ownColliders: false });
+    const tree = { x, z, y: y + 2.1 * s, drops: 2, cool: 0 };
     lemonTrees.push(tree);
-    solid(x, z, 0.5, { tree });
+    solid(x, z, 0.45 * s, { tree });
   }
   function palm(x, z) {
     const y = heightAt(x, z);
@@ -636,8 +668,8 @@ export async function buildMurcia({ scene, tier, step }) {
       if (z < riverZ(x) + 10 || !free(x, z)) continue;
       const h = heightAt(x, z);
       if (h > 5.4) continue;
-      const far = Math.hypot(x, z) > 82;
-      if (far && R() < 0.5) continue;
+      if (Math.hypot(x, z) > 96) continue;
+      if (Math.hypot(x, z) > 80 && R() < 0.5) continue;
       lemonTree(x, z);
     }
   }
@@ -945,24 +977,12 @@ export async function buildMurcia({ scene, tier, step }) {
   }
 
   // Commit the merged static geometry.
-  const windowMat = track(new THREE.MeshBasicMaterial({ color: PAL.day.window }));
-  const lampMat = track(new THREE.MeshBasicMaterial({ color: '#fff3c4' }));
-  const wind = { value: 0 };
-  const vegMat = track(new THREE.MeshLambertMaterial({ vertexColors: true }));
-  vegMat.onBeforeCompile = (sh) => {
-    sh.uniforms.uWind = wind;
-    sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', '#include <common>\nattribute float sway;\nuniform float uWind;')
-      .replace(
-        '#include <begin_vertex>',
-        `#include <begin_vertex>
-         float ph = uWind * 1.4 + position.x * 0.31 + position.z * 0.27;
-         transformed.x += sin(ph) * 0.085 * sway;
-         transformed.z += cos(ph * 0.83) * 0.06 * sway;`
-      );
-  };
+  const windowMat = track(new THREE.MeshBasicMaterial({ color: THEME.day.window }));
+  const lampMat = track(new THREE.MeshBasicMaterial({ color: THEME.day.lamp }));
+  const staticMat = track(enhance(new THREE.MeshLambertMaterial({ vertexColors: true }), shared, { see: true, breakup: 0.2 }));
+  const vegMat = track(enhance(new THREE.MeshLambertMaterial({ vertexColors: true }), shared, { sway: true, see: true, breakup: 0.14 }));
   {
-    const sm = new THREE.Mesh(track(S.build()), track(new THREE.MeshLambertMaterial({ vertexColors: true })));
+    const sm = new THREE.Mesh(track(S.build()), staticMat);
     const vm = new THREE.Mesh(track(V.build()), vegMat);
     sm.castShadow = sm.receiveShadow = vm.castShadow = true;
     vm.receiveShadow = true;
@@ -982,11 +1002,18 @@ export async function buildMurcia({ scene, tier, step }) {
   await step('life', 0.88);
 
   // ---------------------------------------------------------- Water & sky
-  const waterMat = track(new THREE.MeshLambertMaterial({ color: PAL.day.water, transparent: true, opacity: 0.9 }));
+  const waterMat = track(createWaterMaterial(shared));
   {
-    const w = new THREE.Mesh(track(new THREE.PlaneGeometry(290, 46)), waterMat);
-    w.rotation.x = -Math.PI / 2;
-    w.position.set(0, WATER_Y, -4);
+    const wg = track(new THREE.PlaneGeometry(290, 46, 145, 23));
+    wg.rotateX(-Math.PI / 2);
+    wg.translate(0, WATER_Y, -4);
+    const wp = wg.attributes.position;
+    const shore = new Float32Array(wp.count);
+    // 1 where the bed is shallow (the banks), 0 in the deep channel.
+    for (let i = 0; i < wp.count; i++) shore[i] = smooth(-1.45, -0.62, heightAt(wp.getX(i), wp.getZ(i)));
+    wg.setAttribute('shore', new THREE.BufferAttribute(shore, 1));
+    const w = new THREE.Mesh(wg, waterMat);
+    w.receiveShadow = true;
     group.add(w);
   }
   const glints = [];
@@ -1001,29 +1028,8 @@ export async function buildMurcia({ scene, tier, step }) {
     }
   }
 
-  const skyU = { top: { value: new THREE.Color(PAL.day.skyTop) }, horizon: { value: new THREE.Color(PAL.day.skyHorizon) } };
-  const sky = new THREE.Mesh(
-    track(new THREE.SphereGeometry(400, 20, 12)),
-    track(
-      new THREE.ShaderMaterial({
-        side: THREE.BackSide,
-        depthWrite: false,
-        fog: false,
-        uniforms: skyU,
-        vertexShader: 'varying float h; void main(){ h = normalize(position).y; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
-        fragmentShader:
-          'uniform vec3 top; uniform vec3 horizon; varying float h; void main(){ float t = smoothstep(0.02, 0.5, h); gl_FragColor = vec4(mix(horizon, top, t), 1.0); \n#include <colorspace_fragment>\n }',
-      })
-    )
-  );
-  sky.renderOrder = -10;
-  group.add(sky);
-  const orbMat = track(new THREE.MeshBasicMaterial({ color: PAL.day.orb, fog: false }));
-  const orb = new THREE.Mesh(track(new THREE.CircleGeometry(9, 28)), orbMat);
-  group.add(orb);
-
   const clouds = [];
-  const cloudMat = track(new THREE.MeshBasicMaterial({ color: '#fbf5e6', transparent: true, opacity: PAL.day.cloud, fog: false }));
+  const cloudMat = track(new THREE.MeshBasicMaterial({ color: '#fbf5e6', transparent: true, opacity: THEME.day.cloud, fog: false }));
   {
     const B = new Batch({ jitter: 0 });
     for (let k = 0; k < 4; k++) B.add(P.ico1, '#ffffff', M((k - 1.5) * 3.2, (k % 2) * 0.9, (k % 3) * 0.8, k, 3 + (k % 2) * 1.2, 1.5, 2.4));
@@ -1037,16 +1043,8 @@ export async function buildMurcia({ scene, tier, step }) {
     }
   }
 
-  // --------------------------------------------------------------- Lights
-  const hemi = new THREE.HemisphereLight(PAL.day.hemiSky, PAL.day.hemiGround, PAL.day.hemiI);
-  const sun = new THREE.DirectionalLight(PAL.day.sun, PAL.day.sunI);
-  const sunDir = new THREE.Vector3(-0.55, 0.62, 0.56).normalize();
-  group.add(hemi, sun, sun.target);
-  const fog = new THREE.Fog(PAL.day.fog, 55, 150);
-  scene.fog = fog;
-  orb.position.copy(sunDir).multiplyScalar(-1).setY(0.2).normalize().multiplyScalar(380);
-  orb.position.y = 70;
-  orb.lookAt(0, 0, 0);
+  // ---------------------------------------------------------- Light and air
+  const atmo = createAtmosphere(scene, PALETTE);
 
   // ----------------------------------------------------------- Ambient life
   const pigeons = [];
@@ -1139,7 +1137,21 @@ export async function buildMurcia({ scene, tier, step }) {
   } catch {
     /* falls back to Georgia */
   }
-  roadPaint('MURCIA', 0.035, { width: 2.9 });
+  roadPaint('MURCIA', 0.062, { width: 2.9 });
+  {
+    const { tex, aspect } = textTexture('SALIDA', { size: 120, color: '#f6efdf' });
+    track(tex);
+    const a = pointAt(0.034);
+    const mat = track(new THREE.MeshBasicMaterial({ map: tex, transparent: true }));
+    const geo = track(new THREE.PlaneGeometry(0.5 * aspect, 0.5));
+    for (const flip of [0, Math.PI]) {
+      const m = new THREE.Mesh(geo, mat);
+      m.position.set(a.x, a.y + 3.75, a.z);
+      m.rotation.y = Math.atan2(a.tx, a.tz) + flip;
+      m.translateZ(0.035);
+      group.add(m);
+    }
+  }
   roadPaint('¡VENGA!', 0.235, { width: 2.7, italic: true });
   roadPaint('SEGURA', bridgeT[0] - 0.022, { width: 2.6 });
   roadPaint('¡ÁNIMO!', 0.9, { width: 2.7, italic: true });
@@ -1161,31 +1173,30 @@ export async function buildMurcia({ scene, tier, step }) {
   }
 
   // --------------------------------------------------------------- Theming
-  let dark = false;
-  const cA = new THREE.Color();
-  function setTheme(isDark) {
-    dark = isDark;
-    const p = isDark ? PAL.night : PAL.day;
-    skyU.top.value.set(p.skyTop);
-    skyU.horizon.value.set(p.skyHorizon);
-    fog.color.set(p.fog);
-    scene.background = cA.set(p.fog).clone();
-    sun.color.set(p.sun);
-    sun.intensity = p.sunI;
-    hemi.color.set(p.hemiSky);
-    hemi.groundColor.set(p.hemiGround);
-    hemi.intensity = p.hemiI;
-    waterMat.color.set(p.water);
-    windowMat.color.set(p.window);
-    glowMat.opacity = p.glow * 0.22;
-    cloudMat.opacity = p.cloud;
-    orbMat.color.set(p.orb);
-    orb.scale.setScalar(isDark ? 0.55 : 1);
-    lampMat.color.set(isDark ? '#ffe1a0' : '#f6efdf');
-    markerMat.color.set(isDark ? '#93f75a' : '#3fbf16');
-    ringMat.color.set(isDark ? '#93f75a' : '#3fbf16');
-    paintMat.forEach((m) => m.color.set(isDark ? '#8f8a7c' : '#ffffff'));
-    glintMat.opacity = isDark ? 0.16 : 0.4;
+  // Chapter materials follow the atmosphere's day ↔ night blend.
+  {
+    const D = {};
+    const Nn = {};
+    for (const key of ['deep', 'shallow', 'foam', 'window', 'lamp', 'signal', 'paint']) {
+      D[key] = new THREE.Color(THEME.day[key]);
+      Nn[key] = new THREE.Color(THEME.night[key]);
+    }
+    const wc = waterMat.userData.colors;
+    atmo.onBlend((k) => {
+      wc.uDeep.value.lerpColors(D.deep, Nn.deep, k);
+      wc.uShallow.value.lerpColors(D.shallow, Nn.shallow, k);
+      wc.uFoam.value.lerpColors(D.foam, Nn.foam, k);
+      // Windows and lamps come on as the light goes, not at the flick of a switch.
+      const on = smooth(0.42, 0.78, k);
+      windowMat.color.lerpColors(D.window, Nn.window, on);
+      lampMat.color.lerpColors(D.lamp, Nn.lamp, on);
+      glowMat.opacity = on * 0.22;
+      cloudMat.opacity = lerp(THEME.day.cloud, THEME.night.cloud, k);
+      markerMat.color.lerpColors(D.signal, Nn.signal, k);
+      ringMat.color.copy(markerMat.color);
+      paintMat.forEach((m) => m.color.lerpColors(D.paint, Nn.paint, k));
+      glintMat.opacity = lerp(THEME.day.glint, THEME.night.glint, k);
+    });
   }
 
   // ---------------------------------------------------------------- Update
@@ -1219,7 +1230,6 @@ export async function buildMurcia({ scene, tier, step }) {
   function update(s) {
     const { dt, time } = s;
     events.length = 0;
-    if (!s.calm) wind.value = time;
 
     // Photo boards load when the rider is heading their way, not before.
     for (const e of easels) {
@@ -1301,7 +1311,7 @@ export async function buildMurcia({ scene, tier, step }) {
     for (const p of pigeons) {
       if (!p.fly && Math.hypot(p.hx - s.x, p.hz - s.z) < 3.6 && Math.abs(s.speed) > 1) {
         scatterPigeons();
-        events.push({ type: 'pigeons' });
+        events.push({ type: 'secret', id: 'pigeons' });
       }
       if (p.fly) {
         p.fly += dt;
@@ -1378,7 +1388,6 @@ export async function buildMurcia({ scene, tier, step }) {
       b.m.rotation.z -= b.vx * dt * 3;
     }
 
-    sky.position.set(s.x, 0, s.z);
     return events;
   }
   const _v = new THREE.Vector3();
@@ -1391,23 +1400,43 @@ export async function buildMurcia({ scene, tier, step }) {
 
   function dispose() {
     disposables.forEach((d) => d.dispose && d.dispose());
+    atmo.dispose();
     scene.remove(group);
-    scene.fog = null;
   }
 
   await step('ready', 1);
 
+  const start = pointAt(0);
   return {
     id: 'murcia',
-    group, sun, sunDir, fog,
+    group,
+    atmosphere: atmo,
+    route: { length, RX, RZ, N, closed: false, bridgeT },
     heightAt, groundAt, nearest, pointAt,
-    route: { length, RX, RZ, N, bridgeT },
-    river: riverZ,
+    waterY: WATER_Y,
+    rideHeight: 0.05,
     bounds: BOUNDS,
+    river: riverZ,
     colliders, pois, beats, shots, plaza, tower, bell,
-    dropLemon, scatterPigeons, update, setTheme, dispose,
-    get dark() {
-      return dark;
+    cine: [[bridgeT[0] - 0.012, bridgeT[1] + 0.012]],
+    establishing: { from: [start.x + 44, start.y + 38, start.z + 26], look: [start.x + 14, start.y - 2, start.z - 22] },
+    /** Nearest safe point on the route: never the middle of the bridge. */
+    safeT(x, z) {
+      const t = nearest(x, z).t;
+      if (t > bridgeT[0] - 0.01 && t < bridgeT[1] + 0.01) return z > riverZ(x) ? bridgeT[0] - 0.02 : bridgeT[1] + 0.02;
+      return t;
     },
+    /** A vehicle hit something: lemon trees answer with a lemon. */
+    bump(c, st) {
+      return c.tree && dropLemon(c.tree, st.x, st.z) ? 'tree' : null;
+    },
+    /** A sound was made: ring the bell near the tower and the tower answers. */
+    heard(kind, st) {
+      if (kind !== 'bell' || Math.hypot(tower.x - st.x, tower.z - st.z) > 22) return null;
+      scatterPigeons();
+      return { tone: [392, 0.16, 2.6], delay: 520, secret: 'bell' };
+    },
+    update,
+    dispose,
   };
 }
