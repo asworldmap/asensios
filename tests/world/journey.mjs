@@ -6,12 +6,38 @@ import { open } from './lib.mjs';
 const stages = [
   { id: 'europe', model: 'train_cab', part: 'PART_wheelset_front1', card: 'ch5' },
   { id: 'europe-bus', model: 'coach_bus', part: 'PART_wheel_fl', card: 'ch7' },
-  { id: 'asia', model: 'airliner', part: 'PART_gear_main_l', card: 'ch4' },
   { id: 'japan', model: 'passenger_ship', part: 'PART_propeller', card: 'ch8' },
+  { id: 'flight', model: 'airliner', part: 'PART_gear_main_l', card: 'ch4' },
   { id: 'chile', model: 'city_bike', part: 'PART_wheel_front', card: 'ch10' },
 ];
 
-const { b, p, errs, wait } = await open({ reduced: true, quality: 1 });
+const { b, p, errs, wait } = await open({
+  reduced: true, quality: 0,
+  init: () => {
+    const Native = window.AudioContext;
+    const audio = window.journeyAudio = { beds: 0, ended: 0, volume: [], bedGains: [] };
+    window.AudioContext = class extends Native {
+      createGain() {
+        const node = super.createGain();
+        const gain = node.gain;
+        const index = audio.bedGains.push([]) - 1;
+        const schedule = gain.setTargetAtTime.bind(gain);
+        gain.setTargetAtTime = (value, time, constant) => {
+          (index === 0 ? audio.volume : audio.bedGains[index]).push([value, constant]);
+          return schedule(value, time, constant);
+        };
+        return node;
+      }
+      createBufferSource() {
+        const source = super.createBufferSource();
+        audio.beds++;
+        source.addEventListener('ended', () => audio.ended++);
+        return source;
+      }
+    };
+  },
+});
+p.setDefaultTimeout(120000);
 try {
   const stats = () => p.evaluate(() => window.__pw.game.stats());
   const chapter = (id) => p.waitForFunction((target) => window.__pw.game.chapter === target, id);
@@ -28,11 +54,23 @@ try {
   assert.ok(initial.some((url) => url.endsWith('/vehicles/city_bike.glb')));
   assert.ok(!initial.some((url) => /\/(train_cab|coach_bus|airliner|passenger_ship)\.glb$/.test(url)));
 
-  // Arrival in Murcia continues into the same journey, without a reload.
+  // Travel with the story controls. Each arrival hands off without a menu or reload.
   await p.click('[data-menu-open]');
-  await p.locator('[data-travel] button').last().click();
-  await p.locator('[data-chapter-next]').click();
+  const order = await p.locator('[data-chapter-id]').evaluateAll((buttons) => buttons.map((button) => button.dataset.chapterId));
+  assert.deepEqual(order, ['murcia', ...stages.map(({ id }) => id)]);
+  await p.uncheck('[data-set-sound]');
+  await p.keyboard.press('Escape');
+  await p.waitForFunction(() => window.journeyAudio?.volume.at(-1)?.[0] === 0);
+  await p.click('[data-menu-open]');
+  await p.check('[data-set-sound]');
+  await p.keyboard.press('Escape');
+  await p.waitForFunction(() => window.journeyAudio?.volume.at(-1)?.[0] === 0.68);
+  for (let i = 0; i < 3; i++) await p.click('[data-next]');
   await chapter('europe');
+  await p.waitForFunction(() => window.journeyAudio.beds === 2 && window.journeyAudio.ended === 1);
+  assert.ok(await p.evaluate(() =>
+    window.journeyAudio.bedGains.some((settings) => settings.some(([value, time]) => value === 0 && time === 0.24))
+  ));
 
   for (const stage of stages) {
     assert.equal(await p.evaluate(() => window.__pw.game.state.mode), 'story');
@@ -58,15 +96,16 @@ try {
         const g = window.__pw.game;
         g.state.t = g.state.tTarget = 0.93;
         g.state.speed = 8;
-        return g.vehicle.object.getObjectByName('PART_door_l1').position.z;
+        return g.assets.get('vehicles/train_cab').entry.rig.find((part) => part.name === 'PART_door_l1').pivot[2];
       });
       await p.keyboard.down('KeyW');
       await p.waitForFunction(() => window.__pw.game.state.t === 1 && window.__pw.game.state.speed === 0);
       await p.keyboard.up('KeyW');
       await p.waitForFunction((z) => Math.abs(window.__pw.game.vehicle.object.getObjectByName('PART_door_l1').position.z - z) > 0.6, closed);
     }
-    if (stage.id === 'asia') {
+    if (stage.id === 'flight') {
       await p.waitForFunction(() => window.__pw.game.state.y > 28);
+      assert.notDeepEqual(await pose(), before, 'gear retracted in flight');
       const oldYaw = await p.evaluate(() => window.__pw.game.state.yaw);
       await p.keyboard.press('Space');
       await p.keyboard.down('KeyA');
@@ -74,9 +113,14 @@ try {
       await p.keyboard.up('KeyA');
       assert.ok(await p.evaluate((yaw) => Math.abs(window.__pw.game.state.yaw - yaw) > 0.14, oldYaw));
       await p.keyboard.press('Space');
-      await p.waitForFunction(() => window.__pw.game.state.t > 0.86);
-    }
-    assert.notDeepEqual(await pose(), before, stage.part);
+      await p.waitForFunction(() => {
+        const g = window.__pw.game;
+        const gear = g.vehicle.object.getObjectByName('PART_gear_main_l');
+        return g.state.t > 0.86 && g.state.y < 0.15 && !g.state.airborne && Math.abs(gear.quaternion.z) < 0.07;
+      });
+      assert.equal(await p.evaluate(() => window.__pw.game.chapter), 'flight');
+      console.log('PASS guided touchdown and landing gear');
+    } else assert.notDeepEqual(await pose(), before, stage.part);
 
     if (stage.id === 'europe-bus') {
       await p.evaluate(() => window.__pw.game.travel('europe-bus_start'));
@@ -126,14 +170,14 @@ try {
 
     await p.click('[data-mode="story"]');
     await p.click('[data-menu-open]');
-    await p.locator('[data-travel] button').last().click();
+    await p.locator('[data-travel] button').nth(1).click();
     await p.locator('[data-open]').click();
     assert.equal(await p.getAttribute('[data-card-link]', 'href'), '/trajectory/#' + stage.card);
     assert.ok((await p.getAttribute('[data-card-img]', 'src')).endsWith('.webp'));
     await p.keyboard.press('Escape');
     const current = stages.indexOf(stage);
     if (current < stages.length - 1) {
-      await p.locator('[data-chapter-next]').click();
+      await p.click('[data-next]');
       await chapter(stages[current + 1].id);
     } else {
       assert.equal(await p.getAttribute('[data-cap-link]', 'href'), '/trajectory/');
@@ -153,15 +197,15 @@ try {
   const fail = '**/vehicles/airliner.glb';
   await p.route(fail, (request) => request.fulfill({ status: 503, body: 'test load failure' }));
   await p.click('[data-menu-open]');
-  await p.click('[data-chapter-id="asia"]');
-  await p.waitForFunction(() => document.querySelector('[data-chapter-loading]').hidden);
+  await p.click('[data-chapter-id="flight"]');
+  await p.waitForFunction(() => document.querySelector('[data-toast]').textContent.includes('Reintenta'));
   assert.equal((await stats()).chapter, 'murcia');
   assert.equal((await stats()).assets, city.assets);
   assert.ok((await p.locator('[data-toast]').textContent()).includes('Reintenta'));
   await p.unroute(fail);
-  await select('asia');
+  await select('flight');
   assert.ok(errs.every((error) => error.includes('503')), errs.join('\n'));
-  console.log('PASS chapter memory, failed load and retry');
+  console.log('PASS continuous order, audio crossfades, mute, chapter memory and retry');
 } finally {
   await b.close();
 }

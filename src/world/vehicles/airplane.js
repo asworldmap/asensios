@@ -53,9 +53,11 @@ export const airplane = {
         if (st.lock > 0) return;
         const throttle = clamp(input.up - input.down + input.joyY, -1, 1);
         if (!st.speed && throttle <= 0.1 && st.y < 2) return;
-        const rollLimit = st.t > 0.89 && !flyingFree ? 0 : 44;
-        st.speed = rollLimit === 0 ? damp(st.speed, 0, 2.8, dt) : Math.min(rollLimit, st.speed + dt * 16);
-        if (st.speed < 0.05) st.speed = 0;
+        const runwayLimit = 62 - 51 * smooth(world.landing, 1, st.t);
+        const speedLimit = flyingFree ? 57 : runwayLimit;
+        st.speed = st.speed > speedLimit
+          ? damp(st.speed, speedLimit, 2.1, dt)
+          : Math.min(speedLimit, st.speed + dt * 19);
         if (flyingFree) {
           st.steer = damp(st.steer, input.left - input.right - input.joyX, 4, dt);
           st.slope = damp(st.slope, throttle * 0.24, 3, dt);
@@ -70,10 +72,11 @@ export const airplane = {
             fx.respawn('edge', Math.min(st.t, 0.8));
           }
         } else {
-          const t = clamp(st.t + st.speed * dt / world.route.length, 0, 0.96);
+          const t = clamp(st.t + st.speed * dt / world.route.length);
           const p = world.pointAt(t);
           const next = world.pointAt(t + 0.004);
           const yaw = Math.atan2(p.tx, p.tz);
+          if (t === 1) st.speed = 0;
           st.steer = clamp(Math.sin(yaw - st.yaw) * 5, -1, 1);
           st.yaw = dampAngle(st.yaw, yaw, 5, dt);
           if (t === st.t) st.slope = 0;

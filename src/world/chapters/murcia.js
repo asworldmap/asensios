@@ -199,12 +199,12 @@ export async function build({ scene, tier, step, assets, shared }) {
   const own = (id) => ({ meta: `world.beat.${id}.meta`, title: `world.beat.${id}.title`, text: `world.beat.${id}.text` });
   const beats = [
     { t: 0, id: 'start', keys: own('start'), place: 'world.place.start' },
-    { t: 0.145, id: 'divulgalo', poi: 'divulgalo', keys: tr('ch1'), place: 'world.place.divulgalo' },
+    { t: 0.145, id: 'divulgalo', optional: true, poi: 'divulgalo', keys: tr('ch1'), place: 'world.place.divulgalo' },
     { t: 0.335, id: 'beemoney', poi: 'beemoney', keys: tr('ch9'), place: 'world.place.beemoney' },
-    { t: mid, id: 'bridge', cine: true, keys: own('bridge'), place: 'world.place.bridge' },
+    { t: mid, id: 'bridge', optional: true, cine: true, keys: own('bridge'), place: 'world.place.bridge' },
     { t: 0.66, id: 'mwy', poi: 'mwy', keys: tr('ch6'), place: 'world.place.mwy' },
-    { t: 0.815, id: 'eu', poi: 'eu', keys: tr('ch7'), place: 'world.place.eu' },
-    { t: 1, id: 'end', keys: own('end'), place: 'world.place.end', link: '/trajectory/', next: true },
+    { t: 0.815, id: 'eu', optional: true, poi: 'eu', keys: tr('ch7'), place: 'world.place.eu' },
+    { t: 1, id: 'end', keys: own('end'), place: 'world.place.end', next: true },
   ];
   const sideOf = (id) => Math.sign(nearest(sites[id].x, sites[id].z, _n).side) || 1;
   // Camera keyframes in the bike's frame: metres behind, to its left, above; look-ahead; lens.
@@ -699,18 +699,15 @@ export async function build({ scene, tier, step, assets, shared }) {
       V.add(P.ico, z > riverZ(x) ? '#6f9a48' : '#8a9a5a', M(x, h + 0.25, z, R() * 6, 0.5 + R() * 0.5, 0.4 + R() * 0.2, 0.5 + R() * 0.5), swayTop(-1, 1));
     }
   }
-  // Distant sierras that close the valley.
-  {
-    const B = new Batch({ jitter: 0.03, seed: 5 });
-    for (let k = 0; k < 44; k++) {
-      const a = (k / 44) * Math.PI * 2 + R() * 0.1;
-      const r = 150 + R() * 26;
-      const h = 8 + R() * 9;
-      const w = 30 + R() * 22;
-      B.add(P.ico1, k % 3 ? '#d3c09a' : '#c9b48c', M(Math.cos(a) * r, -3, Math.sin(a) * r, R() * 6, w, h, w * (0.6 + R() * 0.3)));
-      if (k % 2) B.add(P.ico, '#cfbb94', M(Math.cos(a + 0.07) * (r - 14), -2, Math.sin(a + 0.07) * (r - 14), R() * 6, w * 0.5, h * 0.55, w * 0.4));
-    }
-    group.add(new THREE.Mesh(track(B.build()), track(new THREE.MeshLambertMaterial({ vertexColors: true }))));
+  // The horizon pieces face inward and stay out of the riding space.
+  for (let i = 0; i < 8; i++) {
+    const a = i * Math.PI / 4;
+    stamp('murcia_v2/sierra_backdrop', Math.sin(a) * 180, Math.cos(a) * 180, a + Math.PI,
+      { y: -3, scale: 1.9, ownColliders: false });
+  }
+  for (const t of [0.18, 0.22, 0.72]) {
+    const p = beside(t, 7);
+    if (free(p.x, p.z, 4) && !inSight(p.x, p.z)) stamp('murcia_v2/olive_tree', p.x, p.z, p.yaw, { scale: 0.8 });
   }
 
   await step('stories', 0.75);
@@ -937,13 +934,17 @@ export async function build({ scene, tier, step, assets, shared }) {
     solid(arcade.x, arcade.z, 0.7);
   }
 
-  // Mirador: a bench, a railing and a signpost toward the next chapter.
+  // Station forecourt, where the ride hands off to the train.
   let signpost;
   {
     const s = sites.mirador;
     const end = pointAt(1);
     const yaw = Math.atan2(end.tx, end.tz);
     const y = heightAt(s.x, s.z);
+    const station = offset(s, yaw, 9, 9);
+    stamp('europe_v2/station_building', station.x, station.z, yaw + Math.PI, { y: heightAt(station.x, station.z) - 0.25, scale: 0.62 });
+    const notice = offset(s, yaw, -3.2, 1.2);
+    stamp('murcia_v2/notice_board', notice.x, notice.z, yaw + Math.PI);
     for (let k = -3; k <= 3; k++) {
       const p = offset(s, yaw, k * 1.1, 4.2 - Math.abs(k) * 0.25);
       S.add(P.cyl6, '#7a5a3a', M(p.x, heightAt(p.x, p.z) + 0.5, p.z, 0, 0.07, 1, 0.07));

@@ -16,7 +16,8 @@
 import * as THREE from 'three';
 import { createAssets } from './assets.js';
 import { createShared } from './shading.js';
-import { CHAPTERS } from './chapters/index.js';
+import { createJourneyAudio } from './audio.js';
+import { CHAPTERS, JOURNEY } from './chapters/index.js';
 import { getVehicle } from './vehicles/index.js';
 import { clamp, lerp, smooth, damp, dampAngle } from './kit.js';
 
@@ -46,9 +47,15 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   let loading = false;
   let transitioning = false;
   let retained = [];
+  let storyBookmark = null;
+  let transfer = null;
+  let transferAge = 0;
+  let stayHere = false;
+  let introSeconds = 3.4;
   let isDark = dark;
   let calm = reduced;
-  let sound = true;
+  const audio = createJourneyAudio();
+  const tone = audio.tone;
 
   // ---------------------------------------------------------------- State
   const st = {
@@ -104,30 +111,6 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     vehicle.setTheme(v);
   }
 
-  // ---------------------------------------------------------------- Audio
-  let ac = null;
-  function tone(freq, gain, len, type = 'sine', partials = [1, 2.76]) {
-    if (!sound) return;
-    try {
-      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
-      if (ac.state === 'suspended') ac.resume();
-      const now = ac.currentTime;
-      partials.forEach((m, i) => {
-        const o = ac.createOscillator();
-        const g = ac.createGain();
-        o.type = type;
-        o.frequency.value = freq * m;
-        g.gain.setValueAtTime(gain / (i + 1), now);
-        g.gain.exponentialRampToValueAtTime(0.0001, now + len / (i + 1));
-        o.connect(g).connect(ac.destination);
-        o.start(now);
-        o.stop(now + len);
-      });
-    } catch {
-      /* no audio — nothing else changes */
-    }
-  }
-
   // Services a vehicle or chapter may ask the engine for.
   const fx = {
     respawn,
@@ -147,7 +130,10 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
       if (kind === 'bell') {
         tone(1560, 0.1, 0.9);
         setTimeout(() => tone(1560, 0.08, 0.9), 150);
-      } else if (kind === 'horn') tone(311, 0.09, 1.1, 'triangle', [1, 1.19]);
+      } else if (kind === 'horn') {
+        const pitch = chapterId === 'japan' ? 114 : chapterId === 'europe' ? 178 : 311;
+        tone(pitch, 0.09, 1.1, 'triangle', [1, 1.19]);
+      }
       const reply = world.heard?.(kind, st);
       if (reply) {
         if (reply.tone) setTimeout(() => tone(...reply.tone), reply.delay || 0);
@@ -179,10 +165,12 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
 
   function updateStory(dt) {
     const hold = input.up - input.down + input.adv + (Math.abs(input.joyY) > 0.2 ? input.joyY : 0);
-    st.tTarget = clamp(st.tTarget + (hold * 0.06 * dt * 230 * (world.storyRate || 1)) / world.route.length + input.wheel, 0, 1);
+    st.tTarget = clamp(st.tTarget + (hold * 0.06 * dt * 230 * (world.storyRate || 1)) / world.route.length + input.wheel, 0, transfer?.t ?? 1);
     input.wheel = 0;
     const prev = st.t;
-    st.t = damp(st.t, st.tTarget, 3.4, dt);
+    const progress = damp(st.t, st.tTarget, 3.4, dt) - st.t;
+    const step = world.storySpeed ? world.storySpeed * dt / world.route.length : Infinity;
+    st.t += clamp(progress, -step, step);
     if (Math.abs(st.tTarget - st.t) < 1e-5) st.t = st.tTarget;
     const delta = st.t - prev;
     if (delta > 2e-5) st.dir = 1;
@@ -201,7 +189,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     st.speed = ((Math.abs(delta) * world.route.length) / Math.max(dt, 1e-4)) * (vehicle.onRails ? st.dir : 1);
     st.steer = clamp(((st.yaw - prevYaw) / Math.max(dt, 1e-4)) * 0.55, -1, 1);
     st.pedal = Math.abs(st.speed) > 0.25 ? 1 : 0;
-    st.airborne = false;
+    st.airborne = world.landing != null && p.y > 1;
 
     const p2 = world.pointAt(st.t + 0.004 * st.dir, g0);
     st.slope = Math.atan2(p2.y - p.y, Math.hypot(p2.x - p.x, p2.z - p.z) || 1);
@@ -209,7 +197,9 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     storyShot(st.t, want);
 
     let beat = null;
-    for (const b of world.beats) if (Math.abs(st.t - b.t) < (b.cine ? 0.03 : 0.04)) beat = b;
+    for (const b of world.beats) {
+      if ((!b.optional || b.id === storyBookmark) && Math.abs(st.t - b.t) < (b.cine ? 0.03 : 0.04)) beat = b;
+    }
     if (beat !== st.beat) {
       st.beat = beat;
       emit('beat', beat ? beat.id : null);
@@ -218,6 +208,16 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     let cine = false;
     for (const [a, b] of world.cine || []) if (st.t > a && st.t < b) cine = true;
     if (cine !== st.cine) emit('cine', (st.cine = cine));
+
+    if (!transfer) return;
+    const ready = Math.abs(st.t - transfer.t) < 0.006 && Math.abs(st.tTarget - transfer.t) < 0.002;
+    if (!ready) {
+      transferAge = 0;
+      if (st.tTarget < transfer.t - 0.06 && st.t < transfer.t - 0.06) stayHere = false;
+    } else if (!stayHere && (transferAge += dt) >= 1.9) {
+      stayHere = true;
+      emit('advance', transfer.id);
+    }
   }
 
   function setNear(id) {
@@ -323,6 +323,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
 
     vehicle.place(st, world);
     vehicle.animate({ dt, time: st.time, st, calm });
+    audio.update(st.speed, st.airborne, vehicle.walking, st.t);
     st.jolt = 0;
 
     focus.set(st.x, st.y + vehicle.focusHeight, st.z);
@@ -349,7 +350,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
 
     // Camera: every mode only states what it wants; one spring gets us there.
     if (st.started && st.intro < 1) {
-      st.intro = Math.min(1, st.intro + dt / 3.4);
+      st.intro = Math.min(1, st.intro + dt / introSeconds);
       const e = st.intro < 0.5 ? 4 * st.intro ** 3 : 1 - (-2 * st.intro + 2) ** 3 / 2;
       want.pos.lerpVectors(introFrom, want.pos, e);
       want.fov = lerp(40, want.fov, e);
@@ -486,6 +487,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   }
   let lost = false;
   function onVisibility() {
+    audio.setQuiet(document.hidden || st.paused);
     if (document.hidden) {
       halt();
       clearInput();
@@ -531,7 +533,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
    * Load a chapter and its vehicle, disposing whatever was there before.
    * Used for the first load and for every chapter transition.
    */
-  async function loadChapter(id, { t = null, progress = () => {} } = {}) {
+  async function loadChapter(id, { t = null, progress = () => {}, fromStory = false } = {}) {
     const def = CHAPTERS[id];
     if (!def) throw new Error(`unknown chapter "${id}"`);
     const vdef = getVehicle(def.vehicle);
@@ -572,7 +574,17 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     vehicle = nextVehicle;
     scene.fog = world.atmosphere.fog;
     scene.add(vehicle.object);
+    const lastChapter = chapterId;
     chapterId = id;
+    audio.change(id);
+    const index = JOURNEY.findIndex((chapter) => chapter.id === id);
+    const next = index >= 0 && JOURNEY[index + 1];
+    const end = world.beats.at(-1);
+    transfer = next && end?.next ? { id: next.id, t: end.t } : null;
+    storyBookmark = null;
+    transferAge = 0;
+    stayHere = false;
+    introSeconds = fromStory ? (lastChapter === 'japan' ? 1.55 : 1.15) : 3.4;
 
     Object.assign(st, { mode: 'story', speed: 0, vy: 0, airborne: false, steer: 0, slope: 0, dir: 1, rejoin: 1, near: null, beat: undefined, cine: false, lemons: 0, stuck: 0, lock: 0 });
     placeOnRoute(t ?? 0);
@@ -597,19 +609,18 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   }
 
   /** Chapter-to-chapter transition: fade, swap, fade back. */
-  async function travelToChapter(id) {
+  async function travelToChapter(id, { fromStory = false } = {}) {
     if (loading || transitioning || id === chapterId || !Object.hasOwn(CHAPTERS, id)) return false;
     transitioning = true;
     const wasPaused = st.paused;
     st.paused = true;
     clearInput();
-    emit('loading', true);
+    emit('loading', { active: true, fromStory });
     if (!calm) {
-      emit('fade', 'chapter');
-      await new Promise((r) => setTimeout(r, 280));
+      await new Promise((r) => setTimeout(r, fromStory ? 330 : 280));
     }
     try {
-      await loadChapter(id);
+      await loadChapter(id, { fromStory });
       return true;
     } catch (error) {
       console.warn('[pedal-the-world] chapter could not be loaded', error);
@@ -618,7 +629,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     } finally {
       transitioning = false;
       st.paused = wasPaused;
-      emit('loading', false);
+      emit('loading', { active: false, fromStory });
     }
   }
 
@@ -630,7 +641,9 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     clearInput();
     if (st.cine) emit('cine', (st.cine = false));
     if (mode === 'story') {
+      transferAge = 0;
       st.t = st.tTarget = vehicle.onRails ? st.t : world.nearest(st.x, st.z).t;
+      stayHere = !!transfer && st.t >= transfer.t - 0.035;
       st.rejoin = vehicle.onRails ? 1 : 0;
       st.dir = 1;
       st.beat = undefined;
@@ -645,9 +658,10 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
 
   function nextBeat(dir) {
     if (st.mode !== 'story' || !world || transitioning) return;
-    const B = world.beats;
+    const B = world.beats.filter((beat) => !beat.optional);
+    storyBookmark = null;
     const ref = st.tTarget;
-    let target = dir > 0 ? 1 : 0;
+    let target = dir > 0 ? (transfer?.t ?? 1) : 0;
     if (dir > 0) {
       for (const b of B) if (b.t > ref + 0.012) {
         target = b.t;
@@ -672,11 +686,18 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     const b = world.beats.find((q) => q.id === id) || world.pois.find((q) => q.id === id);
     if (!b) return;
     if (st.mode === 'story') {
+      storyBookmark = b.id;
+      if (b.next) stayHere = true;
       if (Math.abs(b.t - st.t) > 0.18 && !calm) {
         emit('fade', 'travel');
         const active = world;
-        setTimeout(() => { if (world === active && !transitioning) placeOnRoute(b.t); }, 260);
-      } else st.tTarget = b.t;
+        setTimeout(() => {
+          if (world !== active || transitioning) return;
+          if (b.next) stayHere = true;
+          placeOnRoute(b.t);
+        }, 260);
+      } else if (calm && world.storySpeed) placeOnRoute(b.t);
+      else st.tTarget = b.t;
     } else respawn('travel', clamp(b.t - (vehicle.onRails ? 0 : 0.012), 0, 1));
   }
 
@@ -689,6 +710,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   function start() {
     if (st.started) return;
     st.started = true;
+    audio.unlock();
     cam.ready = true;
     emit('mode', st.mode);
   }
@@ -721,7 +743,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     splash.geometry.dispose();
     splash.material.dispose();
     renderer.dispose();
-    if (ac) ac.close().catch(() => {});
+    audio.dispose();
   }
 
   // First chapter. A reload mid-ride resumes where the rider was.
@@ -746,6 +768,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     loadChapter: travelToChapter,
     setPaused(v) {
       st.paused = v;
+      audio.setQuiet(v || document.hidden);
       if (v) clearInput();
     },
     setJoystick(x, y) {
@@ -759,7 +782,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
       calm = v;
     },
     setSound(v) {
-      sound = v;
+      audio.setEnabled(v);
     },
     setQuality(q) {
       if (q === 'auto') autoQuality = true;

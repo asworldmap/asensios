@@ -6,10 +6,11 @@
 import process from 'node:process';
 import { chromium, devices } from 'playwright';
 export { devices };
-export async function open({ viewport = { width: 1280, height: 720 }, theme = 'light', query = '', device = null, reduced = false, quality = 3, start = true } = {}) {
+export async function open({ viewport = { width: 1280, height: 720 }, theme = 'light', query = '', device = null, reduced = false, quality = 3, start = true, init } = {}) {
   const b = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHROMIUM_CHANNEL || undefined, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const ctx = await b.newContext(device ? { ...devices[device], colorScheme: theme, reducedMotion: reduced ? 'reduce' : 'no-preference' } : { viewport, deviceScaleFactor: 1, colorScheme: theme, reducedMotion: reduced ? 'reduce' : 'no-preference' });
   const p = await ctx.newPage();
+  if (init) await p.addInitScript(init);
   const errs = [];
   p.on('console', (m) => { if (m.type() === 'error') errs.push('console: ' + m.text()); });
   p.on('pageerror', (e) => errs.push('PAGEERROR ' + e.message));

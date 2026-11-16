@@ -453,6 +453,7 @@
   color: var(--ink-soft);
 }
 
+.pw-cap-meta:empty,
 .pw-cap-text:empty {
   display: none;
 }

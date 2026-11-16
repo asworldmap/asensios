@@ -102,11 +102,15 @@ export function scenery({ scene, assets, shared }, spec) {
       }
     }
 
-    const poiAt = pointAt(spec.stop);
+    const poiAt = pointAt(spec.discoverAt ?? spec.stop);
     const id = spec.id;
-    const poi = { id, t: spec.stop, x: poiAt.x, z: poiAt.z, focus: poiAt, radius: spec.radius || 14, ...spec.card };
+    const poi = { id, t: spec.discoverAt ?? spec.stop, x: poiAt.x, z: poiAt.z, focus: poiAt, radius: spec.radius || 14, ...spec.card };
     const opening = { id: id + '_start', t: 0, keys: storyKeys(id + '_start'), place: 'world.leg.' + id + '.start' };
-    const end = { id, t: spec.stop, poi: id, keys: storyKeys(id), place: 'world.leg.' + id + '.stop', next: true, link: spec.link };
+    const discovery = spec.discoverAt == null ? [] : [{
+      id: id + '_discovery', t: spec.discoverAt, poi: id, keys: storyKeys(id + '_discovery'),
+      place: 'world.leg.' + id + '.discovery',
+    }];
+    const end = { id, t: spec.stop, poi: discovery.length ? null : id, keys: storyKeys(id), place: 'world.leg.' + id + '.stop', next: true, link: spec.link };
     return {
       id, group, route, pointAt, nearest, colliders, atmosphere,
       waterY: spec.water ? spec.floor : -30,
@@ -117,10 +121,12 @@ export function scenery({ scene, assets, shared }, spec) {
         const n = nearest(x, z);
         return Object.assign(out, { y: spec.driveY ?? spec.floor, t: n.t, routeD: n.d, water: !!spec.water, onRoad: n.d < 7 });
       },
-      pois: [poi], beats: [opening, end],
+      pois: [poi], beats: [opening, ...discovery, end],
       shots: spec.shots, cine: [[0.09, spec.stop - 0.07]],
       establishing: spec.establishing,
       storyRate: spec.storyRate,
+      storySpeed: spec.storySpeed,
+      landing: spec.landing,
       update: () => [],
       dispose() {
         for (const resource of owned) resource.dispose();

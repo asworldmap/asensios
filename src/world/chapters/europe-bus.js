@@ -3,11 +3,11 @@ import { scenery, shots } from './scenery.js';
 export async function build(ctx) {
   const s = scenery(ctx, {
     id: 'europe-bus', points: [[-25, -76], [-25, -30], [4, 5], [33, 16], [43, 49], [43, 82]],
-    floor: -0.035, driveY: 0, ground: '#8e936e', stop: 0.93, radius: 12,
+    floor: -0.035, driveY: 0, ground: '#8e936e', stop: 0.93, discoverAt: 0.48, radius: 12,
     card: { key: 'ch7', photo: '/media/eu-parliament.webp', href: '/trajectory/#ch7' },
-    day: { sunDir: [-0.57, 0.53, -0.32], fog: '#e6dfc8' },
+    day: { skyTop: '#80aed1', sunDir: [-0.62, 0.48, -0.5], fog: '#dfeaf0' },
     shots: shots([0, 13, 12, 7, 1, 2.6, 45], [0.4, 13, -12, 5.4, 3, 2.2, 46], [1, 12, 8, 5, 2, 2.2, 44]),
-    establishing: { from: [-46, 15, -91], look: [-25, 2.9, -64] },
+    establishing: { from: [-44, 11, -87], look: [-18, 3.7, -70] },
   });
   s.groundStrip('#666b62', 12, -0.015);
   s.groundStrip('#ded0a8', 0.15, -0.009, 5.2);
@@ -31,6 +31,15 @@ export async function build(ctx) {
     const p = s.beside(s.random(), (i % 2 ? -1 : 1) * (11.5 + 32 * s.random()));
     s.stamp('europe/conifer', p.x, p.z, { yaw: s.random() * 6, scale: 0.65 + s.random(), solid: true });
   }
+  s.stamp('europe_v2/station_building', -12, -72, { y: 0, yaw: -Math.PI / 2, solid: true });
+  for (const t of [0.22, 0.35, 0.51, 0.63]) {
+    const p = s.beside(t, 13);
+    s.stamp('europe_v2/hedgerow', p.x, p.z, { yaw: p.yaw, solid: true });
+  }
+  s.stamp('maritime_v2/harbour_office', 59, 76, { y: 0, yaw: -Math.PI / 2, solid: true });
+  s.stamp('maritime_v2/dock_clutter', 50.6, 79, { y: 0, solid: true });
+  // An angled strip of basin past the quay hints at the water still to cross.
+  s.groundStrip('#508092', 35, -0.013, -25, 0.76, 1);
   await ctx.step('scenery', 0.85);
   return { ...s.finish(), stops };
 }

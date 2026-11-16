@@ -70,7 +70,7 @@ export const train = {
 
     function animate({ dt, st }) {
       roll = (roll + st.speed * dt / cars[0].entry.meta.wheel_radius) % (2 * Math.PI);
-      door = damp(door, st.near && Math.abs(st.speed) < 0.2 ? 1 : 0, 4, dt);
+      door = damp(door, (st.t < 0.035 || st.t > 0.97) && Math.abs(st.speed) < 0.2 ? 1 : 0, 4, dt);
       for (const car of cars) {
         for (const part of car.parts) {
           if (part.role === 'wheel') part.turn(roll * (car.reversed ? -1 : 1));
