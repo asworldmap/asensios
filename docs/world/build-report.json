@@ -2,75 +2,9 @@
   "ok": true,
   "results": [
     {
-      "ref": "maritime_v2/breakwater",
+      "ref": "asia_v2/airstairs",
       "status": "built",
-      "seconds": 2.5,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [],
-      "class": "batched",
-      "triangles": 992,
-      "bytes": 100736,
-      "materials": 1,
-      "parts": 0,
-      "colliders": 2,
-      "anchors": 2,
-      "import_check": {
-        "objects": 6,
-        "meshes": 1,
-        "vertices": 2904
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "maritime_v2/coast_headland",
-      "status": "built",
-      "seconds": 2.4,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [],
-      "class": "batched",
-      "triangles": 3220,
-      "bytes": 102052,
-      "materials": 3,
-      "parts": 0,
-      "colliders": 0,
-      "anchors": 1,
-      "import_check": {
-        "objects": 3,
-        "meshes": 1,
-        "vertices": 2488
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "maritime_v2/deck_bench",
-      "status": "built",
-      "seconds": 2.4,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [],
-      "class": "batched",
-      "triangles": 284,
-      "bytes": 23300,
-      "materials": 3,
-      "parts": 0,
-      "colliders": 1,
-      "anchors": 1,
-      "import_check": {
-        "objects": 4,
-        "meshes": 1,
-        "vertices": 574
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "maritime_v2/deck_vent",
-      "status": "built",
-      "seconds": 2.0,
+      "seconds": 2.3,
       "error": "",
       "contract": "pass",
       "errors": [],
@@ -78,186 +12,43 @@
         "material \"M_paint\" is double-sided; enable backface culling unless the mesh is a single open sheet"
       ],
       "class": "batched",
-      "triangles": 208,
-      "bytes": 13964,
-      "materials": 2,
+      "triangles": 924,
+      "bytes": 65348,
+      "materials": 5,
       "parts": 0,
-      "colliders": 1,
-      "anchors": 0,
+      "colliders": 3,
+      "anchors": 2,
       "import_check": {
-        "objects": 3,
+        "objects": 7,
         "meshes": 1,
-        "vertices": 326
+        "vertices": 1700
       },
       "blender": "5.3.0"
     },
     {
-      "ref": "maritime_v2/dock_clutter",
+      "ref": "asia_v2/apron_tile",
       "status": "built",
-      "seconds": 2.2,
+      "seconds": 1.9,
       "error": "",
       "contract": "pass",
       "errors": [],
-      "warnings": [
-        "material \"M_cloth\" is double-sided; enable backface culling unless the mesh is a single open sheet"
-      ],
+      "warnings": [],
       "class": "batched",
-      "triangles": 920,
-      "bytes": 64436,
-      "materials": 4,
+      "triangles": 256,
+      "bytes": 20972,
+      "materials": 3,
       "parts": 0,
-      "colliders": 2,
-      "anchors": 0,
+      "colliders": 0,
+      "anchors": 2,
       "import_check": {
         "objects": 4,
         "meshes": 1,
-        "vertices": 1713
+        "vertices": 512
       },
       "blender": "5.3.0"
     },
     {
-      "ref": "maritime_v2/fishing_boat",
-      "status": "built",
-      "seconds": 2.5,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [
-        "material \"M_paint\" is double-sided; enable backface culling unless the mesh is a single open sheet",
-        "material \"M_wood\" is double-sided; enable backface culling unless the mesh is a single open sheet"
-      ],
-      "class": "batched",
-      "triangles": 640,
-      "bytes": 51940,
-      "materials": 8,
-      "parts": 0,
-      "colliders": 2,
-      "anchors": 2,
-      "import_check": {
-        "objects": 6,
-        "meshes": 1,
-        "vertices": 1256
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "maritime_v2/gangway",
-      "status": "built",
-      "seconds": 2.3,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [
-        "material \"M_metal\" is double-sided; enable backface culling unless the mesh is a single open sheet",
-        "material \"M_cloth\" is double-sided; enable backface culling unless the mesh is a single open sheet"
-      ],
-      "class": "batched",
-      "triangles": 478,
-      "bytes": 36256,
-      "materials": 3,
-      "parts": 0,
-      "colliders": 2,
-      "anchors": 2,
-      "import_check": {
-        "objects": 6,
-        "meshes": 1,
-        "vertices": 932
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "maritime_v2/harbour_office",
-      "status": "built",
-      "seconds": 2.4,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [
-        "material \"M_stone\" is double-sided; enable backface culling unless the mesh is a single open sheet",
-        "material \"M_cloth\" is double-sided; enable backface culling unless the mesh is a single open sheet"
-      ],
-      "class": "batched",
-      "triangles": 2950,
-      "bytes": 197872,
-      "materials": 7,
-      "parts": 0,
-      "colliders": 4,
-      "anchors": 4,
-      "import_check": {
-        "objects": 10,
-        "meshes": 1,
-        "vertices": 5399
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "maritime_v2/horizon_islands",
-      "status": "built",
-      "seconds": 2.0,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [],
-      "class": "batched",
-      "triangles": 288,
-      "bytes": 12200,
-      "materials": 1,
-      "parts": 0,
-      "colliders": 0,
-      "anchors": 0,
-      "import_check": {
-        "objects": 2,
-        "meshes": 1,
-        "vertices": 288
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "maritime_v2/lighthouse",
-      "status": "built",
-      "seconds": 2.3,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [],
-      "class": "batched",
-      "triangles": 2272,
-      "bytes": 128300,
-      "materials": 7,
-      "parts": 0,
-      "colliders": 1,
-      "anchors": 2,
-      "import_check": {
-        "objects": 5,
-        "meshes": 1,
-        "vertices": 3369
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "maritime_v2/pier_head",
-      "status": "built",
-      "seconds": 2.3,
-      "error": "",
-      "contract": "pass",
-      "errors": [],
-      "warnings": [],
-      "class": "batched",
-      "triangles": 1344,
-      "bytes": 92452,
-      "materials": 4,
-      "parts": 0,
-      "colliders": 2,
-      "anchors": 4,
-      "import_check": {
-        "objects": 8,
-        "meshes": 1,
-        "vertices": 2483
-      },
-      "blender": "5.3.0"
-    },
-    {
-      "ref": "maritime_v2/pier_section",
+      "ref": "asia_v2/control_tower",
       "status": "built",
       "seconds": 2.1,
       "error": "",
@@ -265,16 +56,130 @@
       "errors": [],
       "warnings": [],
       "class": "batched",
-      "triangles": 992,
-      "bytes": 71064,
-      "materials": 4,
+      "triangles": 1680,
+      "bytes": 95004,
+      "materials": 6,
       "parts": 0,
-      "colliders": 1,
+      "colliders": 2,
       "anchors": 3,
+      "import_check": {
+        "objects": 7,
+        "meshes": 1,
+        "vertices": 2462
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "asia_v2/pushback_tug",
+      "status": "built",
+      "seconds": 2.0,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 608,
+      "bytes": 38860,
+      "materials": 5,
+      "parts": 0,
+      "colliders": 2,
+      "anchors": 2,
       "import_check": {
         "objects": 6,
         "meshes": 1,
-        "vertices": 1900
+        "vertices": 931
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "asia_v2/rain_tree",
+      "status": "built",
+      "seconds": 2.4,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 2252,
+      "bytes": 70964,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 1,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 1722
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "asia_v2/skyline_backdrop",
+      "status": "built",
+      "seconds": 2.3,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 1396,
+      "bytes": 101252,
+      "materials": 3,
+      "parts": 0,
+      "colliders": 0,
+      "anchors": 0,
+      "import_check": {
+        "objects": 2,
+        "meshes": 1,
+        "vertices": 2802
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "asia_v2/terminal_hall",
+      "status": "built",
+      "seconds": 2.6,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [
+        "material \"M_metal\" is double-sided; enable backface culling unless the mesh is a single open sheet"
+      ],
+      "class": "batched",
+      "triangles": 1748,
+      "bytes": 87572,
+      "materials": 6,
+      "parts": 0,
+      "colliders": 15,
+      "anchors": 3,
+      "import_check": {
+        "objects": 20,
+        "meshes": 1,
+        "vertices": 2167
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "asia_v2/windsock",
+      "status": "built",
+      "seconds": 1.9,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [
+        "material \"M_cloth\" is double-sided; enable backface culling unless the mesh is a single open sheet"
+      ],
+      "class": "batched",
+      "triangles": 208,
+      "bytes": 17844,
+      "materials": 5,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 0,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 364
       },
       "blender": "5.3.0"
     }
