@@ -4,17 +4,24 @@ import { open } from './lib.mjs';
 
 const { b, p, errs } = await open({
   quality: 0,
+  viewport: { width: 960, height: 540 },
   init: () => {
     const cut = window.directorCut = { started: 0, stages: [], cuts: [] };
     document.addEventListener('click', (event) => {
-      if (event.target.closest('[data-start]')) cut.started = performance.now();
+      if (event.target.closest('[data-start]')) {
+        cut.started = performance.now();
+        cut.stages.push({ id: window.__pw.game.chapter, at: 0 });
+      }
     }, { capture: true });
     let entered;
     new MutationObserver(() => {
       const root = document.documentElement;
       const now = performance.now();
       const id = window.__pw?.game.chapter;
-      if (id && cut.stages.at(-1)?.id !== id) cut.stages.push({ id, at: now - cut.started });
+      if (id && cut.stages.at(-1)?.id !== id) {
+        cut.stages.push({ id, at: now - cut.started });
+        console.info('Director cut · ' + id + ' @ ' + Math.round((now - cut.started) / 1000) + 's');
+      }
       if (root.dataset.handoff && !entered) entered = now;
       else if (!root.dataset.handoff && entered) {
         cut.cuts.push(now - entered);
@@ -22,6 +29,10 @@ const { b, p, errs } = await open({
       }
     }).observe(document, { subtree: true, attributes: true, attributeFilter: ['data-handoff', 'data-handoff-phase'] });
   },
+});
+
+p.on('console', (message) => {
+  if (message.text().startsWith('Director cut · ')) console.log(message.text());
 });
 
 try {
@@ -39,6 +50,12 @@ try {
   assert.equal(await p.getAttribute('[data-cap-link]', 'href'), '/trajectory/');
   assert.deepEqual(errs, []);
   console.log('PASS full hands-free Story');
+} catch (error) {
+  console.error(await p.evaluate(() => {
+    const game = window.__pw?.game;
+    return { chapter: game?.chapter, t: game?.state.t, target: game?.state.tTarget, paused: game?.state.paused, visibility: document.visibilityState, timing: window.directorCut };
+  }), errs);
+  throw error;
 } finally {
   await b.close();
 }
