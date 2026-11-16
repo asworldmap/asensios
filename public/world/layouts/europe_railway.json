@@ -1,0 +1,1870 @@
+{
+ "scene": "europe_railway",
+ "space": "game: x left, y up, z forward (metres); yaw in radians about +y",
+ "camera": {
+  "position": [
+   -66,
+   15.5,
+   20
+  ],
+  "look_at": [
+   0,
+   -7.0,
+   88
+  ],
+  "lens_mm": 24
+ },
+ "sun_direction": [
+  -0.62,
+  0.48,
+  -0.5
+ ],
+ "notes": [
+  "Track = z axis, rail top y = 0. Station at z = 30 on +x; viaduct z = 60..130; tunnel mouth at z = 140.",
+  "Station building and canopy sit at platform level (y = 0.92); raise the ground behind the station to match.",
+  "The valley under the viaduct is 17 m deep with a river at z = 95; tree y values follow the render terrain \u2014 re-seat them on the chapter's own heightAt().",
+  "Cinematic viewpoint for the train's arrival: camera block (a knoll west of the station looking up the line)."
+ ],
+ "extra": {},
+ "placements": [
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    -75
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    -65
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    -55
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    -45
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    -35
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    -25
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    -15
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    -5
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    5
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    15
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    25
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    35
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    45
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    55
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    65
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    75
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    85
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    95
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    105
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    115
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    125
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    135
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe/rail_track_straight",
+   "position": [
+    0,
+    0,
+    145
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "track tile (10 m)"
+  },
+  {
+   "asset": "europe_v2/viaduct_arch",
+   "position": [
+    0,
+    0,
+    67
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "viaduct span (14 m); deck top = rail top"
+  },
+  {
+   "asset": "europe_v2/viaduct_arch",
+   "position": [
+    0,
+    0,
+    81
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "viaduct span (14 m); deck top = rail top"
+  },
+  {
+   "asset": "europe_v2/viaduct_arch",
+   "position": [
+    0,
+    0,
+    95
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "viaduct span (14 m); deck top = rail top"
+  },
+  {
+   "asset": "europe_v2/viaduct_arch",
+   "position": [
+    0,
+    0,
+    109
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "viaduct span (14 m); deck top = rail top"
+  },
+  {
+   "asset": "europe_v2/viaduct_arch",
+   "position": [
+    0,
+    0,
+    123
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "viaduct span (14 m); deck top = rail top"
+  },
+  {
+   "asset": "europe_v2/tunnel_portal",
+   "position": [
+    0,
+    0,
+    140
+   ],
+   "yaw": 3.1416,
+   "scale": 1.0,
+   "note": "mouth faces the viaduct (-z)"
+  },
+  {
+   "asset": "europe/catenary_mast",
+   "position": [
+    -3.2,
+    0,
+    -60
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe/catenary_mast",
+   "position": [
+    -3.2,
+    0,
+    -30
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe/catenary_mast",
+   "position": [
+    -3.2,
+    0,
+    0
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe/catenary_mast",
+   "position": [
+    -3.2,
+    0,
+    30
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe/rail_signal",
+   "position": [
+    -2.6,
+    0,
+    56
+   ],
+   "yaw": 3.1416,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe/rail_signal",
+   "position": [
+    -2.6,
+    0,
+    -12
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe/rail_platform",
+   "position": [
+    0,
+    0,
+    5
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing platform edge tile"
+  },
+  {
+   "asset": "europe/rail_platform",
+   "position": [
+    0,
+    0,
+    15
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing platform edge tile"
+  },
+  {
+   "asset": "europe/rail_platform",
+   "position": [
+    0,
+    0,
+    25
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing platform edge tile"
+  },
+  {
+   "asset": "europe/rail_platform",
+   "position": [
+    0,
+    0,
+    35
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing platform edge tile"
+  },
+  {
+   "asset": "europe/rail_platform",
+   "position": [
+    0,
+    0,
+    45
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing platform edge tile"
+  },
+  {
+   "asset": "europe/rail_platform",
+   "position": [
+    0,
+    0,
+    55
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing platform edge tile"
+  },
+  {
+   "asset": "europe_v2/platform_paving",
+   "position": [
+    8.87,
+    0.92,
+    15
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "platform floor up to the station front"
+  },
+  {
+   "asset": "europe_v2/platform_paving",
+   "position": [
+    8.87,
+    0.92,
+    25
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "platform floor up to the station front"
+  },
+  {
+   "asset": "europe_v2/platform_paving",
+   "position": [
+    8.87,
+    0.92,
+    35
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "platform floor up to the station front"
+  },
+  {
+   "asset": "europe_v2/platform_paving",
+   "position": [
+    8.87,
+    0.92,
+    45
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "platform floor up to the station front"
+  },
+  {
+   "asset": "europe_v2/station_building",
+   "position": [
+    12.5,
+    0.92,
+    30
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0,
+   "note": "front faces the track (-x); origin at platform level"
+  },
+  {
+   "asset": "europe_v2/station_canopy",
+   "position": [
+    12.5,
+    0.92,
+    30
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0,
+   "note": "same transform as the building"
+  },
+  {
+   "asset": "europe_v2/signal_box",
+   "position": [
+    -8.5,
+    0,
+    2
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "across the line from the station"
+  },
+  {
+   "asset": "common/park_bench",
+   "position": [
+    6.6,
+    0.92,
+    12
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0
+  },
+  {
+   "asset": "common/park_bench",
+   "position": [
+    6.6,
+    0.92,
+    48
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0
+  },
+  {
+   "asset": "common/street_lamp",
+   "position": [
+    7.2,
+    0.92,
+    8
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "common/street_lamp",
+   "position": [
+    7.2,
+    0.92,
+    52
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe/road_sign",
+   "position": [
+    6.0,
+    0.92,
+    6
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0,
+   "note": "station name board"
+  },
+  {
+   "asset": "common/planter",
+   "position": [
+    6.9,
+    0.92,
+    20
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "common/planter",
+   "position": [
+    6.9,
+    0.92,
+    40
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "vehicles/train_cab",
+   "position": [
+    0,
+    0,
+    52
+   ],
+   "yaw": 3.1416,
+   "scale": 1.0,
+   "note": "heading -z into the platform"
+  },
+  {
+   "asset": "vehicles/train_coach",
+   "position": [
+    0,
+    0,
+    70.1
+   ],
+   "yaw": 3.1416,
+   "scale": 1.0
+  },
+  {
+   "asset": "vehicles/train_coach",
+   "position": [
+    0,
+    0,
+    88.2
+   ],
+   "yaw": 3.1416,
+   "scale": 1.0
+  },
+  {
+   "asset": "vehicles/train_coach",
+   "position": [
+    0,
+    0,
+    106.3
+   ],
+   "yaw": 3.1416,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe_v2/broadleaf_tree",
+   "position": [
+    24,
+    0.551,
+    14
+   ],
+   "yaw": 2.8409,
+   "scale": 1.046
+  },
+  {
+   "asset": "europe_v2/broadleaf_tree",
+   "position": [
+    27,
+    0.447,
+    44
+   ],
+   "yaw": 5.804,
+   "scale": 1.013
+  },
+  {
+   "asset": "europe_v2/broadleaf_tree",
+   "position": [
+    22,
+    0.15,
+    58
+   ],
+   "yaw": 3.1892,
+   "scale": 1.056
+  },
+  {
+   "asset": "europe_v2/broadleaf_tree",
+   "position": [
+    -20,
+    -0.246,
+    -14
+   ],
+   "yaw": 1.1597,
+   "scale": 1.029
+  },
+  {
+   "asset": "europe_v2/broadleaf_tree",
+   "position": [
+    30,
+    -0.695,
+    -8
+   ],
+   "yaw": 3.9557,
+   "scale": 1.128
+  },
+  {
+   "asset": "europe_v2/broadleaf_tree",
+   "position": [
+    40,
+    -0.492,
+    30
+   ],
+   "yaw": 0.5911,
+   "scale": 0.956
+  },
+  {
+   "asset": "europe_v2/birch_tree",
+   "position": [
+    -13,
+    -0.15,
+    -4
+   ],
+   "yaw": 0.5694,
+   "scale": 1.133
+  },
+  {
+   "asset": "europe_v2/birch_tree",
+   "position": [
+    -15,
+    -0.151,
+    9
+   ],
+   "yaw": 4.3548,
+   "scale": 0.865
+  },
+  {
+   "asset": "europe_v2/birch_tree",
+   "position": [
+    19,
+    0.681,
+    4
+   ],
+   "yaw": 6.1682,
+   "scale": 1.188
+  },
+  {
+   "asset": "europe_v2/birch_tree",
+   "position": [
+    21,
+    0.643,
+    50
+   ],
+   "yaw": 4.1066,
+   "scale": 1.065
+  },
+  {
+   "asset": "europe_v2/birch_tree",
+   "position": [
+    34,
+    -0.122,
+    52
+   ],
+   "yaw": 0.9891,
+   "scale": 0.855
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    41.716,
+    -5.228,
+    65.221
+   ],
+   "yaw": 4.021,
+   "scale": 0.922
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    24.367,
+    -7.206,
+    67.317
+   ],
+   "yaw": 4.445,
+   "scale": 0.864
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -40.55,
+    -14.407,
+    115.545
+   ],
+   "yaw": 0.677,
+   "scale": 0.857
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -45.226,
+    -10.151,
+    70.799
+   ],
+   "yaw": 6.0544,
+   "scale": 1.004
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -57.301,
+    -13.677,
+    116.223
+   ],
+   "yaw": 1.1158,
+   "scale": 0.941
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -7.886,
+    -0.15,
+    145.894
+   ],
+   "yaw": 2.41,
+   "scale": 0.889
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    73.508,
+    13.251,
+    183.869
+   ],
+   "yaw": 1.91,
+   "scale": 1.044
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -43.393,
+    -4.801,
+    66.308
+   ],
+   "yaw": 0.2644,
+   "scale": 0.811
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -63.99,
+    5.741,
+    150.936
+   ],
+   "yaw": 2.3153,
+   "scale": 0.961
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -47.576,
+    -0.922,
+    62.466
+   ],
+   "yaw": 4.5555,
+   "scale": 0.815
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    19.347,
+    -0.97,
+    129.113
+   ],
+   "yaw": 3.7902,
+   "scale": 0.898
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -59.424,
+    5.414,
+    150.728
+   ],
+   "yaw": 2.4593,
+   "scale": 0.898
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    60.724,
+    -7.77,
+    67.856
+   ],
+   "yaw": 0.7938,
+   "scale": 0.916
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    23.026,
+    -10.183,
+    69.854
+   ],
+   "yaw": 4.7036,
+   "scale": 0.787
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -13.286,
+    6.001,
+    152.688
+   ],
+   "yaw": 3.5932,
+   "scale": 0.806
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -20.678,
+    10.05,
+    169.562
+   ],
+   "yaw": 3.2778,
+   "scale": 1.063
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    13.481,
+    -4.951,
+    124.445
+   ],
+   "yaw": 6.0462,
+   "scale": 0.772
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    20.428,
+    -7.528,
+    67.716
+   ],
+   "yaw": 0.4727,
+   "scale": 0.937
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    35.551,
+    -0.42,
+    130.216
+   ],
+   "yaw": 2.2095,
+   "scale": 0.981
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    60.125,
+    -6.361,
+    123.177
+   ],
+   "yaw": 3.5972,
+   "scale": 0.962
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -17.65,
+    1.084,
+    143.609
+   ],
+   "yaw": 0.7258,
+   "scale": 0.846
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    23.999,
+    6.967,
+    154.713
+   ],
+   "yaw": 1.5738,
+   "scale": 0.965
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    45.557,
+    -13.062,
+    72.074
+   ],
+   "yaw": 3.6619,
+   "scale": 0.865
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -54.574,
+    10.244,
+    178.192
+   ],
+   "yaw": 0.4028,
+   "scale": 1.074
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    48.279,
+    -5.052,
+    124.37
+   ],
+   "yaw": 2.4024,
+   "scale": 0.929
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    25.822,
+    -0.08,
+    132.522
+   ],
+   "yaw": 0.469,
+   "scale": 0.775
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    55.924,
+    -0.761,
+    129.59
+   ],
+   "yaw": 4.0775,
+   "scale": 0.943
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    21.148,
+    -12.311,
+    118.178
+   ],
+   "yaw": 1.4909,
+   "scale": 0.809
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -67.959,
+    10.492,
+    168.348
+   ],
+   "yaw": 4.0187,
+   "scale": 0.881
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -63.305,
+    6.005,
+    151.522
+   ],
+   "yaw": 0.0676,
+   "scale": 0.914
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    32.126,
+    8.231,
+    155.558
+   ],
+   "yaw": 5.946,
+   "scale": 0.923
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    74.521,
+    -2.146,
+    62.547
+   ],
+   "yaw": 0.5477,
+   "scale": 1.059
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    33.357,
+    -2.321,
+    62.079
+   ],
+   "yaw": 2.3663,
+   "scale": 0.944
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    56.898,
+    12.144,
+    160.867
+   ],
+   "yaw": 6.1691,
+   "scale": 0.796
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    54.924,
+    -13.563,
+    72.773
+   ],
+   "yaw": 5.6519,
+   "scale": 1.074
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    71.604,
+    10.432,
+    154.418
+   ],
+   "yaw": 5.3743,
+   "scale": 0.875
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -62.584,
+    -2.931,
+    126.107
+   ],
+   "yaw": 5.7761,
+   "scale": 0.834
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    55.132,
+    12.302,
+    163.99
+   ],
+   "yaw": 4.948,
+   "scale": 0.809
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -52.699,
+    10.281,
+    177.799
+   ],
+   "yaw": 2.7642,
+   "scale": 1.042
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    11.843,
+    8.747,
+    159.774
+   ],
+   "yaw": 1.8223,
+   "scale": 0.995
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    20.831,
+    -0.118,
+    132.56
+   ],
+   "yaw": 4.2158,
+   "scale": 1.066
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    55.51,
+    3.866,
+    146.352
+   ],
+   "yaw": 3.2921,
+   "scale": 0.945
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -44.855,
+    -7.468,
+    68.574
+   ],
+   "yaw": 3.3807,
+   "scale": 0.779
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    62.603,
+    -8.751,
+    68.704
+   ],
+   "yaw": 4.3394,
+   "scale": 0.786
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -38.058,
+    -7.899,
+    121.473
+   ],
+   "yaw": 3.2969,
+   "scale": 0.799
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -69.656,
+    7.15,
+    152.784
+   ],
+   "yaw": 2.2316,
+   "scale": 0.96
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -59.267,
+    -13.222,
+    116.701
+   ],
+   "yaw": 4.5071,
+   "scale": 0.986
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    56.81,
+    11.716,
+    177.133
+   ],
+   "yaw": 1.0031,
+   "scale": 0.829
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    19.697,
+    10.655,
+    178.307
+   ],
+   "yaw": 3.6841,
+   "scale": 0.808
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    62.224,
+    5.73,
+    148.151
+   ],
+   "yaw": 1.9781,
+   "scale": 1.056
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -42.278,
+    -15.423,
+    75.974
+   ],
+   "yaw": 0.8324,
+   "scale": 0.793
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -16.815,
+    9.828,
+    164.447
+   ],
+   "yaw": 0.7913,
+   "scale": 0.892
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    27.782,
+    -12.119,
+    118.421
+   ],
+   "yaw": 0.7248,
+   "scale": 0.924
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    38.723,
+    -8.465,
+    68.045
+   ],
+   "yaw": 3.0274,
+   "scale": 0.773
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    39.3,
+    -10.579,
+    69.814
+   ],
+   "yaw": 1.1589,
+   "scale": 0.829
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    51.032,
+    -16.441,
+    75.845
+   ],
+   "yaw": 0.8443,
+   "scale": 0.98
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -63.359,
+    -6.617,
+    122.599
+   ],
+   "yaw": 2.7009,
+   "scale": 0.954
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    110.45,
+    6.886,
+    0.53
+   ],
+   "yaw": 1.2254,
+   "scale": 1.089
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    -79.277,
+    4.063,
+    -31.517
+   ],
+   "yaw": 5.2872,
+   "scale": 1.388
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    97.726,
+    6.309,
+    -20.905
+   ],
+   "yaw": 3.6714,
+   "scale": 1.163
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    75.964,
+    3.694,
+    -28.373
+   ],
+   "yaw": 4.6659,
+   "scale": 1.087
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    64.991,
+    2.149,
+    -7.009
+   ],
+   "yaw": 3.3841,
+   "scale": 1.175
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    112.392,
+    6.952,
+    0.575
+   ],
+   "yaw": 4.5381,
+   "scale": 1.05
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    77.627,
+    3.934,
+    -29.914
+   ],
+   "yaw": 5.5769,
+   "scale": 1.436
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    80.336,
+    3.173,
+    25.976
+   ],
+   "yaw": 3.5769,
+   "scale": 1.244
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    93.602,
+    5.373,
+    9.759
+   ],
+   "yaw": 1.339,
+   "scale": 1.07
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    128.507,
+    6.14,
+    -37.718
+   ],
+   "yaw": 3.8647,
+   "scale": 1.33
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    88.273,
+    4.751,
+    10.476
+   ],
+   "yaw": 4.781,
+   "scale": 1.292
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -62.384,
+    1.937,
+    -14.911
+   ],
+   "yaw": 5.6874,
+   "scale": 1.251
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    127.535,
+    6.774,
+    16.798
+   ],
+   "yaw": 6.2493,
+   "scale": 1.288
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    -96.206,
+    5.338,
+    26.843
+   ],
+   "yaw": 5.9996,
+   "scale": 1.182
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -83.943,
+    0.431,
+    57.007
+   ],
+   "yaw": 5.3736,
+   "scale": 1.248
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    -87.218,
+    4.595,
+    9.453
+   ],
+   "yaw": 1.7863,
+   "scale": 1.187
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    82.418,
+    4.496,
+    -11.425
+   ],
+   "yaw": 4.1141,
+   "scale": 1.255
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    104.769,
+    4.969,
+    34.775
+   ],
+   "yaw": 0.1687,
+   "scale": 1.344
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    -102.474,
+    5.611,
+    0.881
+   ],
+   "yaw": 4.2976,
+   "scale": 1.042
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    111.127,
+    6.915,
+    -34.984
+   ],
+   "yaw": 6.2095,
+   "scale": 1.417
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    -114.819,
+    6.433,
+    -17.63
+   ],
+   "yaw": 4.5161,
+   "scale": 1.125
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    -58.408,
+    1.217,
+    -30.153
+   ],
+   "yaw": 5.0879,
+   "scale": 1.402
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    -128.412,
+    6.583,
+    41.67
+   ],
+   "yaw": 3.7908,
+   "scale": 1.068
+  },
+  {
+   "asset": "europe_v2/spruce_tall",
+   "position": [
+    89.177,
+    5.427,
+    -19.634
+   ],
+   "yaw": 0.3269,
+   "scale": 1.242
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    -82.248,
+    4.413,
+    -26.022
+   ],
+   "yaw": 2.6186,
+   "scale": 1.272
+  },
+  {
+   "asset": "europe_v2/broadleaf_tree",
+   "position": [
+    -41,
+    0.145,
+    -2
+   ],
+   "yaw": 4.0166,
+   "scale": 1.198
+  },
+  {
+   "asset": "europe_v2/broadleaf_tree",
+   "position": [
+    -56,
+    1.022,
+    57
+   ],
+   "yaw": 1.0,
+   "scale": 1.0,
+   "note": "frames the view"
+  },
+  {
+   "asset": "europe_v2/hedgerow",
+   "position": [
+    -52,
+    1.934,
+    44
+   ],
+   "yaw": 0.9,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe_v2/birch_tree",
+   "position": [
+    -30,
+    0.098,
+    22
+   ],
+   "yaw": 2.0,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe_v2/hedgerow",
+   "position": [
+    -12,
+    0.0,
+    14
+   ],
+   "yaw": 0.0,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe_v2/hedgerow",
+   "position": [
+    -12,
+    0.0,
+    24
+   ],
+   "yaw": 0.0,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe_v2/hedgerow",
+   "position": [
+    -12,
+    0.0,
+    34
+   ],
+   "yaw": 0.0,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe_v2/hedgerow",
+   "position": [
+    30,
+    0.516,
+    16
+   ],
+   "yaw": 0.1,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe_v2/hedgerow",
+   "position": [
+    46,
+    -0.057,
+    -20
+   ],
+   "yaw": 1.2,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe_v2/meadow_hill",
+   "position": [
+    -95,
+    4.466,
+    40
+   ],
+   "yaw": 2.1841,
+   "scale": 1.3,
+   "note": "rolling country"
+  },
+  {
+   "asset": "europe_v2/meadow_hill",
+   "position": [
+    95,
+    4.244,
+    20
+   ],
+   "yaw": 4.4632,
+   "scale": 1.3,
+   "note": "rolling country"
+  },
+  {
+   "asset": "europe_v2/meadow_hill",
+   "position": [
+    -80,
+    3.381,
+    -50
+   ],
+   "yaw": 4.8908,
+   "scale": 1.3,
+   "note": "rolling country"
+  },
+  {
+   "asset": "europe_v2/meadow_hill",
+   "position": [
+    85,
+    3.872,
+    -60
+   ],
+   "yaw": 0.8218,
+   "scale": 1.3,
+   "note": "rolling country"
+  },
+  {
+   "asset": "europe_v2/meadow_hill",
+   "position": [
+    110,
+    -18.283,
+    110
+   ],
+   "yaw": 1.7408,
+   "scale": 1.3,
+   "note": "rolling country"
+  },
+  {
+   "asset": "europe_v2/meadow_hill",
+   "position": [
+    -110,
+    -11.169,
+    120
+   ],
+   "yaw": 0.7732,
+   "scale": 1.3,
+   "note": "rolling country"
+  },
+  {
+   "asset": "europe_v2/hedgerow",
+   "position": [
+    -44,
+    1.391,
+    30
+   ],
+   "yaw": 1.2,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe_v2/hedgerow",
+   "position": [
+    -53,
+    2.052,
+    34
+   ],
+   "yaw": 1.2,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe_v2/hedgerow",
+   "position": [
+    -40,
+    1.225,
+    44
+   ],
+   "yaw": 0.2,
+   "scale": 1.0
+  },
+  {
+   "asset": "europe_v2/alps_backdrop",
+   "position": [
+    -500,
+    -6,
+    480
+   ],
+   "yaw": 2.7816,
+   "scale": 4.2,
+   "note": "horizon; scale 4.2"
+  },
+  {
+   "asset": "europe_v2/alps_backdrop",
+   "position": [
+    -250,
+    -6,
+    450
+   ],
+   "yaw": 2.9616,
+   "scale": 4.2,
+   "note": "horizon; scale 4.2"
+  },
+  {
+   "asset": "europe_v2/alps_backdrop",
+   "position": [
+    0,
+    -6,
+    420
+   ],
+   "yaw": 3.1416,
+   "scale": 4.2,
+   "note": "horizon; scale 4.2"
+  },
+  {
+   "asset": "europe_v2/alps_backdrop",
+   "position": [
+    250,
+    -6,
+    450
+   ],
+   "yaw": 3.3216,
+   "scale": 4.2,
+   "note": "horizon; scale 4.2"
+  },
+  {
+   "asset": "europe_v2/alps_backdrop",
+   "position": [
+    500,
+    -6,
+    480
+   ],
+   "yaw": 3.5016,
+   "scale": 4.2,
+   "note": "horizon; scale 4.2"
+  },
+  {
+   "asset": "europe_v2/alps_backdrop",
+   "position": [
+    -130,
+    -4,
+    290
+   ],
+   "yaw": 2.9416,
+   "scale": 2.6,
+   "note": "nearer range; scale 2.6"
+  },
+  {
+   "asset": "europe_v2/alps_backdrop",
+   "position": [
+    60,
+    -4,
+    290
+   ],
+   "yaw": 3.1416,
+   "scale": 2.6,
+   "note": "nearer range; scale 2.6"
+  },
+  {
+   "asset": "europe_v2/alps_backdrop",
+   "position": [
+    250,
+    -4,
+    290
+   ],
+   "yaw": 3.3416,
+   "scale": 2.6,
+   "note": "nearer range; scale 2.6"
+  }
+ ]
+}
