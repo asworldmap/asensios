@@ -49,7 +49,7 @@
   "rig": [],
   "meta": {},
   "forward": "+Z (glTF / Three.js), -Y in Blender",
-  "source_hash": "6e97348e582517c3",
+  "source_hash": "24e9d8a82dfd5dc1",
   "source": {
     "script": "tools/world/blender/assets/murcia/farmhouse.py",
     "blend": "assets-src/world/murcia/farmhouse.blend"

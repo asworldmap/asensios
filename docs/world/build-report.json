@@ -2,6 +2,813 @@
   "ok": true,
   "results": [
     {
+      "ref": "asia/baggage_cart",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 1024,
+      "bytes": 69024,
+      "materials": 3,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 0,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 1865
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "asia/bamboo_clump",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 1260,
+      "bytes": 45644,
+      "materials": 1,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 0,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 1145
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "asia/jet_bridge",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 604,
+      "bytes": 37488,
+      "materials": 3,
+      "parts": 0,
+      "colliders": 2,
+      "anchors": 2,
+      "import_check": {
+        "objects": 6,
+        "meshes": 1,
+        "vertices": 951
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "asia/runway_light",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 136,
+      "bytes": 7684,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 0,
+      "anchors": 1,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 138
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "asia/terminal_bay",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 452,
+      "bytes": 30224,
+      "materials": 5,
+      "parts": 0,
+      "colliders": 2,
+      "anchors": 2,
+      "import_check": {
+        "objects": 6,
+        "meshes": 1,
+        "vertices": 705
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "chile/andes_peak",
+      "status": "built",
+      "seconds": 2.7,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 270,
+      "bytes": 8816,
+      "materials": 1,
+      "parts": 0,
+      "colliders": 0,
+      "anchors": 0,
+      "import_check": {
+        "objects": 2,
+        "meshes": 1,
+        "vertices": 185
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "chile/araucaria",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 1182,
+      "bytes": 56332,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 0,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 1468
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "chile/rock_outcrop",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 400,
+      "bytes": 42240,
+      "materials": 1,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 0,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 1200
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "chile/tussock_grass",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 192,
+      "bytes": 11956,
+      "materials": 1,
+      "parts": 0,
+      "colliders": 0,
+      "anchors": 0,
+      "import_check": {
+        "objects": 2,
+        "meshes": 1,
+        "vertices": 295
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "common/park_bench",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 412,
+      "bytes": 32612,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 1,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 868
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "common/planter",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 272,
+      "bytes": 11368,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 0,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 234
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "common/signpost",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 152,
+      "bytes": 13960,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 3,
+      "import_check": {
+        "objects": 6,
+        "meshes": 1,
+        "vertices": 324
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "common/street_lamp",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 136,
+      "bytes": 10352,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 1,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 219
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "europe/catenary_mast",
+      "status": "built",
+      "seconds": 2.8,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 100,
+      "bytes": 6924,
+      "materials": 1,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 1,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 148
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "europe/conifer",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 204,
+      "bytes": 10120,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 0,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 208
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "europe/rail_platform",
+      "status": "built",
+      "seconds": 2.8,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 188,
+      "bytes": 15856,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 2,
+      "import_check": {
+        "objects": 5,
+        "meshes": 1,
+        "vertices": 384
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "europe/rail_signal",
+      "status": "built",
+      "seconds": 2.9,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 468,
+      "bytes": 27732,
+      "materials": 3,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 3,
+      "import_check": {
+        "objects": 6,
+        "meshes": 1,
+        "vertices": 666
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "europe/rail_track_straight",
+      "status": "built",
+      "seconds": 3.0,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 286,
+      "bytes": 21956,
+      "materials": 3,
+      "parts": 0,
+      "colliders": 0,
+      "anchors": 1,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 540
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "europe/road_guardrail",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 156,
+      "bytes": 8452,
+      "materials": 1,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 1,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 188
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "europe/road_sign",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 156,
+      "bytes": 9852,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 2,
+      "import_check": {
+        "objects": 5,
+        "meshes": 1,
+        "vertices": 200
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "europe/station_shelter",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 472,
+      "bytes": 28796,
+      "materials": 5,
+      "parts": 0,
+      "colliders": 2,
+      "anchors": 2,
+      "import_check": {
+        "objects": 6,
+        "meshes": 1,
+        "vertices": 643
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "maritime/cargo_crate",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 188,
+      "bytes": 14892,
+      "materials": 1,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 1,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 384
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "maritime/deck_chair",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 236,
+      "bytes": 18404,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 0,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 460
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "maritime/harbour_light",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 636,
+      "bytes": 40400,
+      "materials": 5,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 1,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 988
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "maritime/life_ring_stand",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 232,
+      "bytes": 15248,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 0,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 362
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "maritime/mooring_buoy",
+      "status": "built",
+      "seconds": 3.2,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 216,
+      "bytes": 10876,
+      "materials": 3,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 1,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 195
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "maritime/quay_section",
+      "status": "built",
+      "seconds": 3.1,
+      "error": "",
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 296,
+      "bytes": 20516,
+      "materials": 4,
+      "parts": 0,
+      "colliders": 2,
+      "anchors": 4,
+      "import_check": {
+        "objects": 8,
+        "meshes": 1,
+        "vertices": 449
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia/bridge_segura",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 3616,
+      "bytes": 254484,
+      "materials": 3,
+      "parts": 0,
+      "colliders": 2,
+      "anchors": 6,
+      "import_check": {
+        "objects": 10,
+        "meshes": 1,
+        "vertices": 7144
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia/farmhouse",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 2620,
+      "bytes": 157324,
+      "materials": 8,
+      "parts": 0,
+      "colliders": 6,
+      "anchors": 2,
+      "import_check": {
+        "objects": 10,
+        "meshes": 1,
+        "vertices": 4162
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia/fountain",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 332,
+      "bytes": 21528,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 1,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 540
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia/lemon_tree",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 1248,
+      "bytes": 37344,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 1,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 859
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia/lemon_tree_far",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 260,
+      "bytes": 18884,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 1,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 467
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia/orange_crate",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 224,
+      "bytes": 10192,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 0,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 206
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia/palm_tree",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [
+        "material \"M_foliage\" is double-sided; enable backface culling unless the mesh is a single open sheet"
+      ],
+      "class": "batched",
+      "triangles": 360,
+      "bytes": 19928,
+      "materials": 2,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 0,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 484
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia/stone_wall",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 924,
+      "bytes": 71580,
+      "materials": 1,
+      "parts": 0,
+      "colliders": 1,
+      "anchors": 1,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 2016
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia/townhouse_a",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 2436,
+      "bytes": 170972,
+      "materials": 8,
+      "parts": 0,
+      "colliders": 4,
+      "anchors": 2,
+      "import_check": {
+        "objects": 8,
+        "meshes": 1,
+        "vertices": 4629
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia/townhouse_b",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 3312,
+      "bytes": 233608,
+      "materials": 8,
+      "parts": 0,
+      "colliders": 4,
+      "anchors": 2,
+      "import_check": {
+        "objects": 8,
+        "meshes": 1,
+        "vertices": 6420
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "murcia/townhouse_c",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": "pass",
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 2272,
+      "bytes": 160944,
+      "materials": 8,
+      "parts": 0,
+      "colliders": 4,
+      "anchors": 2,
+      "import_check": {
+        "objects": 8,
+        "meshes": 1,
+        "vertices": 4349
+      },
+      "blender": "5.3.0"
+    },
+    {
       "ref": "vehicles/airliner",
       "status": "skipped",
       "seconds": 0,
@@ -58,8 +865,8 @@
         "material \"M_glass\" is double-sided; enable backface culling unless the mesh is a single open sheet"
       ],
       "class": "hero",
-      "triangles": 14694,
-      "bytes": 916456,
+      "triangles": 9962,
+      "bytes": 607752,
       "materials": 7,
       "parts": 9,
       "colliders": 4,
@@ -67,7 +874,7 @@
       "import_check": {
         "objects": 30,
         "meshes": 8,
-        "vertices": 25239
+        "vertices": 16445
       },
       "blender": "5.3.0"
     },
@@ -100,8 +907,8 @@
       "errors": [],
       "warnings": [],
       "class": "hero",
-      "triangles": 5924,
-      "bytes": 330016,
+      "triangles": 5928,
+      "bytes": 333728,
       "materials": 5,
       "parts": 11,
       "colliders": 0,
@@ -109,7 +916,7 @@
       "import_check": {
         "objects": 29,
         "meshes": 12,
-        "vertices": 8589
+        "vertices": 8692
       },
       "blender": "5.3.0"
     },

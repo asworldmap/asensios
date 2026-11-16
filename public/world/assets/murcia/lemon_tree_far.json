@@ -35,7 +35,7 @@
   "rig": [],
   "meta": {},
   "forward": "+Z (glTF / Three.js), -Y in Blender",
-  "source_hash": "070e89bd528f376b",
+  "source_hash": "5ec1c91a3530a3ee",
   "source": {
     "script": "tools/world/blender/assets/murcia/lemon_tree_far.py",
     "blend": "assets-src/world/murcia/lemon_tree_far.blend"

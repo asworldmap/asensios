@@ -60,6 +60,8 @@ def build(k):
     glaze = lambda c: WIN0 < c.z < WIN1 and abs(c.x) > W * 0.4 and -L / 2 + 0.9 < -c.y < L / 2 - 0.45
     cut_faces(body, glaze)
     cut_faces(body, lambda c: -c.y > L / 2 - 0.05 and 1.62 < c.z < 3.2)  # windscreen opening
+    # Wheel arches: open the skirt over each axle so the wheels can be seen (and steer).
+    cut_faces(body, lambda c: c.z < 1.0 and abs(c.x) > W * 0.4 and min(abs(-c.y - AX_F), abs(-c.y - AX_R)) < 0.78)
 
     def livery(c, n_, base):
         y = c.z
@@ -100,17 +102,19 @@ def build(k):
     for tag, i in (("front", bays - 1), ("mid", 3)):
         z = z0 + (i + 0.5) * bw
         node = k.node(f"PART_door_{tag}", g(-W / 2, 1.9, z + bw / 2 - 0.05), role="door", axis="y", limit_deg=88, swings="out")
-        P.panel(k, "door", bw - 0.12, 2.42, (-(W / 2 - 0.01), 1.62, z), "paint", P.CREAM, yaw=math.pi, depth=0.05, parent=node, bevel=0.03)
-        P.panel(k, "door_glass", bw - 0.34, 1.7, (-(W / 2 + 0.012), 1.9, z), "glass", "#a9c2bf", yaw=math.pi, depth=0.02, parent=node, bevel=0.0)
+        P.panel(k, "door", bw - 0.12, 1.3, (-(W / 2 - 0.01), 1.04, z), "paint", P.CREAM, yaw=math.pi, depth=0.05, parent=node, bevel=0.03)
+        P.panel(k, "door_glass", bw - 0.12, WIN1 - WIN0 + 0.04, (-(W / 2 - 0.005), (WIN0 + WIN1) / 2, z), "glass", "#a9c2bf", yaw=math.pi, depth=0.025, parent=node, bevel=0.0)
+        P.panel(k, "door_split", 0.05, 2.3, (-(W / 2 + 0.012), 1.55, z), "rubber", P.INK, yaw=math.pi, depth=0.02, parent=node, bevel=0.0)
         P.panel(k, "door_kick", bw - 0.12, 0.5, (-(W / 2 + 0.012), 0.66, z), "paint", P.GREEN, yaw=math.pi, depth=0.02, parent=node, bevel=0.0)
         k.anchor(f"door_{tag}", g(-W / 2 - 0.7, 0, z), kind="boarding")
 
     # ---- Luggage hatches, grille, bumpers, roof pod ---------------------------
     for s in (-1, 1):
-        for z in (-1.6, 0.1, 1.8):
+        for z in (-2.05, 1.25):
             P.panel(k, "hatch", 1.55, 0.72, (s * (W / 2 - 0.005), 1.08, z), "paint", P.CREAM_SHADE, yaw=0 if s > 0 else math.pi, depth=0.03, bevel=0.03)
         for az in (AX_F, AX_R):
-            P.panel(k, "arch", 1.34, 0.66, (s * (W / 2 - 0.02), 0.62, az), "rubber", P.INK, yaw=0 if s > 0 else math.pi, depth=0.05, bevel=0.2)
+            # Wheel-arch lip: a dark band over the wheel, which stays visible below it.
+            P.panel(k, "arch", 1.36, 0.16, (s * (W / 2 + 0.005), WR * 2 + 0.1, az), "rubber", P.INK, yaw=0 if s > 0 else math.pi, depth=0.05, bevel=0.06)
     P.panel(k, "grille", 1.5, 0.3, (0, 0.92, L / 2 + 0.005), "metal", P.INK, yaw=math.pi / 2, depth=0.03, bevel=0.03)
     P.panel(k, "engine_grille", 1.7, 0.5, (0, 1.05, -L / 2 - 0.005), "metal", P.INK, yaw=-math.pi / 2, depth=0.03, bevel=0.03)
     for z, f in ((L / 2 + 0.02, 1), (-L / 2 - 0.02, -1)):

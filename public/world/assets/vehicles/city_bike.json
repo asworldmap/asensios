@@ -5,7 +5,7 @@
   "contract": 1,
   "file": "vehicles/city_bike.glb",
   "bytes": 216024,
-  "sha256": "8a2211ef67126c7740c510e9c2449a6a5ec2ff7f2da809bdf059793ddd58fa88",
+  "sha256": "844a36ffb591dfc7bec03dd1ac951a4ca5a85d5aa0bd2988f0c1b26082fff1f4",
   "triangles": 5028,
   "tri_budget": 9000,
   "materials": [
@@ -188,7 +188,7 @@
     "limbs": "arms and legs are drawn by the engine (two-bone IK), not part of the asset"
   },
   "forward": "+Z (glTF / Three.js), -Y in Blender",
-  "source_hash": "141e79af6260fd67",
+  "source_hash": "ee2ea7858f6800e5",
   "source": {
     "script": "tools/world/blender/assets/vehicles/city_bike.py",
     "blend": "assets-src/world/vehicles/city_bike.blend"

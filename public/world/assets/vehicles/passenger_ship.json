@@ -206,7 +206,7 @@
     "colliders": "2D, describe the main deck: deckhouse walls. Railings are visual; clamp walkers to each deck's half_width."
   },
   "forward": "+Z (glTF / Three.js), -Y in Blender",
-  "source_hash": "f76d45ed90588cd9",
+  "source_hash": "693b968acd3f0a69",
   "source": {
     "script": "tools/world/blender/assets/vehicles/passenger_ship.py",
     "blend": "assets-src/world/vehicles/passenger_ship.blend"

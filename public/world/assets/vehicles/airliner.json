@@ -348,7 +348,7 @@
     "starboard": "-x (green light)"
   },
   "forward": "+Z (glTF / Three.js), -Y in Blender",
-  "source_hash": "a6c34d038653d16f",
+  "source_hash": "50e6fe73b0e1c661",
   "source": {
     "script": "tools/world/blender/assets/vehicles/airliner.py",
     "blend": "assets-src/world/vehicles/airliner.blend"

@@ -48,7 +48,7 @@
   "rig": [],
   "meta": {},
   "forward": "+Z (glTF / Three.js), -Y in Blender",
-  "source_hash": "b6e6021c732432de",
+  "source_hash": "b0b67e13ded86e1d",
   "source": {
     "script": "tools/world/blender/assets/murcia/townhouse_a.py",
     "blend": "assets-src/world/murcia/townhouse_a.blend"

@@ -165,8 +165,8 @@ def seat_rows(k, z0, z1, y, xs, pitch=0.85, color=GREEN_LIGHT, parent=None):
     for i in range(n):
         z = z0 + (i + 0.5) * pitch
         for x in xs:
-            k.paint(k.bbox("seat", (0.46, 0.46, 0.14), g(x, y + 0.42, z), "cloth", bevel=0.05, parent=parent), color, jitter=0.03)
-            k.paint(k.bbox("seat_back", (0.46, 0.14, 0.72), g(x, y + 0.8, z - 0.22), "cloth", bevel=0.05, parent=parent), color, jitter=0.03)
+            k.paint(k.bbox("seat", (0.46, 0.46, 0.14), g(x, y + 0.42, z), "cloth", bevel=0.05, seg=1, parent=parent), color, jitter=0.03)
+            k.paint(k.bbox("seat_back", (0.46, 0.14, 0.72), g(x, y + 0.8, z - 0.22), "cloth", bevel=0.05, seg=1, parent=parent), color, jitter=0.03)
 
 
 def stairs(k, a, b, width, steps, color=STEEL, parent=None):

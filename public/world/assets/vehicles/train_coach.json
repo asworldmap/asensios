@@ -190,7 +190,7 @@
     "wheel_radius": 0.46
   },
   "forward": "+Z (glTF / Three.js), -Y in Blender",
-  "source_hash": "6a827d139e063e49",
+  "source_hash": "ae154a1cadcee7c7",
   "source": {
     "script": "tools/world/blender/assets/vehicles/train_coach.py",
     "blend": "assets-src/world/vehicles/train_coach.blend"

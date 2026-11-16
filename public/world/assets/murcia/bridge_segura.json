@@ -51,7 +51,7 @@
   "rig": [],
   "meta": {},
   "forward": "+Z (glTF / Three.js), -Y in Blender",
-  "source_hash": "6211e1659a25e41a",
+  "source_hash": "f4680070b96a640e",
   "source": {
     "script": "tools/world/blender/assets/murcia/bridge_segura.py",
     "blend": "assets-src/world/murcia/bridge_segura.blend"

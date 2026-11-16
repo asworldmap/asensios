@@ -23,12 +23,22 @@ STATIONS = (1.24, 1.36, 2.02, 2.98, 3.3)
 
 
 def ease(t):
+    t = max(0.0, min(1.0, t))
     return t * t * (3 - 2 * t)
+
+
+def nose_sy(t):
+    """Roof height along the nose: level, then a raked windscreen, then the snout."""
+    return 1 - 0.5 * ease((t - 0.1) / 0.68)
+
+
+def nose_sx(t):
+    return 1 - 0.3 * ease(t) ** 1.3
 
 
 def make(k, cab=True):
     sec = P.body_section(W, Y0, Y1, r_bot=0.16, r_top=0.62, stations=STATIONS, seg=4, tumble=0.07)
-    nose_len = 4.4 if cab else 0.0
+    nose_len = 3.7 if cab else 0.0
     rings = []
     n = 12
     z_back, z_front = -L / 2, L / 2 - nose_len
@@ -37,12 +47,10 @@ def make(k, cab=True):
         rings.append(P.ring(sec, z_back + 0.35 + (z_front - z_back - (0.35 if not cab else 0.0) - 0.35) * i / n))
     if cab:
         # The nose: the section narrows and its roof comes down in a long curve.
-        steps = 7
+        steps = 9
         for i in range(1, steps + 1):
             t = i / steps
-            sx = 1 - 0.36 * ease(t) ** 1.2
-            sy = 1 - 0.47 * (t**1.7)
-            rings.append(P.ring(P.scale_section(sec, sx, sy, Y0, dy=0.1 * t), z_front + nose_len * (1 - (1 - t) ** 1.35)))
+            rings.append(P.ring(P.scale_section(sec, nose_sx(t), nose_sy(t), Y0), z_front + nose_len * (1 - (1 - t) ** 1.25)))
     else:
         rings.append(P.ring(P.scale_section(sec, 0.9, 0.93, Y0), L / 2 + 0.02))
     body = k.loft("body", rings, "paint", smooth=48)
@@ -52,25 +60,26 @@ def make(k, cab=True):
     def livery(c, n_, base):
         y = c.z
         z = -c.y
-        t = max(0.0, (z - nose0) / nose_len) if cab else 0.0
-        top = Y0 + (Y1 - Y0) * (1 - 0.47 * t**1.7) + 0.1 * t
+        t = 0.0
+        if cab and z > nose0:
+            t = 1 - (1 - min(1.0, (z - nose0) / nose_len)) ** (1 / 1.25)
+        top = Y0 + (Y1 - Y0) * nose_sy(t)
         rel = (y - Y0) / max(0.1, top - Y0)  # 0 at the sill, 1 at the roof line
+        if cab and t > 0.05:
+            half = W / 2 * nose_sx(t)
+            if 0.2 < t < 0.76 and rel > 0.55 and abs(c.x) < half * 0.86:
+                return k.blend(P.GLASS_DARK, "#51625f", max(0.0, n_.z) * 0.6)  # windscreen
+            if 0.05 < t < 0.24 and 0.5 < rel < 0.8 and abs(n_.x) > 0.7:
+                return k.blend(P.GLASS_DARK, P.GLASS_DARK, 1)  # cab side window
+            if rel < 0.26 and t > 0.5:
+                return k.blend(P.TERRACOTTA, P.TERRACOTTA, 1)  # chin
         if n_.z > 0.72 and rel > 0.8:
             return k.blend(P.STEEL, P.CREAM_SHADE, 0.35)  # roof
-        if cab and t > 0.08:
-            # Windscreen wraps the nose; a terracotta chin gives the front a face.
-            fwd = -n_.y
-            if t > 0.3 and 0.5 < rel < 0.97 and fwd > 0.16:
-                return k.blend(P.GLASS_DARK, "#51625f", max(0.0, n_.z))  # windscreen
-            if 0.06 < t < 0.3 and 0.5 < rel < 0.8 and abs(n_.x) > 0.7:
-                return k.blend(P.GLASS_DARK, P.GLASS_DARK, 1)  # cab side window
-            if rel < 0.2 and t > 0.55:
-                return k.blend(P.TERRACOTTA, P.TERRACOTTA, 1)
         if rel < 0.135:
             return k.blend(P.GREEN, P.GREEN, 1)
         if rel < 0.175:
             return k.blend(P.TERRACOTTA, P.TERRACOTTA, 1)
-        if 0.39 < rel < 0.7 and not (cab and t > 0.02):
+        if 0.39 < rel < 0.7 and t < 0.02:
             return k.blend(P.GREEN, P.GREEN, 1)  # the band the windows sit in
         return k.blend(P.CREAM, P.CREAM, 1)
 
@@ -79,7 +88,7 @@ def make(k, cab=True):
     # ---- Windows and doors ------------------------------------------------
     xw = W / 2 - 0.045
     yw, hw = 2.5, 0.86
-    door_z = [-5.1, 5.1 if not cab else 3.3]
+    door_z = [-5.1, 5.1 if not cab else 3.6]
     spans = [(-L / 2 + 0.9, door_z[0] - 0.95), (door_z[0] + 0.95, door_z[1] - 0.95)]
     if not cab:
         spans.append((door_z[1] + 0.95, L / 2 - 0.9))
@@ -130,7 +139,6 @@ def make(k, cab=True):
             P.lamp(k, (sx, 1.52, front_z - 0.02), 0.13, anchor=f"headlight_{'l' if sx > 0 else 'r'}")
             P.lamp(k, (sx * 1.42, 1.5, front_z - 0.26), 0.07, color=P.TAIL, name="marker")
         P.lamp(k, (0, 2.2, front_z - 0.02), 0.09, name="toplamp")
-        k.paint(k.bbox("wiper", (0.04, 0.03, 0.7), g(0.3, 2.6, front_z - 1.55), "metal", bevel=0.005), P.INK, jitter=0)
     else:
         k.paint(k.bbox("gangway", (1.7, 0.36, 2.3), g(0, 2.2, front_z + 0.12), "rubber", bevel=0.1), P.INK, jitter=0.02)
     k.paint(k.bbox("gangway", (1.7, 0.36, 2.3), g(0, 2.2, -L / 2 - 0.12), "rubber", bevel=0.1), P.INK, jitter=0.02)
