@@ -225,7 +225,7 @@ export const dict = {
     // Pedal the World (experimental)
     'nav.world': 'Pedal the World',
     'world.meta.title': 'Pedal the World — Asensio Sabater',
-    'world.meta.description': 'Una historia jugable sobre una vida sin fronteras. Capítulo 1: Murcia, en bici.',
+    'world.meta.description': 'Un viaje interactivo de Asensio Sabater desde Murcia hasta Chile, en bicicleta, tren, autobús, barco y avión.',
     'world.cover.kicker': 'Capítulo 01 · Murcia',
     'world.cover.tag': 'Una historia jugable sobre una vida sin fronteras.',
     'world.cover.loading': 'Preparando el viaje…',
@@ -528,7 +528,7 @@ export const dict = {
     // Pedal the World (experimental)
     'nav.world': 'Pedal the World',
     'world.meta.title': 'Pedal the World — Asensio Sabater',
-    'world.meta.description': 'A playable story about a life without borders. Chapter 1: Murcia, by bike.',
+    'world.meta.description': 'An interactive journey with Asensio Sabater from Murcia to Chile by bike, train, bus, ship and plane.',
     'world.cover.kicker': 'Chapter 01 · Murcia',
     'world.cover.tag': 'A playable story about a life without borders.',
     'world.cover.loading': 'Building the valley…',

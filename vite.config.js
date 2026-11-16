@@ -7,7 +7,7 @@ import { defineConfig } from 'vite';
 //   index.html            -> /
 //   trajectory/index.html -> /trajectory
 //   games/index.html      -> /games
-//   world/index.html      -> /world  (Pedal the World, experimental)
+//   world/index.html      -> /world
 export default defineConfig({
   appType: 'mpa',
   build: {
