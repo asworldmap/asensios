@@ -78,7 +78,9 @@ export const airplane = {
           st.yaw = dampAngle(st.yaw, yaw, 5, dt);
           if (t === st.t) st.slope = 0;
           else st.slope = Math.atan2(next.y - p.y, world.route.length * 0.004);
-          Object.assign(st, { t, x: p.x, y: p.y, z: p.z });
+          const prev = world.pointAt(st.t);
+          const rejoin = Math.exp(-2.6 * dt);
+          Object.assign(st, { t, x: p.x + (st.x - prev.x) * rejoin, y: p.y + (st.y - prev.y) * rejoin, z: p.z + (st.z - prev.z) * rejoin });
         }
         st.airborne = st.y > 1;
       },

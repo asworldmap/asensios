@@ -4,7 +4,7 @@ export async function build(ctx) {
   const s = scenery(ctx, {
     id: 'europe', points: [[0, -86], [0, 0], [0, 94]], floor: -0.74, driveY: 0,
     ground: '#78816a', stop: 1, radius: 11,
-    card: { key: 'ch5', href: '/trajectory/#ch5' },
+    card: { key: 'ch5', photo: '/media/alpadia-field.webp', href: '/trajectory/#ch5' },
     day: { skyTop: '#8bb4c9', fog: '#d5dcca' },
     shots: shots([0, 5, 8, 3.9, -10, 1.6, 49], [0.44, 8, 11, 4.1, -17, 2, 48], [1, 5, -7, 2.7, -12, 2, 44]),
     establishing: { from: [38, 18, -76], look: [0, 2, -101] },

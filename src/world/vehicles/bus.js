@@ -8,7 +8,7 @@ export const bus = {
   id: 'bus',
   assets: [BUS],
   onRails: false,
-  actions: { a: 'horn', b: null },
+  actions: { a: 'horn', b: 'doors' },
 
   create({ assets }) {
     const model = vehicleModel(assets, BUS);
@@ -16,18 +16,24 @@ export const bus = {
     const wheelbase = model.entry.meta.wheelbase;
     let roll = 0;
     let doors = 0;
+    let waitingAtStop = false;
+    let opening = true;
     const view = { back: 16, side: 3.5, up: 6, lift: 2.7, ahead: 5 };
     const probes = [-4.7, -2.35, 0, 2.35, 4.9];
 
     return {
       ...model, id: 'bus', radius: 1.7, onRails: false, storyScale: 1, focusHeight: 2.5,
-      place(st) {
+      place(st, world) {
+        waitingAtStop = Math.abs(st.speed) < 0.25 && world.stops.some((stop) =>
+          Math.hypot(st.x - stop.x, st.z - stop.z) < stop.radius
+        );
+        if (!waitingAtStop) opening = true;
         object.position.set(st.x, st.y, st.z);
         object.rotation.y = st.yaw;
       },
       animate({ dt, st }) {
         roll = (roll + st.speed * dt / model.entry.meta.wheel_radius) % (2 * Math.PI);
-        doors = damp(doors, Math.abs(st.speed) < 0.25 && (st.near || st.t < 0.018) ? 1 : 0, 4, dt);
+        doors = damp(doors, waitingAtStop && opening ? 1 : 0, 4, dt);
         for (const part of parts) {
           if (part.role === 'wheel') part.turn(roll);
           if (part.role === 'steer') part.turn(st.steer * part.limit);
@@ -71,6 +77,10 @@ export const bus = {
       },
       action(id, st, fx) {
         if (id === 'horn') fx.sound('horn');
+        if (id === 'doors') {
+          if (waitingAtStop) opening = !opening;
+          fx.feedback(waitingAtStop ? (opening ? 'doorsOpen' : 'doorsClosed') : 'doorsStop');
+        }
       },
     };
   },

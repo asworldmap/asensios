@@ -17,6 +17,7 @@
 //     radius            collision radius, metres
 //     storyScale        multiplier for a chapter's authored camera distances
 //     focusHeight       where the camera and the see-through effect aim
+//     reset?()          clear optional vehicle-specific modes on travel / mode changes
 //     place(st, world)  put the model where the state says it is
 //     animate({ dt, time, st, calm })   pose wheels, limbs, cars…
 //     drive(dt, input, world, st, fx)   free movement (Explore); mutates st
@@ -27,24 +28,18 @@
 //
 // `st` is the engine state (x, y, z, yaw, speed, t, …); `fx` gives a vehicle
 // the few engine services it may use: respawn(reason), splash(x, z),
-// bump(collider, st), sound(kind).
+// bump(collider, st), sound(kind), feedback(id), snapCamera().
 
 import { bicycle } from './bicycle.js';
 import { train } from './train.js';
-
 import { bus } from './bus.js';
-
 import { airplane } from './airplane.js';
-
 import { ship } from './ship.js';
 
-export const VEHICLES = { ship, airplane, bus, bicycle, train };
-
-/** Planned vehicles: named so chapters can reference them, not built yet. */
-export const PLANNED = ['bus', 'airplane', 'ship'];
+export const VEHICLES = { bicycle, train, bus, airplane, ship };
 
 export function getVehicle(id) {
   const def = VEHICLES[id];
-  if (!def) throw new Error(`vehicle "${id}" is not implemented${PLANNED.includes(id) ? ' yet (planned)' : ''}`);
+  if (!def) throw new Error(`vehicle "${id}" is not implemented`);
   return def;
 }

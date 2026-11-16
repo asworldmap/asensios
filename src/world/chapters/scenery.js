@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Batch, M, rng } from '../kit.js';
 import { createRoute } from '../route.js';
 import { createAtmosphere, DEFAULT_PALETTE } from '../atmosphere.js';
-import { enhance } from '../shading.js';
+import { createWaterMaterial, enhance } from '../shading.js';
 
 export function scenery({ scene, assets, shared }, spec) {
   const group = new THREE.Group();
@@ -67,10 +67,21 @@ export function scenery({ scene, assets, shared }, spec) {
 
   const ground = new THREE.PlaneGeometry(1500, 1500);
   ground.rotateX(-Math.PI / 2);
-  const groundMat = enhance(new THREE.MeshLambertMaterial({ color: spec.ground }), shared, { breakup: 0.24 });
+  const groundMat = spec.water
+    ? createWaterMaterial(shared)
+    : enhance(new THREE.MeshLambertMaterial({ color: spec.ground }), shared, { breakup: 0.24 });
   mesh(ground, groundMat).position.y = spec.floor;
   if (spec.water) {
-    atmosphere.onBlend((k) => groundMat.color.set(k > 0.68 ? '#183f50' : spec.ground));
+    ground.setAttribute('shore', new THREE.Float32BufferAttribute(new Float32Array(ground.attributes.position.count), 1));
+    groundMat.transparent = false;
+    const colors = groundMat.userData.colors;
+    const day = new THREE.Color(spec.ground);
+    const night = new THREE.Color('#183f50');
+    colors.uFlow.value = 0.44;
+    atmosphere.onBlend((k) => {
+      colors.uDeep.value.lerpColors(day, night, k);
+      colors.uShallow.value.copy(colors.uDeep.value).multiplyScalar(1.35);
+    });
   }
 
   function finish() {
@@ -95,7 +106,7 @@ export function scenery({ scene, assets, shared }, spec) {
     const id = spec.id;
     const poi = { id, t: spec.stop, x: poiAt.x, z: poiAt.z, focus: poiAt, radius: spec.radius || 14, ...spec.card };
     const opening = { id: id + '_start', t: 0, keys: storyKeys(id + '_start'), place: 'world.leg.' + id + '.start' };
-    const end = { id, t: spec.stop, poi: id, keys: storyKeys(id), place: 'world.leg.' + id + '.stop', next: true };
+    const end = { id, t: spec.stop, poi: id, keys: storyKeys(id), place: 'world.leg.' + id + '.stop', next: true, link: spec.link };
     return {
       id, group, route, pointAt, nearest, colliders, atmosphere,
       waterY: spec.water ? spec.floor : -30,

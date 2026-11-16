@@ -44,6 +44,8 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   let vehicle = null;
   let chapterId = null;
   let loading = false;
+  let transitioning = false;
+  let retained = [];
   let isDark = dark;
   let calm = reduced;
   let sound = true;
@@ -63,6 +65,8 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   const want = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 46 };
   const introFrom = new THREE.Vector3();
   const focus = new THREE.Vector3();
+  const cameraRay = new THREE.Ray();
+  const cameraHit = new THREE.Vector3();
   const rp = {};
   const g0 = {};
 
@@ -240,11 +244,12 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
 
   /** Fade, then put the vehicle back on the route — at t, or at the nearest safe point. */
   function respawn(reason, t) {
-    if (st.lock > 0) return;
+    if (st.lock > 0 || transitioning) return;
+    const active = world;
     st.lock = 0.7;
     emit('fade', reason || '');
     setTimeout(() => {
-      if (!world) return;
+      if (world !== active || transitioning) return;
       placeOnRoute(t != null ? t : world.safeT ? world.safeT(st.x, st.z) : world.nearest(st.x, st.z).t);
     }, 260);
   }
@@ -271,6 +276,24 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     }
     setNear(near);
     vehicle.chase(st, cam, want, { portrait: camera.aspect < 0.8, calm, dt });
+  }
+
+  function clearCamera(pos) {
+    if (st.mode !== 'explore' || !world.cameraBlockers?.length) return;
+    cameraRay.origin.copy(focus);
+    cameraRay.direction.subVectors(pos, focus);
+    const length = cameraRay.direction.length();
+    if (length < 0.01) return;
+    cameraRay.direction.divideScalar(length);
+    let distance = length;
+    for (const box of world.cameraBlockers) {
+      if (box.containsPoint(focus)) continue;
+      if (cameraRay.intersectBox(box, cameraHit)) {
+        const hit = focus.distanceTo(cameraHit);
+        if (hit < distance) distance = Math.max(0.85, hit - 0.36);
+      }
+    }
+    if (distance < length) cameraRay.at(distance, pos);
   }
 
   // ------------------------------------------------------------------ Loop
@@ -335,6 +358,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
       if (world.establishing) want.look.set(...world.establishing.look);
       want.fov = 40;
     }
+    clearCamera(want.pos);
     if (!cam.ready) {
       cam.pos.copy(want.pos);
       cam.look.copy(want.look);
@@ -350,6 +374,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     cam.look.y = damp(cam.look.y, want.look.y, lam + 2, dt);
     cam.look.z = damp(cam.look.z, want.look.z, lam + 2, dt);
     cam.fov = damp(cam.fov, want.fov, 3, dt);
+    clearCamera(cam.pos);
     const floor = world.heightAt(cam.pos.x, cam.pos.z) + 0.7;
     if (cam.pos.y < floor) cam.pos.y = floor;
     if (cam.pos.y < world.waterY + 0.7) cam.pos.y = world.waterY + 0.7;
@@ -426,6 +451,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     }
     if (!down || e.repeat || !st.started || st.paused || loading) return;
     if (e.code === 'Space') {
+      if (e.target.closest('button, a[href]')) return;
       e.preventDefault();
       if (st.mode === 'explore') action('a');
       else nextBeat(1);
@@ -438,7 +464,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   function onWheel(e) {
     if (!st.started || st.paused) return;
     e.preventDefault();
-    if (st.mode !== 'story' || !world) return;
+    if (st.mode !== 'story' || !world || transitioning) return;
     const px = e.deltaMode === 1 ? e.deltaY * 32 : e.deltaY;
     input.wheel += (clamp(px, -240, 240) * 0.00021 * 230) / world.route.length;
   }
@@ -455,7 +481,8 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     dragY = null;
   }
   function clearInput() {
-    input.up = input.down = input.left = input.right = input.joyX = input.joyY = input.adv = 0;
+    input.up = input.down = input.left = input.right = input.joyX = input.joyY = input.adv = input.wheel = 0;
+    dragY = null;
   }
   let lost = false;
   function onVisibility() {
@@ -507,20 +534,43 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   async function loadChapter(id, { t = null, progress = () => {} } = {}) {
     const def = CHAPTERS[id];
     if (!def) throw new Error(`unknown chapter "${id}"`);
-    loading = true;
     const vdef = getVehicle(def.vehicle);
-    unloadChapter();
-    renderer.renderLists.dispose();
-
-    await assets.load([...(def.assets || []), ...vdef.assets], (f) => progress(0.08 + f * 0.22, 'assets'));
-    const mod = await def.load();
-    const step = (label, f) =>
-      new Promise((res) => {
+    const keys = [...def.assets, ...vdef.assets];
+    const previousObjects = new Set(scene.children);
+    const previousFog = scene.fog;
+    const previousBackground = scene.background;
+    loading = true;
+    let nextWorld;
+    let nextVehicle;
+    try {
+      await assets.load(keys, (f) => progress(0.08 + f * 0.22, 'assets'));
+      const mod = await def.load();
+      const step = (label, f) => new Promise((res) => {
         progress(0.3 + f * 0.66, label);
         requestAnimationFrame(() => res());
       });
-    world = await mod.build({ scene, tier, step, assets, shared });
-    vehicle = vdef.create({ assets, tier });
+      nextWorld = await mod.build({ scene, tier, step, assets, shared });
+      nextVehicle = vdef.create({ assets, tier });
+    } catch (error) {
+      nextVehicle?.dispose();
+      nextWorld?.dispose();
+      for (const child of [...scene.children]) {
+        if (!previousObjects.has(child)) scene.remove(child);
+      }
+      scene.fog = previousFog;
+      scene.background = previousBackground;
+      assets.retain(retained);
+      loading = false;
+      throw error;
+    }
+
+    unloadChapter();
+    renderer.renderLists.dispose();
+    assets.retain(keys);
+    retained = keys;
+    world = nextWorld;
+    vehicle = nextVehicle;
+    scene.fog = world.atmosphere.fog;
     scene.add(vehicle.object);
     chapterId = id;
 
@@ -534,6 +584,10 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     const est = world.establishing || { from: [st.x + 40, st.y + 36, st.z + 30], look: [st.x, st.y, st.z] };
     introFrom.set(...est.from);
     if (calm || t) introFrom.copy(want.pos);
+    st.intro = calm || t ? 1 : 0;
+    splashT = 1;
+    splash.material.opacity = 0;
+    emit('cine', false);
     cam.ready = false;
     renderer.compile(scene, camera);
     loading = false;
@@ -544,16 +598,26 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
 
   /** Chapter-to-chapter transition: fade, swap, fade back. */
   async function travelToChapter(id) {
-    if (loading || id === chapterId) return;
-    emit('fade', 'chapter');
+    if (loading || transitioning || id === chapterId || !Object.hasOwn(CHAPTERS, id)) return false;
+    transitioning = true;
+    const wasPaused = st.paused;
     st.paused = true;
-    await new Promise((r) => setTimeout(r, 280));
+    clearInput();
     emit('loading', true);
+    if (!calm) {
+      emit('fade', 'chapter');
+      await new Promise((r) => setTimeout(r, 280));
+    }
     try {
       await loadChapter(id);
-      st.intro = 1;
+      return true;
+    } catch (error) {
+      console.warn('[pedal-the-world] chapter could not be loaded', error);
+      emit('chapterError', id);
+      return false;
     } finally {
-      st.paused = false;
+      transitioning = false;
+      st.paused = wasPaused;
       emit('loading', false);
     }
   }
@@ -580,7 +644,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   }
 
   function nextBeat(dir) {
-    if (st.mode !== 'story' || !world) return;
+    if (st.mode !== 'story' || !world || transitioning) return;
     const B = world.beats;
     const ref = st.tTarget;
     let target = dir > 0 ? 1 : 0;
@@ -604,12 +668,14 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
 
   /** Fast travel to a story point (by poi or beat id). */
   function travel(id) {
+    if (!world || transitioning) return;
     const b = world.beats.find((q) => q.id === id) || world.pois.find((q) => q.id === id);
     if (!b) return;
     if (st.mode === 'story') {
       if (Math.abs(b.t - st.t) > 0.18 && !calm) {
         emit('fade', 'travel');
-        setTimeout(() => placeOnRoute(b.t), 260);
+        const active = world;
+        setTimeout(() => { if (world === active && !transitioning) placeOnRoute(b.t); }, 260);
       } else st.tTarget = b.t;
     } else respawn('travel', clamp(b.t - (vehicle.onRails ? 0 : 0.012), 0, 1));
   }
@@ -666,7 +732,12 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   } catch {
     /* no saved progress */
   }
-  await loadChapter(firstChapter, { t: resume, progress: onProgress });
+  try {
+    await loadChapter(firstChapter, { t: resume, progress: onProgress });
+  } catch (error) {
+    dispose();
+    throw error;
+  }
   if (resume) st.intro = 1;
   run();
 

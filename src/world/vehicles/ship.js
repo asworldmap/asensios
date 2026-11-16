@@ -87,9 +87,8 @@ export const ship = {
       chase(st, cam, want, env) {
         chaseCamera(st, cam, want, env, view);
         if (!walking) return;
-        object.updateMatrixWorld(true);
-        want.pos.copy(walker).add(new THREE.Vector3(0, 1.66, 0));
-        want.look.copy(want.pos).add(new THREE.Vector3(Math.sin(deckYaw), -0.08, Math.cos(deckYaw)));
+        want.pos.set(walker.x, walker.y + 1.66, walker.z);
+        want.look.set(want.pos.x + Math.sin(deckYaw), want.pos.y - 0.08, want.pos.z + Math.cos(deckYaw));
         object.localToWorld(want.pos);
         object.localToWorld(want.look);
         want.fov = env.portrait ? 69 : 65;

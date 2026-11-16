@@ -204,7 +204,7 @@ export async function build({ scene, tier, step, assets, shared }) {
     { t: mid, id: 'bridge', cine: true, keys: own('bridge'), place: 'world.place.bridge' },
     { t: 0.66, id: 'mwy', poi: 'mwy', keys: tr('ch6'), place: 'world.place.mwy' },
     { t: 0.815, id: 'eu', poi: 'eu', keys: tr('ch7'), place: 'world.place.eu' },
-    { t: 1, id: 'end', keys: own('end'), place: 'world.place.end', link: '/trajectory/' },
+    { t: 1, id: 'end', keys: own('end'), place: 'world.place.end', link: '/trajectory/', next: true },
   ];
   const sideOf = (id) => Math.sign(nearest(sites[id].x, sites[id].z, _n).side) || 1;
   // Camera keyframes in the bike's frame: metres behind, to its left, above; look-ahead; lens.
@@ -439,7 +439,6 @@ export async function build({ scene, tier, step, assets, shared }) {
   }
   const local = (base, x, y, z, ry = 0, sx = 1, sy = sx, sz = sx, rx = 0, rz = 0) => base.clone().multiply(M(x, y, z, ry, sx, sy, sz, rx, rz));
 
-  const WALLS = ['#f2e7d1', '#ecd9b6', '#e6c79c', '#dcae86', '#efe0c4', '#d9b06a'];
   const ROOFS = ['#b5573a', '#a94f35', '#c0623f'];
   const glowSpots = [];
 
@@ -455,12 +454,7 @@ export async function build({ scene, tier, step, assets, shared }) {
   }
 
   function lamp(x, z) {
-    const y = groundAt(x, z).y;
-    S.add(P.cyl6, '#4a4034', M(x, y + 1.4, z, 0, 0.05, 2.8, 0.05));
-    S.add(P.cone6, '#4a4034', M(x, y + 2.95, z, 0, 0.28, 0.22, 0.28));
-    Lg.add(P.ico, '#ffffff', M(x, y + 2.78, z, 0, 0.13));
-    glowSpots.push([x, y, z]);
-    solid(x, z, 0.18);
+    stamp('common/street_lamp', x, z, 0, { y: groundAt(x, z).y });
   }
 
   // Bridge over the Segura: a Blender asset, set down along the crossing.
@@ -508,7 +502,14 @@ export async function build({ scene, tier, step, assets, shared }) {
   }
 
   // Town and farmhouses, where the plan put them.
-  for (const h of townPlan) stamp(h.key, h.x, h.z, h.yaw, { y: heightAt(h.x, h.z) - 0.06, tint: h.tint });
+  const cameraBlockers = [];
+  for (const h of townPlan) {
+    const y = heightAt(h.x, h.z) - 0.06;
+    stamp(h.key, h.x, h.z, h.yaw, { y, tint: h.tint });
+    const [min, max] = assets.get(h.key).entry.bounds;
+    const box = new THREE.Box3(new THREE.Vector3(...min), new THREE.Vector3(...max));
+    cameraBlockers.push(box.applyMatrix4(M(h.x, y, h.z, h.yaw)).expandByScalar(0.3));
+  }
   for (let k = 0; k < 6; k++) {
     const a = (k / 6) * Math.PI * 2 + 0.5;
     const lx = plaza.x + Math.cos(a) * (plaza.r - 0.6);
@@ -563,21 +564,20 @@ export async function build({ scene, tier, step, assets, shared }) {
       const bx = plaza.x + Math.cos(a) * (plaza.r - 1.6);
       const bz = plaza.z + Math.sin(a) * (plaza.r - 1.6);
       if (nearest(bx, bz, _n).d < 3.4 || inSight(bx, bz)) continue;
-      const base = M(bx, plaza.y, bz, -a + Math.PI / 2);
-      S.add(P.box, '#8a6a45', local(base, 0, 0.46, 0, 0, 1.9, 0.08, 0.5));
-      S.add(P.box, '#8a6a45', local(base, 0, 0.78, -0.24, 0, 1.9, 0.34, 0.06));
-      for (const o of [-0.8, 0.8]) S.add(P.box, '#cdb48a', local(base, o, 0.22, 0, 0, 0.16, 0.44, 0.5));
-      solid(bx, bz, 0.8);
+      stamp('common/park_bench', bx, bz, -a + Math.PI / 2, { y: plaza.y });
     }
     for (const a of [0.15, 2.25, 3.85, 5.6]) {
       const bx = plaza.x + Math.cos(a) * (plaza.r - 0.9);
       const bz = plaza.z + Math.sin(a) * (plaza.r - 0.9);
       if (nearest(bx, bz, _n).d < 3.2 || inSight(bx, bz)) continue;
-      S.add(P.cyl8, '#cdb48a', M(bx, plaza.y + 0.3, bz, 0, 0.62, 0.6, 0.62));
-      V.add(P.ico1, '#5c8c40', M(bx, plaza.y + 0.95, bz, R() * 3, 0.72, 0.6, 0.72), () => 0.4);
-      V.add(P.ico, '#c9463d', M(bx + 0.25, plaza.y + 1.25, bz + 0.1, 0, 0.2), () => 0.5);
-      V.add(P.ico, '#e08a9a', M(bx - 0.3, plaza.y + 1.15, bz - 0.2, 0, 0.17), () => 0.5);
-      solid(bx, bz, 0.7);
+      stamp('common/planter', bx, bz, a, { y: plaza.y });
+    }
+    for (const a of [0.1, 2.2, 4.2, 5.8]) {
+      const x = plaza.x + Math.cos(a) * 4.4;
+      const z = plaza.z + Math.sin(a) * 4.4;
+      if (nearest(x, z, _n).d < 4 || inSight(x, z) || colliders.some((c) => Math.hypot(c.x - x, c.z - z) < 2.8)) continue;
+      stamp('murcia/fountain', x, z, a, { y: plaza.y });
+      break;
     }
   }
 
@@ -598,17 +598,14 @@ export async function build({ scene, tier, step, assets, shared }) {
     S.add(P.box, '#e6dcc4', M(ms.x, my + 0.32, ms.z, ms.yaw, 0.4, 0.7, 0.24));
     S.add(P.cyl8, '#b5573a', M(ms.x, my + 0.68, ms.z, ms.yaw, 0.2, 0.24, 0.12, 0, Math.PI / 2));
     solid(ms.x, ms.z, 0.3);
-    // Walls of field stones, two courses, with gaps to ride through.
     for (const [t0, t1, side] of [[0.042, 0.072, 3.3], [0.05, 0.1, -3.3], [0.105, 0.128, 3.3]]) {
-      let prev = null;
-      for (let t = t0; t < t1; t += 0.0031) {
-        const q = beside(t, side + (R() - 0.5) * 0.12);
-        const y = heightAt(q.x, q.z);
-        for (let course = 0; course < 2; course++) {
-          S.add(P.box, ['#cdb48a', '#bfa67c', '#d8c39a', '#b59b72'][Math.floor(R() * 4)], M(q.x, y + 0.2 + course * 0.36, q.z, q.yaw + (R() - 0.5) * 0.25, 0.42 + R() * 0.1, 0.34 + R() * 0.06, 0.6 + R() * 0.18));
-        }
-        if (prev) colliders.push({ type: 'segment', ax: prev.x, az: prev.z, bx: q.x, bz: q.z, r: 0.28, x: q.x, z: q.z });
-        prev = q;
+      const p = beside(t0, side);
+      const piece = stamp('murcia/stone_wall', p.x, p.z, p.yaw);
+      const seam = piece.anchors.find((a) => a.name === 'next');
+      const spacing = 2 * Math.hypot(seam.x - p.x, seam.z - p.z) / route.length;
+      for (let t = t0 + spacing; t < t1; t += spacing) {
+        const q = beside(t, side);
+        stamp('murcia/stone_wall', q.x, q.z, q.yaw);
       }
     }
   }
@@ -629,19 +626,9 @@ export async function build({ scene, tier, step, assets, shared }) {
     solid(x, z, 0.45 * s, { tree });
   }
   function palm(x, z) {
-    const y = heightAt(x, z);
-    const h = 4.2 + R() * 2;
-    const lean = (R() - 0.5) * 0.25;
-    const base = M(x, y, z, R() * 6);
-    for (let k = 0; k < 4; k++) {
-      V.add(P.taper, k % 2 ? '#8a6a45' : '#7d5f3d', local(base, lean * k * 0.5, (k + 0.5) * (h / 4), 0, 0, 0.2 - k * 0.02, h / 4 + 0.05, 0.2 - k * 0.02, 0, -lean), () => k * 0.12);
-    }
-    for (let k = 0; k < 8; k++) {
-      const a = (k / 8) * Math.PI * 2;
-      V.add(P.cone4, k % 2 ? '#5b8a45' : '#4f7c3e', local(base, lean * 2 + Math.cos(a) * 1.05, h - 0.1, Math.sin(a) * 1.05, -a, 0.34, 2.5, 0.09, 0, -Math.PI / 2 - 0.45), () => 0.9);
-    }
-    V.add(P.ico, '#6b4a2e', local(base, lean * 2, h, 0, 0, 0.3));
-    solid(x, z, 0.3);
+    const scale = 0.82 + R() * 0.35;
+    const yaw = R() * 6;
+    stamp('murcia/palm_tree', x, z, yaw, { scale });
   }
   function pine(x, z) {
     const y = heightAt(x, z);
@@ -966,12 +953,9 @@ export async function build({ scene, tier, step, assets, shared }) {
     const r1 = offset(s, yaw, 3.3, 3.45);
     S.add(P.box, '#7a5a3a', between(new THREE.Vector3(r0.x, y + 0.9, r0.z), new THREE.Vector3(r1.x, y + 0.9, r1.z), 0.09));
     const b = offset(s, yaw, -2.7, 1.6);
-    S.add(P.box, '#8a6a45', M(b.x, y + 0.45, b.z, yaw + 0.5, 1.6, 0.1, 0.5));
-    S.add(P.box, '#7a5a3a', M(b.x, y + 0.22, b.z, yaw + 0.5, 1.3, 0.44, 0.12));
-    solid(b.x, b.z, 0.8);
+    stamp('common/park_bench', b.x, b.z, yaw + 0.5, { y });
     const sp = offset(s, yaw, 2.8, 1.4);
-    S.add(P.cyl6, '#6b4a2e', M(sp.x, y + 1.5, sp.z, 0, 0.07, 3, 0.07));
-    solid(sp.x, sp.z, 0.25);
+    stamp('common/signpost', sp.x, sp.z, yaw, { y });
     signpost = { x: sp.x, y, z: sp.z, yaw };
     pine(offset(s, yaw, -5.5, -1).x, offset(s, yaw, -5.5, -1).z);
   }
@@ -1417,7 +1401,7 @@ export async function build({ scene, tier, step, assets, shared }) {
     rideHeight: 0.05,
     bounds: BOUNDS,
     river: riverZ,
-    colliders, pois, beats, shots, plaza, tower, bell,
+    colliders, cameraBlockers, pois, beats, shots, plaza, tower, bell,
     cine: [[bridgeT[0] - 0.012, bridgeT[1] + 0.012]],
     establishing: { from: [start.x + 44, start.y + 38, start.z + 26], look: [start.x + 14, start.y - 2, start.z - 22] },
     /** Nearest safe point on the route: never the middle of the bridge. */

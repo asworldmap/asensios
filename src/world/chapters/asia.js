@@ -6,7 +6,7 @@ export async function build(ctx) {
     id: 'asia', points: [[-32, -160], [-32, -25], [-32, 42], [22, 148], [110, 236]],
     height: (t) => 68 * smooth(0.25, 0.76, t),
     floor: -0.04, ground: '#758b78', stop: 0.92, radius: 24, bounds: 410, storyRate: 2.4,
-    card: { key: 'ch4', photo: '/media/korea-cherry-signpost.webp' },
+    card: { key: 'ch4', photo: '/media/korea-cherry-signpost.webp', href: '/trajectory/#ch4' },
     day: { skyTop: '#89adc4', fog: '#d3dce2', skyHorizon: '#e9d3bd', fogNear: 150, fogFar: 470 },
     shots: shots([0, 39, 47, 19, 0, 3.5, 44], [0.24, 53, -19, 15, 4, 4.6, 46], [0.55, 40, 38, 13, 4, 3.3, 48], [1, 58, 43, 18, 7, 4.2, 46]),
     establishing: { from: [23, 25, -197], look: [-32, 4, -139] },

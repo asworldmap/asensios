@@ -11,7 +11,7 @@ import { initTheme, currentTheme } from './lib/theme.js';
 import { initI18n, getLang } from './lib/i18n.js';
 import { prefersReducedMotion, deviceTier } from './lib/motion.js';
 import { dict } from './i18n/dict.js';
-import { CHAPTERS } from './world/chapters/index.js';
+import { CHAPTERS, JOURNEY } from './world/chapters/index.js';
 
 initTheme();
 initI18n();
@@ -27,6 +27,7 @@ const el = {
   body: document.documentElement,
   canvas: $('[data-canvas]'),
   cover: $('[data-cover]'),
+  coverLeg: $('[data-cover-leg]'),
   start: $('[data-start]'),
   startLabel: $('[data-start-label]'),
   progress: $('[data-progress]'),
@@ -38,6 +39,9 @@ const el = {
   capTitle: $('[data-cap-title]'),
   capText: $('[data-cap-text]'),
   capLink: $('[data-cap-link]'),
+  chapterNext: $('[data-chapter-next]'),
+  loading: $('[data-chapter-loading]'),
+  chapters: $('[data-chapters]'),
   open: $('[data-open]'),
   openLabel: $('[data-open-label]'),
   hint: $('[data-hint]'),
@@ -64,6 +68,7 @@ let beat = null;
 let dialog = null; // { root, restore }
 let chapter = { id: 'murcia', vehicle: 'bicycle', actions: { a: 'hop', b: 'bell' }, onRails: false };
 const hintSeen = { story: false, explore: false };
+let changing = false;
 
 // ------------------------------------------------------------- Plain mode
 function setPlain(on, withError = false) {
@@ -110,22 +115,52 @@ function renderCaption() {
     el.capMeta.textContent = tr(b.keys.meta);
     el.capTitle.textContent = tr(b.keys.title);
     el.capText.textContent = b.keys.text ? tr(b.keys.text) : '';
-    el.capLink.hidden = !b.link;
-    if (b.link) el.capLink.href = b.link;
   }
   renderOpen();
 }
 
+const nextChapter = () => {
+  const index = JOURNEY.findIndex((entry) => entry.id === chapter.id);
+  return index >= 0 ? JOURNEY[index + 1] : null;
+};
+
 function renderOpen() {
-  const can = !!near && (mode === 'explore' || !!beatInfo()?.poi);
+  const b = mode === 'story' ? beatInfo() : game?.world.beats.find((entry) => entry.poi && entry.poi === near);
+  const next = b?.next && nextChapter();
+  const can = !!near && (mode === 'explore' || !!b?.poi);
+  const link = b?.link;
   el.open.hidden = !can;
   if (can) el.openLabel.textContent = tr(near === 'playroom' ? 'world.open.playroom' : 'world.open');
-  el.body.classList.toggle('has-near', can && mode === 'explore');
+  el.capLink.hidden = !link;
+  if (link) el.capLink.href = link;
+  el.chapterNext.hidden = !next;
+  if (next) el.chapterNext.textContent = tr('world.journey.continue') + ' · ' + tr(next.title);
+  el.body.classList.toggle('has-near', !!(can || next || link) && mode === 'explore');
 }
 
+async function chooseChapter(id) {
+  if (!game || changing || id === chapter.id) return;
+  closeDialog();
+  if (await game.loadChapter(id)) {
+    const url = new URL(location.href);
+    if (id === 'murcia') url.searchParams.delete('chapter');
+    else url.searchParams.set('chapter', id);
+    history.replaceState(null, '', url);
+    $('[data-menu-open]').focus({ preventScroll: true });
+  }
+}
+
+el.chapterNext.addEventListener('click', () => {
+  const next = nextChapter();
+  if (next) void chooseChapter(next.id);
+});
+
+
 function renderHint() {
-  const free = chapter.onRails ? (coarse ? 'world.hint.railTouch' : 'world.hint.rail') : coarse ? 'world.hint.exploreTouch' : 'world.hint.explore';
-  const key = mode === 'story' ? (coarse ? 'world.hint.storyTouch' : 'world.hint.story') : free;
+  const suffix = coarse ? 'Touch' : '';
+  const controls = { train: 'rail', bus: 'bus', airplane: 'flight', ship: 'ship', bicycle: 'explore' };
+  const story = chapter.vehicle === 'bicycle' ? 'story' : 'journey';
+  const key = 'world.hint.' + (mode === 'story' ? story : controls[chapter.vehicle]) + suffix;
   el.hint.textContent = tr(key);
   el.hint.classList.toggle('is-on', !hintSeen[mode]);
 }
@@ -217,7 +252,7 @@ function fillCard(id) {
   stats.hidden = !poi.stats;
   if (poi.stats) stats.innerHTML = [1, 2, 3].map((n) => `<li>${tr(`${k}.stat${n}`)}</li>`).join('');
   link.textContent = tr('world.card.more');
-  link.href = '/trajectory/';
+  link.href = poi.href || '/trajectory/';
   return true;
 }
 function openCard(id = near) {
@@ -244,10 +279,30 @@ function renderTravel() {
   });
 }
 
+function renderChapterList() {
+  el.chapters.replaceChildren();
+  for (const def of JOURNEY) {
+    const li = document.createElement('li');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.chapterId = def.id;
+    button.textContent = tr(def.title);
+    if (def.id === chapter.id) {
+      button.setAttribute('aria-current', 'step');
+      button.disabled = true;
+    }
+    button.addEventListener('click', () => void chooseChapter(def.id));
+    li.append(button);
+    el.chapters.append(li);
+  }
+}
+
 /** The HUD follows whichever chapter and vehicle the engine has loaded. */
 function renderChapter() {
   const def = CHAPTERS[chapter.id];
   const labels = Array.from(document.querySelectorAll('.pw-chapter'));
+  el.coverLeg.setAttribute('data-i18n', def.id === 'murcia' ? 'world.cover.kicker' : def.label);
+  el.coverLeg.textContent = tr(el.coverLeg.getAttribute('data-i18n'));
   labels.forEach((n) => n.setAttribute('data-i18n', def.label));
   const title = document.getElementById('pw-menu-title');
   title.setAttribute('data-i18n', def.title);
@@ -257,6 +312,7 @@ function renderChapter() {
     const id = chapter.actions[slot];
     btn.hidden = !id;
     if (id) {
+      btn.textContent = { hop: '⤒', bell: '♪', horn: '♪', flight: '✈', deck: '⇄', doors: '↕' }[id];
       btn.setAttribute('data-i18n-attr', `aria-label:world.touch.${id}`);
       btn.setAttribute('aria-label', tr(`world.touch.${id}`));
     }
@@ -333,7 +389,9 @@ function drawMap() {
 }
 function openMenu() {
   if (!game || dialog) return;
+  if (changing) return;
   renderTravel();
+  renderChapterList();
   openDialog(el.menu);
   drawMap();
 }
@@ -461,7 +519,15 @@ function emit(type, value) {
     chapter = value;
     near = null;
     beat = null;
+    hintSeen.story = hintSeen.explore = false;
     if (game) renderChapter();
+  } else if (type === 'loading') {
+    changing = value;
+    el.loading.hidden = !value;
+    el.hud.inert = value;
+    el.body.classList.toggle('is-changing', value);
+  } else if (type === 'chapterError') {
+    toast('world.journey.error');
   } else if (type === 'mode') {
     mode = value;
     renderMode();
@@ -482,7 +548,7 @@ function emit(type, value) {
     el.lemonCount.textContent = String(value);
     if (value === 1) toast('world.toast.lemon');
   } else if (type === 'secret') {
-    if (value === 'bell') toast('world.toast.bell');
+    toast('world.toast.' + value);
   } else if (type === 'quality') {
     toast('world.toast.quality');
   } else if (type === 'context') {
@@ -494,8 +560,11 @@ function emit(type, value) {
 new MutationObserver((muts) => {
   for (const m of muts) {
     if (m.attributeName === 'lang') {
-      renderMode();
-      if (game && dialog?.root === el.menu) renderTravel();
+      if (game) renderChapter();
+      if (game && dialog?.root === el.menu) {
+        renderTravel();
+        renderChapterList();
+      }
       if (game && dialog?.root === el.card && cardId) fillCard(cardId);
       if (game && el.start.dataset.ready) el.startLabel.textContent = tr('world.cover.start');
     } else if (m.attributeName === 'data-theme') {
@@ -530,7 +599,7 @@ async function boot() {
       dark: currentTheme() === 'dark',
       onProgress,
       emit,
-      chapter: CHAPTERS[params.get('chapter')] ? params.get('chapter') : 'murcia',
+      chapter: Object.hasOwn(CHAPTERS, params.get('chapter')) ? params.get('chapter') : 'murcia',
     });
     renderChapter();
   } catch (err) {

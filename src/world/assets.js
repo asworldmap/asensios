@@ -99,25 +99,32 @@ export function createAssets() {
   /** Load a set of assets ("pack/id"). Resolves when all are ready to stamp. */
   async function load(keys, onProgress) {
     const man = await ready();
+    const unique = [...new Set(keys)];
     let done = 0;
-    await Promise.all(
-      keys.map(async (key) => {
-        if (!cache.has(key)) {
-          const entry = man.assets[key];
-          if (!entry) throw new Error(`asset "${key}" is not in the manifest`);
-          cache.set(
-            key,
-            loader.loadAsync(BASE + entry.file).then((gltf) => {
+    const results = await Promise.allSettled(unique.map(async (key) => {
+      if (!cache.has(key)) {
+        const entry = man.assets[key];
+        if (!entry) throw new Error('asset "' + key + '" is not in the manifest');
+        const pending = loader.loadAsync(BASE + entry.file)
+          .then((gltf) => {
+            const template = prepare(key, entry, gltf);
+            if (cache.get(key) === pending) {
+              cache.set(key, template);
               bytes += entry.bytes;
-              return prepare(key, entry, gltf);
-            })
-          );
-        }
-        const t = await cache.get(key);
-        cache.set(key, t);
-        onProgress?.(++done / keys.length);
-      })
-    );
+            } else release(template);
+            return template;
+          })
+          .catch((error) => {
+            if (cache.get(key) === pending) cache.delete(key);
+            throw error;
+          });
+        cache.set(key, pending);
+      }
+      await cache.get(key);
+      onProgress?.(++done / unique.length);
+    }));
+    const failure = results.find((result) => result.status === 'rejected');
+    if (failure) throw failure.reason;
   }
 
   function get(key) {
@@ -168,23 +175,32 @@ export function createAssets() {
     return { scene, nodes, entry: t.entry };
   }
 
-  function dispose() {
-    for (const t of cache.values()) {
-      if (!t || typeof t.then === 'function') continue;
-      t.parts.forEach((p) => p.geometry.dispose());
-      t.scene?.traverse((o) => {
-        if (o.isMesh) {
-          o.geometry.dispose();
-          o.material.map?.dispose();
-          o.material.dispose();
-        }
-      });
-    }
-    cache.clear();
+  function release(template) {
+    template.parts.forEach((p) => p.geometry.dispose());
+    template.scene?.traverse((node) => {
+      if (!node.isMesh) return;
+      node.geometry.dispose();
+      node.material.map?.dispose();
+      node.material.dispose();
+    });
   }
 
+  // Call after removing the chapter that owns the live hero instances.
+  function retain(keys) {
+    const keep = new Set(keys);
+    for (const [key, template] of cache) {
+      if (keep.has(key)) continue;
+      cache.delete(key);
+      if (typeof template.then === 'function') continue;
+      release(template);
+      bytes -= template.entry.bytes;
+    }
+  }
+
+  function dispose() { retain([]); }
+
   return {
-    ready, load, get, stamp, instance, dispose,
+    ready, load, get, stamp, instance, retain, dispose,
     get bytes() {
       return bytes;
     },

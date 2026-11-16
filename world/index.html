@@ -52,14 +52,14 @@
         <a class="mono ln pw-cover-back" href="/" data-i18n="traj.back">← Asensio Sabater</a>
         <p class="mono pw-kicker">
           <span class="rule" aria-hidden="true"></span>
-          <span data-i18n="world.cover.kicker">Capítulo 01 · Murcia</span>
+          <span data-cover-leg data-i18n="world.cover.kicker">Capítulo 01 · Murcia</span>
         </p>
         <h1 class="display pw-title">Pedal the <em>World</em></h1>
         <p class="lead pw-tag" data-i18n="world.cover.tag">Una historia jugable sobre una vida sin fronteras.</p>
 
         <div class="pw-cover-actions">
           <button class="pw-start" type="button" data-start hidden disabled>
-            <span data-start-label data-i18n="world.cover.loading">Montando el valle…</span>
+            <span data-start-label data-i18n="world.cover.loading">Preparando el viaje…</span>
             <span class="pw-start-bar" aria-hidden="true"><i data-progress></i></span>
           </button>
           <button class="pw-link" type="button" data-plain hidden data-i18n="world.cover.plain">Ver sin 3D</button>
@@ -68,7 +68,7 @@
           <span data-i18n="world.cover.error">No se ha podido cargar el mundo en 3D en este dispositivo. El contenido está aquí debajo.</span>
           <button class="pw-link" type="button" data-retry data-i18n="world.cover.retry">Reintentar</button>
         </p>
-        <p class="mono pw-note" data-i18n="world.cover.note">Prototipo · capítulo 1 de 4</p>
+        <p class="mono pw-note" data-i18n="world.cover.note">Viaje 3D · seis etapas</p>
       </div>
     </section>
 
@@ -104,6 +104,7 @@
             <span data-open-label>Abrir ficha</span> <kbd>Enter</kbd>
           </button>
           <a class="pw-open" href="/trajectory/" data-cap-link hidden data-i18n="world.card.more">Ver la trayectoria completa →</a>
+          <button class="pw-open" type="button" data-chapter-next hidden></button>
         </div>
       </div>
 
@@ -125,6 +126,8 @@
       <p class="pw-toast" data-toast role="status" aria-live="polite"></p>
       <pre class="pw-stats mono" data-stats hidden></pre>
     </div>
+
+    <p class="pw-chapter-loading mono" data-chapter-loading role="status" hidden data-i18n="world.journey.loading">Cargando etapa…</p>
 
     <!-- Project card -->
     <div class="pw-modal" data-card hidden>
@@ -161,12 +164,7 @@
             <ol class="pw-travel" data-travel></ol>
 
             <p class="mono pw-menu-h" data-i18n="world.menu.chapters">Capítulos</p>
-            <ol class="pw-chapters">
-              <li aria-current="true"><span class="mono">01</span> <span data-i18n="world.ch1">Murcia — Donde empezó</span></li>
-              <li class="is-soon"><span class="mono">02</span> <span data-i18n="world.ch2">Europa — Aprender haciendo</span> <em class="mono" data-i18n="world.menu.soon">en construcción</em></li>
-              <li class="is-soon"><span class="mono">03</span> <span data-i18n="world.ch3">Asia — Otra perspectiva</span> <em class="mono" data-i18n="world.menu.soon">en construcción</em></li>
-              <li class="is-soon"><span class="mono">04</span> <span data-i18n="world.ch4">Chile — Conectar mundos</span> <em class="mono" data-i18n="world.menu.soon">en construcción</em></li>
-            </ol>
+            <ol class="pw-chapters pw-travel" data-chapters></ol>
 
             <p class="mono pw-menu-h" data-i18n="world.menu.settings">Ajustes</p>
             <div class="pw-settings">
@@ -236,6 +234,15 @@
             <p data-i18n="traj.ch7.text">Convocatorias europeas, propuestas, plazos. Por dentro, una institución funciona como cualquier equipo: reglas, incentivos y gente intentando que algo salga.</p>
           </div>
         </article>
+
+        <h3 class="display" data-i18n="world.journey.remaining">El resto del viaje</h3>
+        <ul class="pw-index-journey">
+          <li><a class="ln" href="/trajectory/#ch5" data-i18n="world.leg.europe.label">Europa · Tren</a></li>
+          <li><a class="ln" href="/trajectory/#ch7" data-i18n="world.leg.europe-bus.label">Europa · Autobús</a></li>
+          <li><a class="ln" href="/trajectory/#ch4" data-i18n="world.leg.asia.label">Asia · Avión</a></li>
+          <li><a class="ln" href="/trajectory/#ch8" data-i18n="world.leg.japan.label">Japón · Barco</a></li>
+          <li><a class="ln" href="/trajectory/#ch10" data-i18n="world.leg.chile.label">Chile · La llegada</a></li>
+        </ul>
 
         <nav class="pw-index-links" aria-label="Portfolio">
           <a class="ln" href="/trajectory/" data-i18n="world.card.more">Ver la trayectoria completa →</a>

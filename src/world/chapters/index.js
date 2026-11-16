@@ -24,6 +24,8 @@
 const MURCIA_ASSETS = [
   'murcia/bridge_segura', 'murcia/lemon_tree', 'murcia/lemon_tree_far',
   'murcia/townhouse_a', 'murcia/townhouse_b', 'murcia/townhouse_c', 'murcia/farmhouse',
+  'murcia/palm_tree', 'murcia/stone_wall', 'murcia/fountain',
+  'common/street_lamp', 'common/park_bench', 'common/planter', 'common/signpost',
 ];
 
 export const CHAPTERS = {
@@ -81,6 +83,12 @@ export const CHAPTERS = {
     ],
     load: () => import('./japan.js'),
   },
+  chile: {
+    id: 'chile', order: 6, vehicle: 'bicycle', status: 'playable',
+    label: 'world.leg.chile.label', title: 'world.leg.chile.label',
+    assets: ['chile/andes_peak', 'chile/rock_outcrop', 'chile/araucaria', 'chile/tussock_grass', 'common/park_bench', 'common/signpost'],
+    load: () => import('./chile.js'),
+  },
   // Technical test track for vehicles. Not part of the story and never linked
   // from the public interface: reachable only with ?chapter=lab-rail.
   'lab-rail': {
@@ -96,11 +104,4 @@ export const CHAPTERS = {
   },
 };
 
-// The rest of the journey, as planned. Vehicles are design intent; the
-// biographical content of each chapter is added only once it is verified.
-export const PLANNED = [
-  { id: 'europe', order: 2, title: 'world.ch2', vehicles: ['train', 'bus'] },
-  { id: 'asia', order: 3, title: 'world.ch3', vehicles: ['airplane', 'ship'] },
-  { id: 'chile', order: 4, title: 'world.ch4', vehicles: [] },
-];
-
+export const JOURNEY = Object.values(CHAPTERS).filter((chapter) => !chapter.lab).sort((a, b) => a.order - b.order);

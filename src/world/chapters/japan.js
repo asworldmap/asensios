@@ -4,7 +4,7 @@ export async function build(ctx) {
   const s = scenery(ctx, {
     id: 'japan', points: [[-24, -106], [-23, -40], [-36, 8], [-34, 49], [-24, 106]],
     floor: 0, water: true, ground: '#4a8494', stop: 1, radius: 20, storyRate: 1.45,
-    card: { key: 'ch8', photo: '/media/japan-fuji-swy.webp' },
+    card: { key: 'ch8', photo: '/media/japan-fuji-swy.webp', href: '/trajectory/#ch8' },
     day: { skyTop: '#79a6be', skyHorizon: '#e8d5c2', fog: '#d7dde0', fogNear: 125, fogFar: 410 },
     shots: shots([0, 44, 43, 16, 0, 6, 47], [0.48, 32, -57, 20, 0, 5.5, 48], [1, 41, 37, 19, 2, 5.2, 43]),
     establishing: { from: [15, 24, -146], look: [-24, 7, -106] },
