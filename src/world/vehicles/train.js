@@ -1,95 +1,82 @@
-// Train — a prototype of the second vehicle, built to prove the interface.
-//
-// It is deliberately different from the bicycle in every way the engine has to
-// care about: it cannot leave its route, it has momentum instead of agility,
-// it is several bodies following one line, and its camera stands well back.
-// The model is placeholder geometry made here; a production train will arrive
-// as a hero asset through the Blender pipeline, behind this same interface.
-
 import * as THREE from 'three';
 import { clamp, damp, dampAngle } from '../kit.js';
+import { rig } from './rig.js';
 
-const CAR = 9.2; // length of one car, metres
-const GAP = 0.7;
+const CAB = 'vehicles/train_cab';
+const COACH = 'vehicles/train_coach';
 
 export const train = {
   id: 'train',
-  assets: [],
+  assets: [CAB, COACH],
   onRails: true,
   actions: { a: 'horn', b: null },
 
-  create() {
-    const root = new THREE.Group(); // stays at the origin: cars are placed in world space
-    const mats = {
-      body: new THREE.MeshLambertMaterial({ color: '#efe6d2' }),
-      band: new THREE.MeshLambertMaterial({ color: '#27512f' }),
-      roof: new THREE.MeshLambertMaterial({ color: '#b9b3a6' }),
-      glass: new THREE.MeshLambertMaterial({ color: '#33403f' }),
-      under: new THREE.MeshLambertMaterial({ color: '#2f2b27' }),
-      lamp: new THREE.MeshBasicMaterial({ color: '#fff3c4' }),
-    };
-    const box = new THREE.BoxGeometry(1, 1, 1);
-    const wheelGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.14, 12);
-    wheelGeo.rotateZ(Math.PI / 2);
-    const wheels = [];
-    const cars = [];
-    const part = (parent, mat, sx, sy, sz, x, y, z) => {
-      const m = new THREE.Mesh(box, mat);
-      m.scale.set(sx, sy, sz);
-      m.position.set(x, y, z);
-      m.castShadow = true;
-      parent.add(m);
-      return m;
-    };
-    for (let i = 0; i < 3; i++) {
-      const car = new THREE.Group();
-      const lead = i === 0;
-      part(car, mats.under, 2.3, 0.5, CAR - 0.6, 0, 0.75, 0);
-      part(car, mats.body, 2.6, 1.9, CAR, 0, 1.95, 0);
-      part(car, mats.band, 2.63, 0.42, CAR + 0.01, 0, 1.3, 0);
-      part(car, mats.roof, 2.3, 0.22, CAR - 0.4, 0, 3.0, 0);
-      for (const sx of [-1, 1]) for (let w = 0; w < 5; w++) part(car, mats.glass, 0.04, 0.72, 1.15, sx * 1.305, 2.25, -CAR / 2 + 1.25 + w * 1.66);
-      if (lead) {
-        const nose = part(car, mats.body, 2.4, 1.6, 1.2, 0, 1.8, CAR / 2 + 0.45);
-        nose.rotation.x = -0.28;
-        part(car, mats.glass, 2.0, 0.7, 0.05, 0, 2.3, CAR / 2 + 0.92).rotation.x = -0.28;
-        for (const sx of [-0.8, 0.8]) part(car, mats.lamp, 0.26, 0.16, 0.06, sx, 1.25, CAR / 2 + 1.12);
-      }
-      for (const z of [-CAR / 2 + 1.5, CAR / 2 - 1.5]) {
-        for (const sx of [-0.75, 0.75]) {
-          const w = new THREE.Mesh(wheelGeo, mats.under);
-          w.position.set(sx, 0.42, z);
-          car.add(w);
-          wheels.push(w);
-        }
-      }
-      root.add(car);
-      cars.push(car);
+  create({ assets }) {
+    const root = new THREE.Group();
+    const cars = [CAB, COACH, CAB].map((key, i) => {
+      const model = assets.instance(key);
+      const reversed = i === 2;
+      const front = model.scene.getObjectByName('ANCHOR_coupler_' + (reversed ? 'rear' : 'front'));
+      const rear = model.scene.getObjectByName('ANCHOR_coupler_' + (reversed ? 'front' : 'rear'));
+      root.add(model.scene);
+      return { ...model, reversed, nose: Math.abs(front.position.z), tail: Math.abs(rear.position.z), parts: rig(model) };
+    });
+    let distance = 0;
+    for (const car of cars) {
+      car.offset = distance + car.nose;
+      distance = car.offset + car.tail;
     }
-    const headlight = new THREE.SpotLight('#ffe9b0', 0, 60, 0.4, 0.6, 1.0);
-    cars[0].add(headlight, headlight.target);
-    headlight.position.set(0, 2, CAR / 2 + 1);
-    headlight.target.position.set(0, 0, CAR / 2 + 30);
+
+    const headlight = new THREE.SpotLight('#ffe9b0', 0, 55, 0.42, 0.65, 1);
+    const cab = cars[0].scene;
+    const lamp = cab.getObjectByName('ANCHOR_headlight_l');
+    headlight.position.set(0, lamp.position.y, lamp.position.z);
+    headlight.target.position.set(0, 0, lamp.position.z + 28);
+    cab.add(headlight, headlight.target);
 
     const p = {};
     const p2 = {};
-    let spin = 0;
+    let door = 0;
+    let roll = 0;
 
-    /** Each car sits on the route at its own distance behind the front. */
+    function sample(world, t, out) {
+      world.pointAt(t, out);
+      if (!world.route.closed && t < 0) {
+        out.x += out.tx * t * world.route.length;
+        out.z += out.tz * t * world.route.length;
+      }
+      return out;
+    }
+
     function place(st, world) {
-      const L = world.route.length;
-      cars.forEach((car, i) => {
-        const back = CAR / 2 + i * (CAR + GAP);
-        const a = world.pointAt(st.t - (back - CAR * 0.36) / L, p);
-        const b = world.pointAt(st.t - (back + CAR * 0.36) / L, p2);
-        car.position.set((a.x + b.x) / 2, (a.y + b.y) / 2 + 0.18, (a.z + b.z) / 2);
-        car.rotation.y = Math.atan2(a.x - b.x, a.z - b.z);
-      });
+      const length = world.route.length;
+      for (const car of cars) {
+        const t = st.t - car.offset / length;
+        const bogies = car.parts.filter((part) => part.role === 'bogie');
+        const sign = car.reversed ? -1 : 1;
+        const a = sample(world, t + bogies[0].pivot[2] * sign / length, p);
+        const b = sample(world, t + bogies[1].pivot[2] * sign / length, p2);
+        const span = bogies[0].pivot[2] - bogies[1].pivot[2];
+        const f = -bogies[1].pivot[2] / span;
+        const yaw = Math.atan2(a.x - b.x, a.z - b.z);
+        car.scene.position.set(b.x + f * (a.x - b.x), b.y + f * (a.y - b.y), b.z + f * (a.z - b.z));
+        car.scene.rotation.y = yaw;
+        a.yaw = Math.atan2(a.tx * sign, a.tz * sign);
+        b.yaw = Math.atan2(b.tx * sign, b.tz * sign);
+        bogies[0].turn(Math.atan2(Math.sin(a.yaw - yaw), Math.cos(a.yaw - yaw)));
+        bogies[1].turn(Math.atan2(Math.sin(b.yaw - yaw), Math.cos(b.yaw - yaw)));
+      }
     }
 
     function animate({ dt, st }) {
-      spin += (st.speed * dt) / 0.42;
-      for (const w of wheels) w.rotation.x = spin;
+      roll = (roll + st.speed * dt / cars[0].entry.meta.wheel_radius) % (2 * Math.PI);
+      door = damp(door, st.near && Math.abs(st.speed) < 0.2 ? 1 : 0, 4, dt);
+      for (const car of cars) {
+        for (const part of car.parts) {
+          if (part.role === 'wheel') part.turn(roll * (car.reversed ? -1 : 1));
+          if (part.role === 'door') part.slide(part.pivot[0] * (car.reversed ? -1 : 1) > 0 ? door : 0);
+        }
+      }
     }
 
     /** On rails there is one degree of freedom: how fast. */
@@ -145,16 +132,10 @@ export const train = {
       },
       setTheme(dark) {
         headlight.intensity = dark ? 120 : 0;
-        mats.lamp.color.set(dark ? '#fff3c4' : '#e9e1cc');
-        mats.glass.color.set(dark ? '#ffd98a' : '#33403f');
       },
       setCargo() {},
       setShadowBlob() {},
-      dispose() {
-        Object.values(mats).forEach((m) => m.dispose());
-        box.dispose();
-        wheelGeo.dispose();
-      },
+      dispose() { headlight.dispose(); },
     };
   },
 };

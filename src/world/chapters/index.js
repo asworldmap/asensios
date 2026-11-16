@@ -37,6 +37,15 @@ export const CHAPTERS = {
     assets: MURCIA_ASSETS,
     load: () => import('./murcia.js'),
   },
+  europe: {
+    id: 'europe', order: 2, vehicle: 'train', status: 'playable',
+    label: 'world.leg.europe.label', title: 'world.leg.europe.label',
+    assets: [
+      'europe/rail_track_straight', 'europe/rail_platform', 'europe/station_shelter',
+      'europe/rail_signal', 'europe/catenary_mast', 'europe/conifer', 'common/street_lamp',
+    ],
+    load: () => import('./europe.js'),
+  },
   // Technical test track for vehicles. Not part of the story and never linked
   // from the public interface: reachable only with ?chapter=lab-rail.
   'lab-rail': {
@@ -59,3 +68,4 @@ export const PLANNED = [
   { id: 'asia', order: 3, title: 'world.ch3', vehicles: ['airplane', 'ship'] },
   { id: 'chile', order: 4, title: 'world.ch4', vehicles: [] },
 ];
+
