@@ -1,0 +1,1345 @@
+{
+ "scene": "chile_arrival",
+ "space": "game: x left, y up, z forward (metres); yaw in radians about +y",
+ "camera": {
+  "position": [
+   -3.0,
+   3.5,
+   -4.5
+  ],
+  "look_at": [
+   6,
+   -8,
+   400
+  ],
+  "lens_mm": 26
+ },
+ "sun_direction": [
+  0.42,
+  0.3,
+  -0.86
+ ],
+ "notes": [
+  "Lookout = origin, view toward +z. Road along x at z = -6.5. Valley floor 42 m below from z = 75.",
+  "Backdrops in order of depth: city (scale 3.4 at 520 m), precordillera (6.5 at 860 m), Andes (14 at 1250 m).",
+  "If the far plane is shorter, bring all three in proportionally and scale by the same factor.",
+  "Evening sun from behind the viewer: the snow should be the brightest, warmest thing in frame."
+ ],
+ "extra": {},
+ "placements": [
+  {
+   "asset": "chile_v2/lookout_terrace",
+   "position": [
+    0,
+    0,
+    0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "open side faces the view (+z)"
+  },
+  {
+   "asset": "vehicles/coach_bus",
+   "position": [
+    11.5,
+    0,
+    -6.5
+   ],
+   "yaw": 1.6308,
+   "scale": 1.0,
+   "note": "existing coach, pulled in beside the lookout"
+  },
+  {
+   "asset": "chile/rock_outcrop",
+   "position": [
+    12,
+    -0.101,
+    7
+   ],
+   "yaw": 2.2861,
+   "scale": 1.0
+  },
+  {
+   "asset": "chile/rock_outcrop",
+   "position": [
+    -17,
+    -1.137,
+    12
+   ],
+   "yaw": 1.3843,
+   "scale": 1.2
+  },
+  {
+   "asset": "chile/rock_outcrop",
+   "position": [
+    20,
+    -1.865,
+    14
+   ],
+   "yaw": 0.9962,
+   "scale": 1.2
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    24.83,
+    -6.178,
+    22.026
+   ],
+   "yaw": 4.1408,
+   "scale": 1.232
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    -6.987,
+    -9.263,
+    26.022
+   ],
+   "yaw": 3.4586,
+   "scale": 1.369
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    9.695,
+    -11.545,
+    28.822
+   ],
+   "yaw": 2.6364,
+   "scale": 0.993
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    -21.01,
+    -9.355,
+    25.802
+   ],
+   "yaw": 1.0051,
+   "scale": 1.293
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    7.246,
+    -0.311,
+    8.547
+   ],
+   "yaw": 4.7059,
+   "scale": 0.92
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    22.014,
+    -10.817,
+    28.867
+   ],
+   "yaw": 1.2952,
+   "scale": 1.336
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    13.94,
+    -0.653,
+    10.25
+   ],
+   "yaw": 4.0197,
+   "scale": 0.974
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    24.793,
+    -7.968,
+    24.91
+   ],
+   "yaw": 5.88,
+   "scale": 0.932
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    -10.932,
+    -6.975,
+    23.117
+   ],
+   "yaw": 3.6492,
+   "scale": 1.009
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    23.267,
+    -10.886,
+    29.01
+   ],
+   "yaw": 1.8085,
+   "scale": 0.988
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    10.06,
+    -3.461,
+    17.587
+   ],
+   "yaw": 3.98,
+   "scale": 1.196
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    -6.311,
+    -0.165,
+    7.563
+   ],
+   "yaw": 0.8097,
+   "scale": 1.175
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    13.693,
+    -3.747,
+    18.067
+   ],
+   "yaw": 4.4666,
+   "scale": 1.224
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    22.821,
+    -7.397,
+    24.033
+   ],
+   "yaw": 1.9312,
+   "scale": 0.983
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    -26.056,
+    -0.229,
+    8.03
+   ],
+   "yaw": 5.1749,
+   "scale": 1.425
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    15.082,
+    -0.562,
+    9.843
+   ],
+   "yaw": 3.963,
+   "scale": 0.977
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    23.344,
+    -7.402,
+    24.041
+   ],
+   "yaw": 4.4977,
+   "scale": 1.265
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    -4.897,
+    -12.023,
+    29.058
+   ],
+   "yaw": 5.7701,
+   "scale": 1.045
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    -3.757,
+    -9.366,
+    26.069
+   ],
+   "yaw": 4.0797,
+   "scale": 1.146
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    -2.999,
+    -14.999,
+    32.158
+   ],
+   "yaw": 1.6557,
+   "scale": 1.027
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    11.168,
+    -1.879,
+    14.201
+   ],
+   "yaw": 5.3847,
+   "scale": 1.095
+  },
+  {
+   "asset": "chile/tussock_grass",
+   "position": [
+    25.477,
+    -3.249,
+    16.875
+   ],
+   "yaw": 5.3107,
+   "scale": 1.351
+  },
+  {
+   "asset": "chile_v2/espino_tree",
+   "position": [
+    -16,
+    -1.929,
+    14
+   ],
+   "yaw": 4.3921,
+   "scale": 1.007,
+   "note": "dry hillside"
+  },
+  {
+   "asset": "chile_v2/espino_tree",
+   "position": [
+    19,
+    -4.995,
+    20
+   ],
+   "yaw": 0.9855,
+   "scale": 0.916,
+   "note": "dry hillside"
+  },
+  {
+   "asset": "chile_v2/espino_tree",
+   "position": [
+    -26,
+    -12.657,
+    30
+   ],
+   "yaw": 1.0838,
+   "scale": 1.233,
+   "note": "dry hillside"
+  },
+  {
+   "asset": "chile_v2/espino_tree",
+   "position": [
+    9,
+    -12.727,
+    30
+   ],
+   "yaw": 0.3862,
+   "scale": 1.019,
+   "note": "dry hillside"
+  },
+  {
+   "asset": "chile_v2/espino_tree",
+   "position": [
+    30,
+    -18.436,
+    38
+   ],
+   "yaw": 3.4022,
+   "scale": 0.978,
+   "note": "dry hillside"
+  },
+  {
+   "asset": "chile_v2/espino_tree",
+   "position": [
+    -12,
+    -25.752,
+    44
+   ],
+   "yaw": 1.9744,
+   "scale": 1.014,
+   "note": "dry hillside"
+  },
+  {
+   "asset": "chile_v2/espino_tree",
+   "position": [
+    -36,
+    -31.138,
+    52
+   ],
+   "yaw": 4.0565,
+   "scale": 0.959,
+   "note": "dry hillside"
+  },
+  {
+   "asset": "chile_v2/espino_tree",
+   "position": [
+    22,
+    -34.996,
+    56
+   ],
+   "yaw": 5.9851,
+   "scale": 1.199,
+   "note": "dry hillside"
+  },
+  {
+   "asset": "chile_v2/espino_tree",
+   "position": [
+    -48,
+    -5.386,
+    22
+   ],
+   "yaw": 4.2783,
+   "scale": 1.176,
+   "note": "dry hillside"
+  },
+  {
+   "asset": "chile_v2/espino_tree",
+   "position": [
+    44,
+    -1.966,
+    14
+   ],
+   "yaw": 2.9869,
+   "scale": 1.385,
+   "note": "dry hillside"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -86.0,
+    -42.0,
+    96.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -86.0,
+    -42.0,
+    117.5
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -86.0,
+    -42.0,
+    139.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -86.0,
+    -42.0,
+    160.5
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -86.0,
+    -42.0,
+    182.0
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -86.0,
+    -42.0,
+    203.5
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -64.5,
+    -42.0,
+    96.0
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -64.5,
+    -42.0,
+    117.5
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -64.5,
+    -42.0,
+    139.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -64.5,
+    -42.0,
+    160.5
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -64.5,
+    -42.0,
+    182.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -64.5,
+    -42.0,
+    203.5
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -43.0,
+    -42.0,
+    96.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -43.0,
+    -42.0,
+    117.5
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -43.0,
+    -42.0,
+    139.0
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -43.0,
+    -42.0,
+    182.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -43.0,
+    -42.0,
+    203.5
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -21.5,
+    -42.0,
+    96.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -21.5,
+    -42.0,
+    117.5
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -21.5,
+    -42.0,
+    139.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -21.5,
+    -42.0,
+    160.5
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -21.5,
+    -42.0,
+    182.0
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    -21.5,
+    -42.0,
+    203.5
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    0.0,
+    -42.0,
+    96.0
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    0.0,
+    -42.0,
+    117.5
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    0.0,
+    -42.0,
+    139.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    0.0,
+    -42.0,
+    160.5
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    0.0,
+    -42.0,
+    182.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    0.0,
+    -42.0,
+    203.5
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    21.5,
+    -42.0,
+    96.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    21.5,
+    -42.0,
+    139.0
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    21.5,
+    -42.0,
+    160.5
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    21.5,
+    -42.0,
+    182.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    21.5,
+    -42.0,
+    203.5
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    43.0,
+    -42.0,
+    96.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    43.0,
+    -42.0,
+    117.5
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    43.0,
+    -42.0,
+    139.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    43.0,
+    -42.0,
+    160.5
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    43.0,
+    -42.0,
+    203.5
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    64.5,
+    -42.0,
+    96.0
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    64.5,
+    -42.0,
+    117.5
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    64.5,
+    -42.0,
+    139.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    64.5,
+    -42.0,
+    160.5
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    64.5,
+    -42.0,
+    182.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    64.5,
+    -42.0,
+    203.5
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    86.0,
+    -42.0,
+    96.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    86.0,
+    -42.0,
+    117.5
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    86.0,
+    -42.0,
+    139.0
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    86.0,
+    -42.0,
+    160.5
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    86.0,
+    -42.0,
+    182.0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/vineyard_rows",
+   "position": [
+    86.0,
+    -42.0,
+    203.5
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "vineyard tile (20 m) with a track between blocks"
+  },
+  {
+   "asset": "chile_v2/adobe_house",
+   "position": [
+    21.5,
+    -42.0,
+    117.5
+   ],
+   "yaw": 3.3416,
+   "scale": 1.0,
+   "note": "farmhouse; corridor faces the lookout"
+  },
+  {
+   "asset": "chile_v2/poplar_row",
+   "position": [
+    32.5,
+    -42.0,
+    117.5
+   ],
+   "yaw": 0.1,
+   "scale": 1.0
+  },
+  {
+   "asset": "chile_v2/adobe_house",
+   "position": [
+    -43,
+    -42.0,
+    160.5
+   ],
+   "yaw": 2.8416,
+   "scale": 1.0,
+   "note": "farmhouse; corridor faces the lookout"
+  },
+  {
+   "asset": "chile_v2/poplar_row",
+   "position": [
+    -32,
+    -42.0,
+    160.5
+   ],
+   "yaw": 0.1,
+   "scale": 1.0
+  },
+  {
+   "asset": "chile_v2/adobe_house",
+   "position": [
+    43,
+    -42.0,
+    182
+   ],
+   "yaw": 3.2416,
+   "scale": 1.0,
+   "note": "farmhouse; corridor faces the lookout"
+  },
+  {
+   "asset": "chile_v2/poplar_row",
+   "position": [
+    54,
+    -42.0,
+    182
+   ],
+   "yaw": 0.1,
+   "scale": 1.0
+  },
+  {
+   "asset": "chile_v2/poplar_row",
+   "position": [
+    -98,
+    -42.0,
+    110
+   ],
+   "yaw": 0,
+   "scale": 1.223,
+   "note": "windbreak"
+  },
+  {
+   "asset": "chile_v2/poplar_row",
+   "position": [
+    -98,
+    -42.0,
+    150
+   ],
+   "yaw": 0,
+   "scale": 1.205,
+   "note": "windbreak"
+  },
+  {
+   "asset": "chile_v2/poplar_row",
+   "position": [
+    98,
+    -42.0,
+    120
+   ],
+   "yaw": 0,
+   "scale": 1.007,
+   "note": "windbreak"
+  },
+  {
+   "asset": "chile_v2/poplar_row",
+   "position": [
+    98,
+    -42.0,
+    170
+   ],
+   "yaw": 0,
+   "scale": 1.147,
+   "note": "windbreak"
+  },
+  {
+   "asset": "chile_v2/poplar_row",
+   "position": [
+    -40,
+    -42.0,
+    228
+   ],
+   "yaw": 1.5708,
+   "scale": 1.235,
+   "note": "windbreak"
+  },
+  {
+   "asset": "chile_v2/poplar_row",
+   "position": [
+    0,
+    -42.0,
+    228
+   ],
+   "yaw": 1.5708,
+   "scale": 1.16,
+   "note": "windbreak"
+  },
+  {
+   "asset": "chile_v2/poplar_row",
+   "position": [
+    50,
+    -42.0,
+    230
+   ],
+   "yaw": 1.5708,
+   "scale": 1.128,
+   "note": "windbreak"
+  },
+  {
+   "asset": "chile_v2/poplar_row",
+   "position": [
+    -70,
+    -42.0,
+    84
+   ],
+   "yaw": 1.5708,
+   "scale": 1.162,
+   "note": "windbreak"
+  },
+  {
+   "asset": "chile_v2/poplar_row",
+   "position": [
+    64,
+    -42.0,
+    84
+   ],
+   "yaw": 1.5708,
+   "scale": 1.044,
+   "note": "windbreak"
+  },
+  {
+   "asset": "chile_v2/poplar_row",
+   "position": [
+    -120,
+    -42.0,
+    200
+   ],
+   "yaw": 0.3,
+   "scale": 1.182,
+   "note": "windbreak"
+  },
+  {
+   "asset": "chile_v2/poplar_row",
+   "position": [
+    130,
+    -42.0,
+    230
+   ],
+   "yaw": -0.2,
+   "scale": 1.196,
+   "note": "windbreak"
+  },
+  {
+   "asset": "chile_v2/city_basin_backdrop",
+   "position": [
+    -470,
+    -42.0,
+    550
+   ],
+   "yaw": 3.0416,
+   "scale": 3.4,
+   "note": "city in the haze; scale 3.4"
+  },
+  {
+   "asset": "chile_v2/city_basin_backdrop",
+   "position": [
+    -220,
+    -42.0,
+    535
+   ],
+   "yaw": 3.0916,
+   "scale": 3.4,
+   "note": "city in the haze; scale 3.4"
+  },
+  {
+   "asset": "chile_v2/city_basin_backdrop",
+   "position": [
+    30,
+    -42.0,
+    520
+   ],
+   "yaw": 3.1416,
+   "scale": 3.4,
+   "note": "city in the haze; scale 3.4"
+  },
+  {
+   "asset": "chile_v2/city_basin_backdrop",
+   "position": [
+    280,
+    -42.0,
+    535
+   ],
+   "yaw": 3.1916,
+   "scale": 3.4,
+   "note": "city in the haze; scale 3.4"
+  },
+  {
+   "asset": "chile_v2/city_basin_backdrop",
+   "position": [
+    530,
+    -42.0,
+    550
+   ],
+   "yaw": 3.2416,
+   "scale": 3.4,
+   "note": "city in the haze; scale 3.4"
+  },
+  {
+   "asset": "chile_v2/foothill_ridge",
+   "position": [
+    -780,
+    -46.0,
+    900
+   ],
+   "yaw": 2.9016,
+   "scale": 6.5,
+   "note": "precordillera; scale 6.5"
+  },
+  {
+   "asset": "chile_v2/foothill_ridge",
+   "position": [
+    -360,
+    -46.0,
+    880
+   ],
+   "yaw": 3.0216,
+   "scale": 6.5,
+   "note": "precordillera; scale 6.5"
+  },
+  {
+   "asset": "chile_v2/foothill_ridge",
+   "position": [
+    60,
+    -46.0,
+    860
+   ],
+   "yaw": 3.1416,
+   "scale": 6.5,
+   "note": "precordillera; scale 6.5"
+  },
+  {
+   "asset": "chile_v2/foothill_ridge",
+   "position": [
+    480,
+    -46.0,
+    880
+   ],
+   "yaw": 3.2616,
+   "scale": 6.5,
+   "note": "precordillera; scale 6.5"
+  },
+  {
+   "asset": "chile_v2/foothill_ridge",
+   "position": [
+    900,
+    -46.0,
+    900
+   ],
+   "yaw": 3.3816,
+   "scale": 6.5,
+   "note": "precordillera; scale 6.5"
+  },
+  {
+   "asset": "chile_v2/foothill_ridge",
+   "position": [
+    -260,
+    -46.0,
+    380
+   ],
+   "yaw": 1.8708,
+   "scale": 2.6,
+   "note": "side ridge closing the valley"
+  },
+  {
+   "asset": "chile_v2/foothill_ridge",
+   "position": [
+    300,
+    -46.0,
+    420
+   ],
+   "yaw": -1.2708,
+   "scale": 2.6,
+   "note": "side ridge closing the valley"
+  },
+  {
+   "asset": "chile_v2/cordillera_backdrop",
+   "position": [
+    -1720,
+    -52.0,
+    1370
+   ],
+   "yaw": 2.8616,
+   "scale": 14.0,
+   "note": "the Andes; scale 14"
+  },
+  {
+   "asset": "chile_v2/cordillera_backdrop",
+   "position": [
+    -860,
+    -52.0,
+    1310
+   ],
+   "yaw": 3.0016,
+   "scale": 14.0,
+   "note": "the Andes; scale 14"
+  },
+  {
+   "asset": "chile_v2/cordillera_backdrop",
+   "position": [
+    0,
+    -52.0,
+    1250
+   ],
+   "yaw": 3.1416,
+   "scale": 14.0,
+   "note": "the Andes; scale 14"
+  },
+  {
+   "asset": "chile_v2/cordillera_backdrop",
+   "position": [
+    860,
+    -52.0,
+    1310
+   ],
+   "yaw": 3.2816,
+   "scale": 14.0,
+   "note": "the Andes; scale 14"
+  },
+  {
+   "asset": "chile_v2/cordillera_backdrop",
+   "position": [
+    1720,
+    -52.0,
+    1370
+   ],
+   "yaw": 3.4216,
+   "scale": 14.0,
+   "note": "the Andes; scale 14"
+  }
+ ]
+}

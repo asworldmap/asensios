@@ -1,0 +1,1084 @@
+{
+ "scene": "asia_arrival",
+ "space": "game: x left, y up, z forward (metres); yaw in radians about +y",
+ "camera": {
+  "position": [
+   21.0,
+   1.7,
+   38.0
+  ],
+  "look_at": [
+   -1.0,
+   6.5,
+   0.0
+  ],
+  "lens_mm": 27
+ },
+ "sun_direction": [
+  -0.8,
+  0.17,
+  -0.42
+ ],
+ "notes": [
+  "Aircraft at the origin, nose +z. Airstairs on its +x side at door_front; terminal 62 m behind the tail.",
+  "Dawn: sun very low behind the terminal (rim light on the fuselage). Warm, humid haze.",
+  "Skyline is generic and far: scale 6.5 at ~900 m, scale 4 at ~640 m; let fog take most of it."
+ ],
+ "extra": {},
+ "placements": [
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -60,
+    -0.03,
+    -40
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -60,
+    -0.03,
+    -20
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -60,
+    -0.03,
+    0
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -60,
+    -0.03,
+    20
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -60,
+    -0.03,
+    40
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -60,
+    -0.03,
+    60
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -40,
+    -0.03,
+    -40
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -40,
+    -0.03,
+    -20
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -40,
+    -0.03,
+    0
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -40,
+    -0.03,
+    20
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -40,
+    -0.03,
+    40
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -40,
+    -0.03,
+    60
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -20,
+    -0.03,
+    -40
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -20,
+    -0.03,
+    -20
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -20,
+    -0.03,
+    0
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -20,
+    -0.03,
+    20
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -20,
+    -0.03,
+    40
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    -20,
+    -0.03,
+    60
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    0,
+    -0.03,
+    -40
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    0,
+    -0.03,
+    -20
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    0,
+    -0.03,
+    0
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    0,
+    -0.03,
+    20
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    0,
+    -0.03,
+    40
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    0,
+    -0.03,
+    60
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    20,
+    -0.03,
+    -40
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    20,
+    -0.03,
+    -20
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    20,
+    -0.03,
+    0
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    20,
+    -0.03,
+    20
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    20,
+    -0.03,
+    40
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    20,
+    -0.03,
+    60
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    40,
+    -0.03,
+    -40
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    40,
+    -0.03,
+    -20
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    40,
+    -0.03,
+    0
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    40,
+    -0.03,
+    20
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    40,
+    -0.03,
+    40
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    40,
+    -0.03,
+    60
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    60,
+    -0.03,
+    -40
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    60,
+    -0.03,
+    -20
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    60,
+    -0.03,
+    0
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    60,
+    -0.03,
+    20
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    60,
+    -0.03,
+    40
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "asia_v2/apron_tile",
+   "position": [
+    60,
+    -0.03,
+    60
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "apron tile (20 m)"
+  },
+  {
+   "asset": "vehicles/airliner",
+   "position": [
+    0,
+    0,
+    0
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "existing aircraft; nose +z"
+  },
+  {
+   "asset": "asia_v2/airstairs",
+   "position": [
+    7.1,
+    0,
+    13.9
+   ],
+   "yaw": 3.1416,
+   "scale": 1.0,
+   "note": "top landing at the aircraft's door_front"
+  },
+  {
+   "asset": "asia_v2/pushback_tug",
+   "position": [
+    0.3,
+    0,
+    27.0
+   ],
+   "yaw": 3.1416,
+   "scale": 1.0,
+   "note": "tow bar toward the nose wheel"
+  },
+  {
+   "asset": "asia/baggage_cart",
+   "position": [
+    9.5,
+    0,
+    -1.0
+   ],
+   "yaw": 0.25,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/baggage_cart",
+   "position": [
+    10.6,
+    0,
+    -8.2
+   ],
+   "yaw": 0.2,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/baggage_cart",
+   "position": [
+    15.5,
+    0,
+    6.0
+   ],
+   "yaw": 1.3,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/runway_light",
+   "position": [
+    -34,
+    0,
+    -30
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/runway_light",
+   "position": [
+    34,
+    0,
+    -30
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/runway_light",
+   "position": [
+    -34,
+    0,
+    -15
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/runway_light",
+   "position": [
+    34,
+    0,
+    -15
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/runway_light",
+   "position": [
+    -34,
+    0,
+    0
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/runway_light",
+   "position": [
+    34,
+    0,
+    0
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/runway_light",
+   "position": [
+    -34,
+    0,
+    15
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/runway_light",
+   "position": [
+    34,
+    0,
+    15
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/runway_light",
+   "position": [
+    -34,
+    0,
+    30
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/runway_light",
+   "position": [
+    34,
+    0,
+    30
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/runway_light",
+   "position": [
+    -34,
+    0,
+    45
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/runway_light",
+   "position": [
+    34,
+    0,
+    45
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/runway_light",
+   "position": [
+    -34,
+    0,
+    60
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/runway_light",
+   "position": [
+    34,
+    0,
+    60
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia_v2/windsock",
+   "position": [
+    44,
+    0,
+    34
+   ],
+   "yaw": 0.4,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia_v2/terminal_hall",
+   "position": [
+    -21,
+    0,
+    -62
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "glass front faces the apron (+z)"
+  },
+  {
+   "asset": "asia_v2/terminal_hall",
+   "position": [
+    21,
+    0,
+    -62
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia_v2/control_tower",
+   "position": [
+    -50,
+    0,
+    -86
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "tower; base block toward the terminal"
+  },
+  {
+   "asset": "asia/terminal_bay",
+   "position": [
+    -36,
+    0,
+    -49.5
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0,
+   "note": "existing gate bay against the hall"
+  },
+  {
+   "asset": "asia/terminal_bay",
+   "position": [
+    -26,
+    0,
+    -49.5
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0,
+   "note": "existing gate bay against the hall"
+  },
+  {
+   "asset": "asia/terminal_bay",
+   "position": [
+    -16,
+    0,
+    -49.5
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0,
+   "note": "existing gate bay against the hall"
+  },
+  {
+   "asset": "asia/terminal_bay",
+   "position": [
+    6,
+    0,
+    -49.5
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0,
+   "note": "existing gate bay against the hall"
+  },
+  {
+   "asset": "asia/terminal_bay",
+   "position": [
+    16,
+    0,
+    -49.5
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0,
+   "note": "existing gate bay against the hall"
+  },
+  {
+   "asset": "asia/terminal_bay",
+   "position": [
+    26,
+    0,
+    -49.5
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0,
+   "note": "existing gate bay against the hall"
+  },
+  {
+   "asset": "asia/terminal_bay",
+   "position": [
+    36,
+    0,
+    -49.5
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0,
+   "note": "existing gate bay against the hall"
+  },
+  {
+   "asset": "asia/jet_bridge",
+   "position": [
+    -26,
+    0,
+    -46
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia/jet_bridge",
+   "position": [
+    26,
+    0,
+    -46
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0
+  },
+  {
+   "asset": "asia_v2/rain_tree",
+   "position": [
+    -78,
+    0,
+    -50
+   ],
+   "yaw": 0.0737,
+   "scale": 0.934
+  },
+  {
+   "asset": "asia_v2/rain_tree",
+   "position": [
+    -84,
+    0,
+    -22
+   ],
+   "yaw": 2.357,
+   "scale": 1.105
+  },
+  {
+   "asset": "asia_v2/rain_tree",
+   "position": [
+    -80,
+    0,
+    8
+   ],
+   "yaw": 0.8321,
+   "scale": 0.934
+  },
+  {
+   "asset": "asia_v2/rain_tree",
+   "position": [
+    -86,
+    0,
+    36
+   ],
+   "yaw": 1.3908,
+   "scale": 1.127
+  },
+  {
+   "asset": "asia_v2/rain_tree",
+   "position": [
+    82,
+    0,
+    -20
+   ],
+   "yaw": 0.8844,
+   "scale": 1.122
+  },
+  {
+   "asset": "asia_v2/rain_tree",
+   "position": [
+    86,
+    0,
+    12
+   ],
+   "yaw": 3.973,
+   "scale": 0.941
+  },
+  {
+   "asset": "asia_v2/rain_tree",
+   "position": [
+    80,
+    0,
+    44
+   ],
+   "yaw": 3.214,
+   "scale": 1.034
+  },
+  {
+   "asset": "asia_v2/rain_tree",
+   "position": [
+    -60,
+    0,
+    -88
+   ],
+   "yaw": 2.4754,
+   "scale": 1.199
+  },
+  {
+   "asset": "asia_v2/rain_tree",
+   "position": [
+    0,
+    0,
+    -92
+   ],
+   "yaw": 0.5587,
+   "scale": 0.906
+  },
+  {
+   "asset": "asia_v2/rain_tree",
+   "position": [
+    60,
+    0,
+    -90
+   ],
+   "yaw": 5.6388,
+   "scale": 1.021
+  },
+  {
+   "asset": "asia/bamboo_clump",
+   "position": [
+    -70,
+    0,
+    -30
+   ],
+   "yaw": 1.191,
+   "scale": 1.2
+  },
+  {
+   "asset": "asia/bamboo_clump",
+   "position": [
+    -73,
+    0,
+    22
+   ],
+   "yaw": 1.9819,
+   "scale": 1.2
+  },
+  {
+   "asset": "asia/bamboo_clump",
+   "position": [
+    74,
+    0,
+    -2
+   ],
+   "yaw": 2.1894,
+   "scale": 1.2
+  },
+  {
+   "asset": "asia/bamboo_clump",
+   "position": [
+    72,
+    0,
+    30
+   ],
+   "yaw": 5.7307,
+   "scale": 1.2
+  },
+  {
+   "asset": "asia_v2/skyline_backdrop",
+   "position": [
+    -990,
+    0,
+    -990
+   ],
+   "yaw": -0.36,
+   "scale": 6.5,
+   "note": "far skyline; scale 6.5"
+  },
+  {
+   "asset": "asia_v2/skyline_backdrop",
+   "position": [
+    -660,
+    0,
+    -960
+   ],
+   "yaw": -0.24,
+   "scale": 6.5,
+   "note": "far skyline; scale 6.5"
+  },
+  {
+   "asset": "asia_v2/skyline_backdrop",
+   "position": [
+    -330,
+    0,
+    -930
+   ],
+   "yaw": -0.12,
+   "scale": 6.5,
+   "note": "far skyline; scale 6.5"
+  },
+  {
+   "asset": "asia_v2/skyline_backdrop",
+   "position": [
+    0,
+    0,
+    -900
+   ],
+   "yaw": 0.0,
+   "scale": 6.5,
+   "note": "far skyline; scale 6.5"
+  },
+  {
+   "asset": "asia_v2/skyline_backdrop",
+   "position": [
+    330,
+    0,
+    -930
+   ],
+   "yaw": 0.12,
+   "scale": 6.5,
+   "note": "far skyline; scale 6.5"
+  },
+  {
+   "asset": "asia_v2/skyline_backdrop",
+   "position": [
+    660,
+    0,
+    -960
+   ],
+   "yaw": 0.24,
+   "scale": 6.5,
+   "note": "far skyline; scale 6.5"
+  },
+  {
+   "asset": "asia_v2/skyline_backdrop",
+   "position": [
+    990,
+    0,
+    -990
+   ],
+   "yaw": 0.36,
+   "scale": 6.5,
+   "note": "far skyline; scale 6.5"
+  },
+  {
+   "asset": "asia_v2/skyline_backdrop",
+   "position": [
+    -180,
+    0,
+    -640
+   ],
+   "yaw": 3.0416,
+   "scale": 4.0,
+   "note": "nearer district; scale 4"
+  },
+  {
+   "asset": "asia_v2/skyline_backdrop",
+   "position": [
+    120,
+    0,
+    -640
+   ],
+   "yaw": 3.1416,
+   "scale": 4.0,
+   "note": "nearer district; scale 4"
+  },
+  {
+   "asset": "asia_v2/skyline_backdrop",
+   "position": [
+    420,
+    0,
+    -640
+   ],
+   "yaw": 3.2416,
+   "scale": 4.0,
+   "note": "nearer district; scale 4"
+  }
+ ]
+}

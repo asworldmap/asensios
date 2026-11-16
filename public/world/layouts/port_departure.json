@@ -1,0 +1,863 @@
+{
+ "scene": "port_departure",
+ "space": "game: x left, y up, z forward (metres); yaw in radians about +y",
+ "camera": {
+  "position": [
+   -47.0,
+   4.1,
+   67.0
+  ],
+  "look_at": [
+   -22,
+   6.5,
+   0
+  ],
+  "lens_mm": 24
+ },
+ "sun_direction": [
+  -0.55,
+  0.26,
+  0.62
+ ],
+ "notes": [
+  "Quay face = z axis at x = 0; water is -x, land +x. Waterline y = 0; quay and pier decks y = 1.6.",
+  "Ship (existing vehicles/passenger_ship) lies at x = -7, bow +z. Gangway head meets her 4.4 m deck.",
+  "Camera = the pier head 'view' anchor: the departure shot. Reverse it for the arrival.",
+  "Water, sky, haze are render-only; see ART_HANDOFF.md 'Ocean technique' for the web version."
+ ],
+ "extra": {},
+ "placements": [
+  {
+   "asset": "maritime/quay_section",
+   "position": [
+    0,
+    0,
+    -60
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing quay tile; face at x = 0"
+  },
+  {
+   "asset": "maritime/quay_section",
+   "position": [
+    0,
+    0,
+    -50
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing quay tile; face at x = 0"
+  },
+  {
+   "asset": "maritime/quay_section",
+   "position": [
+    0,
+    0,
+    -40
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing quay tile; face at x = 0"
+  },
+  {
+   "asset": "maritime/quay_section",
+   "position": [
+    0,
+    0,
+    -30
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing quay tile; face at x = 0"
+  },
+  {
+   "asset": "maritime/quay_section",
+   "position": [
+    0,
+    0,
+    -20
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing quay tile; face at x = 0"
+  },
+  {
+   "asset": "maritime/quay_section",
+   "position": [
+    0,
+    0,
+    -10
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing quay tile; face at x = 0"
+  },
+  {
+   "asset": "maritime/quay_section",
+   "position": [
+    0,
+    0,
+    0
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing quay tile; face at x = 0"
+  },
+  {
+   "asset": "maritime/quay_section",
+   "position": [
+    0,
+    0,
+    10
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing quay tile; face at x = 0"
+  },
+  {
+   "asset": "maritime/quay_section",
+   "position": [
+    0,
+    0,
+    20
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing quay tile; face at x = 0"
+  },
+  {
+   "asset": "maritime/quay_section",
+   "position": [
+    0,
+    0,
+    30
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing quay tile; face at x = 0"
+  },
+  {
+   "asset": "maritime/quay_section",
+   "position": [
+    0,
+    0,
+    40
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing quay tile; face at x = 0"
+  },
+  {
+   "asset": "maritime/quay_section",
+   "position": [
+    0,
+    0,
+    50
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing quay tile; face at x = 0"
+  },
+  {
+   "asset": "maritime/quay_section",
+   "position": [
+    0,
+    0,
+    60
+   ],
+   "yaw": 0.0,
+   "scale": 1.0,
+   "note": "existing quay tile; face at x = 0"
+  },
+  {
+   "asset": "vehicles/passenger_ship",
+   "position": [
+    -7.0,
+    0,
+    -4
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "alongside, bow +z"
+  },
+  {
+   "asset": "maritime_v2/gangway",
+   "position": [
+    2.0,
+    1.6,
+    6
+   ],
+   "yaw": 3.1416,
+   "scale": 1.0,
+   "note": "foot on the quay, head at the ship's 4.4 m deck"
+  },
+  {
+   "asset": "maritime/harbour_light",
+   "position": [
+    6.5,
+    1.6,
+    -35
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime/harbour_light",
+   "position": [
+    6.5,
+    1.6,
+    -15
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime/harbour_light",
+   "position": [
+    6.5,
+    1.6,
+    20
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime/harbour_light",
+   "position": [
+    6.5,
+    1.6,
+    40
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime_v2/harbour_office",
+   "position": [
+    17,
+    1.6,
+    2
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0,
+   "note": "front faces the quay (-x)"
+  },
+  {
+   "asset": "maritime_v2/harbour_office",
+   "position": [
+    19,
+    1.6,
+    -34
+   ],
+   "yaw": -1.4508,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime_v2/dock_clutter",
+   "position": [
+    4.5,
+    1.6,
+    22
+   ],
+   "yaw": 0.3,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime_v2/dock_clutter",
+   "position": [
+    5.5,
+    1.6,
+    -22
+   ],
+   "yaw": 2.4,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime_v2/dock_clutter",
+   "position": [
+    9.0,
+    1.6,
+    44
+   ],
+   "yaw": 1.2,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime/cargo_crate",
+   "position": [
+    3.5,
+    1.6,
+    14
+   ],
+   "yaw": 2.7746,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime/cargo_crate",
+   "position": [
+    4.8,
+    1.6,
+    14.6
+   ],
+   "yaw": 2.8458,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime/cargo_crate",
+   "position": [
+    4.1,
+    2.8,
+    14.2
+   ],
+   "yaw": 2.6773,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime/cargo_crate",
+   "position": [
+    3.2,
+    1.6,
+    -10
+   ],
+   "yaw": 0.2507,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime/cargo_crate",
+   "position": [
+    7.5,
+    1.6,
+    30
+   ],
+   "yaw": 1.7761,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime/life_ring_stand",
+   "position": [
+    1.2,
+    1.6,
+    -28
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime/life_ring_stand",
+   "position": [
+    1.2,
+    1.6,
+    34
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0
+  },
+  {
+   "asset": "common/park_bench",
+   "position": [
+    9.5,
+    1.6,
+    10
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0
+  },
+  {
+   "asset": "common/park_bench",
+   "position": [
+    9.5,
+    1.6,
+    -4
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0
+  },
+  {
+   "asset": "common/signpost",
+   "position": [
+    8.5,
+    1.6,
+    9
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime_v2/pier_section",
+   "position": [
+    -5,
+    0,
+    62
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0,
+   "note": "pier tile; local +z runs seaward"
+  },
+  {
+   "asset": "maritime_v2/pier_section",
+   "position": [
+    -15,
+    0,
+    62
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0,
+   "note": "pier tile; local +z runs seaward"
+  },
+  {
+   "asset": "maritime_v2/pier_section",
+   "position": [
+    -25,
+    0,
+    62
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0,
+   "note": "pier tile; local +z runs seaward"
+  },
+  {
+   "asset": "maritime_v2/pier_section",
+   "position": [
+    -35,
+    0,
+    62
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0,
+   "note": "pier tile; local +z runs seaward"
+  },
+  {
+   "asset": "maritime_v2/pier_head",
+   "position": [
+    -44,
+    0,
+    62
+   ],
+   "yaw": -1.5708,
+   "scale": 1.0,
+   "note": "bench and beacon face the open sea"
+  },
+  {
+   "asset": "maritime_v2/fishing_boat",
+   "position": [
+    -14,
+    0,
+    56.6
+   ],
+   "yaw": 1.6308,
+   "scale": 1.0,
+   "note": "moored on the pier's south side"
+  },
+  {
+   "asset": "maritime_v2/fishing_boat",
+   "position": [
+    -27,
+    0,
+    67.4
+   ],
+   "yaw": -1.6708,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime_v2/fishing_boat",
+   "position": [
+    -3.2,
+    0,
+    47
+   ],
+   "yaw": 0.08,
+   "scale": 0.9
+  },
+  {
+   "asset": "maritime_v2/fishing_boat",
+   "position": [
+    -25,
+    0,
+    43
+   ],
+   "yaw": 4.0416,
+   "scale": 1.0,
+   "note": "heading out"
+  },
+  {
+   "asset": "maritime/mooring_buoy",
+   "position": [
+    -30,
+    0,
+    40
+   ],
+   "yaw": 0,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime/mooring_buoy",
+   "position": [
+    -46,
+    0,
+    20
+   ],
+   "yaw": 1.0,
+   "scale": 1.0
+  },
+  {
+   "asset": "maritime_v2/deck_bench",
+   "position": [
+    -8,
+    1.6,
+    62.9
+   ],
+   "yaw": 3.1416,
+   "scale": 1.0,
+   "note": "also at home on the ship's decks"
+  },
+  {
+   "asset": "maritime_v2/breakwater",
+   "position": [
+    2,
+    0,
+    -80
+   ],
+   "yaw": 1.7708,
+   "scale": 1.0,
+   "note": "rubble mole sheltering the berth"
+  },
+  {
+   "asset": "maritime_v2/breakwater",
+   "position": [
+    -18,
+    0,
+    -76
+   ],
+   "yaw": 1.7708,
+   "scale": 1.0,
+   "note": "rubble mole sheltering the berth"
+  },
+  {
+   "asset": "maritime_v2/breakwater",
+   "position": [
+    -38,
+    0,
+    -72
+   ],
+   "yaw": 1.7708,
+   "scale": 1.0,
+   "note": "rubble mole sheltering the berth"
+  },
+  {
+   "asset": "maritime_v2/breakwater",
+   "position": [
+    -58,
+    0,
+    -68
+   ],
+   "yaw": 1.7708,
+   "scale": 1.0,
+   "note": "rubble mole sheltering the berth"
+  },
+  {
+   "asset": "maritime_v2/lighthouse",
+   "position": [
+    -64,
+    0,
+    -68
+   ],
+   "yaw": 0.6,
+   "scale": 1.0,
+   "note": "at the mole end"
+  },
+  {
+   "asset": "maritime_v2/deck_vent",
+   "position": [
+    -7,
+    9.8,
+    -14
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "on the ship's upper deck (y = 9.8)"
+  },
+  {
+   "asset": "maritime_v2/deck_vent",
+   "position": [
+    -7,
+    9.8,
+    -6
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "on the ship's upper deck (y = 9.8)"
+  },
+  {
+   "asset": "maritime_v2/deck_vent",
+   "position": [
+    -7,
+    9.8,
+    10
+   ],
+   "yaw": 0,
+   "scale": 1.0,
+   "note": "on the ship's upper deck (y = 9.8)"
+  },
+  {
+   "asset": "maritime_v2/deck_bench",
+   "position": [
+    -10.2,
+    7.15,
+    4
+   ],
+   "yaw": 1.5708,
+   "scale": 1.0,
+   "note": "promenade deck (y = 7.15)"
+  },
+  {
+   "asset": "maritime_v2/coast_headland",
+   "position": [
+    -210,
+    0,
+    -230
+   ],
+   "yaw": 0.35,
+   "scale": 2.2,
+   "note": "headland across the bay"
+  },
+  {
+   "asset": "maritime_v2/coast_headland",
+   "position": [
+    -60,
+    0,
+    -300
+   ],
+   "yaw": 0.1,
+   "scale": 2.6
+  },
+  {
+   "asset": "maritime_v2/coast_headland",
+   "position": [
+    66,
+    0,
+    -70
+   ],
+   "yaw": 1.7708,
+   "scale": 1.5,
+   "note": "wooded rise behind the port"
+  },
+  {
+   "asset": "maritime_v2/coast_headland",
+   "position": [
+    72,
+    0,
+    0
+   ],
+   "yaw": 1.5708,
+   "scale": 1.6,
+   "note": "wooded rise behind the port"
+  },
+  {
+   "asset": "maritime_v2/coast_headland",
+   "position": [
+    64,
+    0,
+    70
+   ],
+   "yaw": 1.3708,
+   "scale": 1.4,
+   "note": "wooded rise behind the port"
+  },
+  {
+   "asset": "maritime_v2/coast_headland",
+   "position": [
+    70,
+    0,
+    140
+   ],
+   "yaw": 1.9708,
+   "scale": 1.6,
+   "note": "wooded rise behind the port"
+  },
+  {
+   "asset": "maritime_v2/coast_headland",
+   "position": [
+    120,
+    0,
+    -150
+   ],
+   "yaw": 1.5708,
+   "scale": 2.4,
+   "note": "wooded rise behind the port"
+  },
+  {
+   "asset": "maritime_v2/horizon_islands",
+   "position": [
+    -640,
+    0,
+    -260
+   ],
+   "yaw": 1.8708,
+   "scale": 6.5,
+   "note": "far islands; scale 5.5\u20137.5"
+  },
+  {
+   "asset": "maritime_v2/horizon_islands",
+   "position": [
+    -700,
+    0,
+    80
+   ],
+   "yaw": 1.3208,
+   "scale": 7.5,
+   "note": "far islands; scale 5.5\u20137.5"
+  },
+  {
+   "asset": "maritime_v2/horizon_islands",
+   "position": [
+    -560,
+    0,
+    -520
+   ],
+   "yaw": 2.2708,
+   "scale": 5.5,
+   "note": "far islands; scale 5.5\u20137.5"
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    38.712,
+    3.845,
+    9.513
+   ],
+   "yaw": 0.7818,
+   "scale": 0.996
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    39.337,
+    3.92,
+    -36.844
+   ],
+   "yaw": 2.7302,
+   "scale": 0.912
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    28.573,
+    2.629,
+    36.501
+   ],
+   "yaw": 2.5275,
+   "scale": 1.156
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    48.026,
+    4.963,
+    -16.151
+   ],
+   "yaw": 0.3453,
+   "scale": 1.292
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    43.674,
+    4.441,
+    28.687
+   ],
+   "yaw": 3.7259,
+   "scale": 1.385
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    36.884,
+    3.626,
+    43.968
+   ],
+   "yaw": 2.2121,
+   "scale": 1.186
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    45.816,
+    4.698,
+    -22.841
+   ],
+   "yaw": 0.5144,
+   "scale": 1.137
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    47.537,
+    4.904,
+    18.591
+   ],
+   "yaw": 2.6847,
+   "scale": 1.221
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    31.461,
+    2.975,
+    -43.219
+   ],
+   "yaw": 1.9405,
+   "scale": 1.308
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    31.868,
+    3.024,
+    -52.855
+   ],
+   "yaw": 0.5916,
+   "scale": 0.919
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    34.267,
+    3.312,
+    15.923
+   ],
+   "yaw": 4.924,
+   "scale": 1.065
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    37.09,
+    3.651,
+    -26.727
+   ],
+   "yaw": 1.8287,
+   "scale": 1.289
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    42.47,
+    4.296,
+    -31.237
+   ],
+   "yaw": 0.6428,
+   "scale": 1.292
+  },
+  {
+   "asset": "europe/conifer",
+   "position": [
+    47.214,
+    4.866,
+    54.285
+   ],
+   "yaw": 1.4282,
+   "scale": 1.173
+  }
+ ]
+}
