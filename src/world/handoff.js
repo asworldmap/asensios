@@ -82,10 +82,10 @@ export function playShot(from, to, seconds, set, skipped) {
   const a = copy(from);
   const b = copy(to);
   const shot = copy(from);
-  let started;
+  const started = performance.now();
+  set(shot);
   return new Promise((resolve) => {
     function step(now) {
-      started ??= now;
       const t = skipped() ? 1 : Math.min(1, (now - started) / (seconds * 1000));
       const k = (1 - Math.cos(Math.PI * t)) / 2;
       shot.pos.lerpVectors(a.pos, b.pos, k);

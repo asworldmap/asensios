@@ -30,14 +30,15 @@ try {
     return chapter === 'chile' && state.t > 0.995 && !document.querySelector('[data-cap-link]').hidden;
   }, null, { timeout: 255000, polling: 250 });
   const timing = await p.evaluate(() => ({ ...window.directorCut, duration: performance.now() - window.directorCut.started }));
+  console.log('Story measured (ms): ' + Math.round(timing.duration));
+  console.log('Transition times (ms): ' + timing.cuts.map(Math.round).join(', '));
   assert.deepEqual(timing.stages.map(({ id }) => id), ['murcia', 'europe', 'europe-bus', 'japan', 'flight', 'chile']);
   assert.ok(timing.duration >= 180000 && timing.duration <= 240000, JSON.stringify(timing));
   assert.equal(timing.cuts.length, 5);
   assert.ok(timing.cuts.every((ms) => ms <= 4200), JSON.stringify(timing.cuts));
   assert.equal(await p.getAttribute('[data-cap-link]', 'href'), '/trajectory/');
   assert.deepEqual(errs, []);
-  console.log('PASS full hands-free Story in ' + Math.round(timing.duration / 1000) + ' seconds');
-  console.log('Transition times (ms): ' + timing.cuts.map(Math.round).join(', '));
+  console.log('PASS full hands-free Story');
 } finally {
   await b.close();
 }

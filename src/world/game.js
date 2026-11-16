@@ -567,10 +567,11 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     try {
       await assets.load(keys, (f) => progress(0.08 + f * 0.22, 'assets'));
       const mod = await def.load();
-      const step = (label, f) => new Promise((res) => {
+      const step = (label, f) => {
         progress(0.3 + f * 0.66, label);
-        requestAnimationFrame(() => res());
-      });
+        // While the splice covers the scene, there is no progress frame to paint.
+        return directed ? Promise.resolve() : new Promise(requestAnimationFrame);
+      };
       nextWorld = await mod.build({ scene, tier, step, assets, shared });
       nextVehicle = vdef.create({ assets, tier });
     } catch (error) {
@@ -646,9 +647,9 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     emit('handoff', { id: sequence.id, phase: 'out', skippable: !calm });
     vehicle.object.updateWorldMatrix(true, true);
     const out = getShot(false);
-    if (!calm && out) await playShot(cam, out, type === 'white_out' ? 0.9 : 1.05, set, skipped);
+    if (!calm && out) await playShot(cam, out, type === 'white_out' ? 0.78 : 0.88, set, skipped);
     emit('splice', type);
-    if (!calm && !skipped()) await delay(type === 'horizon_hold' ? 330 : 240);
+    if (!calm && !skipped()) await delay(type === 'horizon_hold' ? 280 : 220);
     await preload;
     await loadChapter(id, { fromStory: true, directed: true });
     vehicle.place(st, world);
@@ -660,7 +661,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     if (handoffCamera) await new Promise(requestAnimationFrame);
     emit('splice', null);
     emit('handoff', { id: sequence.id, phase: 'in', skippable: !calm });
-    if (!calm && next) await playShot(next, normal, type === 'white_out' ? 1.45 : 1.05, set, skipped);
+    if (!calm && next) await playShot(next, normal, type === 'white_out' ? 1.20 : 0.91, set, skipped);
   }
 
   async function travelToChapter(id, { fromStory = false } = {}) {
