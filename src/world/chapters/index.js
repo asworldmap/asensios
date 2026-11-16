@@ -46,6 +46,18 @@ export const CHAPTERS = {
     ],
     load: () => import('./europe.js'),
   },
+  "europe-bus": {
+    id: 'europe-bus', order: 3, vehicle: 'bus', status: 'playable',
+    label: 'world.leg.europe-bus.label', title: 'world.leg.europe-bus.label',
+    assets: [
+      'europe/conifer',
+      'europe/road_guardrail',
+      'europe/road_sign',
+      'common/park_bench',
+      'common/street_lamp',
+    ],
+    load: () => import('./europe-bus.js'),
+  },
   // Technical test track for vehicles. Not part of the story and never linked
   // from the public interface: reachable only with ?chapter=lab-rail.
   'lab-rail': {
