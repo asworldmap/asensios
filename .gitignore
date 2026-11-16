@@ -15,3 +15,4 @@ blog-artifacts/
 # Blender backups and Python caches
 *.blend1
 __pycache__/
+tools/world/blender/logs/

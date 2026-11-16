@@ -10,4 +10,4 @@ Python module. Written against Blender 4.2 LTS – 5.x; version differences are
 absorbed here, not in asset scripts.
 """
 
-from .kit import Kit, SURFACES, CONTRACT_VERSION, hex_to_linear  # noqa: F401
+from .kit import Kit, SURFACES, CONTRACT_VERSION, GLASS_ALPHA, hex_to_linear  # noqa: F401

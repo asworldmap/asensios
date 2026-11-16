@@ -20,7 +20,7 @@ const ASSET_DIR = path.join(REPO, 'public', 'world', 'assets');
 const MANIFEST = path.join(ASSET_DIR, 'manifest.json');
 
 export const CONTRACT = 1;
-export const SURFACES = ['stone', 'plaster', 'terracotta', 'wood', 'earth', 'foliage', 'metal', 'paint', 'rubber', 'cloth', 'skin', 'window', 'glow'];
+export const SURFACES = ['stone', 'plaster', 'terracotta', 'wood', 'earth', 'foliage', 'metal', 'paint', 'rubber', 'cloth', 'skin', 'window', 'glow', 'glass'];
 export const LIMITS = {
   batched: { triangles: 8000, bytes: 450 * 1024, textures: 0, textureSize: 0 },
   hero: { triangles: 20000, bytes: 1536 * 1024, textures: 4, textureSize: 1024 },
@@ -146,9 +146,10 @@ export function validateGlb(buf, { id, pack, assetClass, triBudget } = {}) {
       if (!/^ANCHOR_[a-z][a-z0-9_]*$/.test(name)) err(`anchor "${name}" must match ANCHOR_lower_snake_case`);
       if (n.mesh != null) err(`anchor "${name}" must be an empty, not a mesh`);
       info.anchors.push(name.slice(7));
-    } else if (name.startsWith('PART_')) {
+    } else if (name.startsWith('PART_') && n.mesh == null) {
       if (!/^PART_[a-z][a-z0-9_]*$/.test(name)) err(`part "${name}" must match PART_lower_snake_case`);
       if (cls === 'batched') err(`"${name}": PART_ nodes are only meaningful in hero assets (batched assets are merged into one mesh)`);
+      if (!x.ptw_role) warn(`part "${name}" has no ptw_role; integrators rely on it`);
       info.parts.push(name.slice(5));
     }
   }
@@ -158,7 +159,8 @@ export function validateGlb(buf, { id, pack, assetClass, triBudget } = {}) {
   for (const m of g.materials || []) {
     const s = (m.name || '').replace(/^M_/, '');
     if (!m.name?.startsWith('M_') || !SURFACES.includes(s)) err(`material "${m.name}" is not in the surface library (M_${SURFACES.join(', M_')})`);
-    if (m.alphaMode && m.alphaMode !== 'OPAQUE') err(`material "${m.name}": alphaMode ${m.alphaMode} is not allowed (opaque only)`);
+    if (m.alphaMode && m.alphaMode !== 'OPAQUE' && !(s === 'glass' && cls === 'hero' && m.alphaMode === 'BLEND')) err(`material "${m.name}": alphaMode ${m.alphaMode} is not allowed (only M_glass in hero assets may blend)`);
+    if (s === 'glass' && cls !== 'hero') err('M_glass is only allowed in hero assets');
     if (m.doubleSided) warn(`material "${m.name}" is double-sided; enable backface culling unless the mesh is a single open sheet`);
     if (cls === 'batched') {
       const p = m.pbrMetallicRoughness || {};

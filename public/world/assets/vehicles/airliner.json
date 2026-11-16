@@ -1,0 +1,365 @@
+{
+  "id": "airliner",
+  "pack": "vehicles",
+  "class": "hero",
+  "contract": 1,
+  "file": "vehicles/airliner.glb",
+  "bytes": 289376,
+  "sha256": "42217e452efd177f90af58a643ff997802f19c042a53ce98834db73203356d15",
+  "triangles": 4700,
+  "tri_budget": 16000,
+  "materials": [
+    "M_glow",
+    "M_metal",
+    "M_paint",
+    "M_rubber",
+    "M_window"
+  ],
+  "bounds": [
+    [
+      -17.12,
+      0.0,
+      -18.35
+    ],
+    [
+      17.12,
+      11.45,
+      18.0
+    ]
+  ],
+  "origin": "ground-centre",
+  "seed": 12,
+  "params": {},
+  "colliders": 0,
+  "anchors": [
+    "chase",
+    "cockpit_view",
+    "door_front",
+    "landing_light",
+    "window_view"
+  ],
+  "parts": [
+    "PART_aileron_l",
+    "PART_aileron_r",
+    "PART_door_front_l",
+    "PART_door_front_r",
+    "PART_door_rear_l",
+    "PART_door_rear_r",
+    "PART_elevator_l",
+    "PART_elevator_r",
+    "PART_fan_l",
+    "PART_fan_r",
+    "PART_flap_l",
+    "PART_flap_r",
+    "PART_gear_main_l",
+    "PART_gear_main_r",
+    "PART_gear_nose",
+    "PART_rudder",
+    "PART_wheel_main_l",
+    "PART_wheel_main_r",
+    "PART_wheel_nose"
+  ],
+  "rig": [
+    {
+      "name": "PART_aileron_l",
+      "node": "PART_aileron_l",
+      "pivot": [
+        11.275,
+        3.47,
+        -4.5084
+      ],
+      "role": "aileron",
+      "axis": "hinge",
+      "hinge": [
+        0.9079,
+        0.0956,
+        -0.4082
+      ],
+      "limit_deg": 25
+    },
+    {
+      "name": "PART_aileron_r",
+      "node": "PART_aileron_r",
+      "pivot": [
+        -11.275,
+        3.47,
+        -4.5084
+      ],
+      "role": "aileron",
+      "axis": "hinge",
+      "hinge": [
+        -0.9079,
+        0.0956,
+        -0.4082
+      ],
+      "limit_deg": 25
+    },
+    {
+      "name": "PART_door_front_l",
+      "node": "PART_door_front_l",
+      "pivot": [
+        1.95,
+        3.75,
+        14.35
+      ],
+      "role": "door",
+      "axis": "y",
+      "limit_deg": 105,
+      "swings": "out"
+    },
+    {
+      "name": "PART_door_front_r",
+      "node": "PART_door_front_r",
+      "pivot": [
+        -1.95,
+        3.75,
+        14.35
+      ],
+      "role": "door",
+      "axis": "y",
+      "limit_deg": 105,
+      "swings": "out"
+    },
+    {
+      "name": "PART_door_rear_l",
+      "node": "PART_door_rear_l",
+      "pivot": [
+        1.833,
+        3.75,
+        -8.75
+      ],
+      "role": "door",
+      "axis": "y",
+      "limit_deg": 105,
+      "swings": "out"
+    },
+    {
+      "name": "PART_door_rear_r",
+      "node": "PART_door_rear_r",
+      "pivot": [
+        -1.833,
+        3.75,
+        -8.75
+      ],
+      "role": "door",
+      "axis": "y",
+      "limit_deg": 105,
+      "swings": "out"
+    },
+    {
+      "name": "PART_elevator_l",
+      "node": "PART_elevator_l",
+      "pivot": [
+        1.09,
+        4.615,
+        -15.876
+      ],
+      "role": "elevator",
+      "axis": "hinge",
+      "hinge": [
+        0.9642,
+        0.0735,
+        -0.2549
+      ],
+      "limit_deg": 25
+    },
+    {
+      "name": "PART_elevator_r",
+      "node": "PART_elevator_r",
+      "pivot": [
+        -1.09,
+        4.615,
+        -15.876
+      ],
+      "role": "elevator",
+      "axis": "hinge",
+      "hinge": [
+        -0.9642,
+        0.0735,
+        -0.2549
+      ],
+      "limit_deg": 25
+    },
+    {
+      "name": "PART_fan_l",
+      "node": "PART_fan_l",
+      "pivot": [
+        5.5,
+        1.5,
+        3.62
+      ],
+      "role": "fan",
+      "axis": "z"
+    },
+    {
+      "name": "PART_fan_r",
+      "node": "PART_fan_r",
+      "pivot": [
+        -5.5,
+        1.5,
+        3.62
+      ],
+      "role": "fan",
+      "axis": "z"
+    },
+    {
+      "name": "PART_flap_l",
+      "node": "PART_flap_l",
+      "pivot": [
+        2.204,
+        2.492,
+        -1.432
+      ],
+      "role": "flap",
+      "axis": "hinge",
+      "hinge": [
+        0.9631,
+        0.106,
+        -0.2474
+      ],
+      "limit_deg": 35
+    },
+    {
+      "name": "PART_flap_r",
+      "node": "PART_flap_r",
+      "pivot": [
+        -2.204,
+        2.492,
+        -1.432
+      ],
+      "role": "flap",
+      "axis": "hinge",
+      "hinge": [
+        -0.9631,
+        0.106,
+        -0.2474
+      ],
+      "limit_deg": 35
+    },
+    {
+      "name": "PART_gear_main_l",
+      "node": "PART_gear_main_l",
+      "pivot": [
+        2.75,
+        2.0,
+        -1.6
+      ],
+      "role": "landing_gear",
+      "axis": "z",
+      "limit_deg": 84,
+      "retracts": "inboard"
+    },
+    {
+      "name": "PART_gear_main_r",
+      "node": "PART_gear_main_r",
+      "pivot": [
+        -2.75,
+        2.0,
+        -1.6
+      ],
+      "role": "landing_gear",
+      "axis": "z",
+      "limit_deg": 84,
+      "retracts": "inboard"
+    },
+    {
+      "name": "PART_gear_nose",
+      "node": "PART_gear_nose",
+      "pivot": [
+        0.0,
+        1.8,
+        13.6
+      ],
+      "role": "landing_gear",
+      "axis": "x",
+      "limit_deg": 95,
+      "retracts": "forward"
+    },
+    {
+      "name": "PART_rudder",
+      "node": "PART_rudder",
+      "pivot": [
+        0.0,
+        5.25,
+        -15.54
+      ],
+      "role": "rudder",
+      "axis": "hinge",
+      "hinge": [
+        0.0,
+        0.9484,
+        -0.3172
+      ],
+      "limit_deg": 25
+    },
+    {
+      "name": "PART_wheel_main_l",
+      "node": "PART_wheel_main_l",
+      "pivot": [
+        2.75,
+        0.56,
+        -1.6
+      ],
+      "parent": "PART_gear_main_l",
+      "role": "wheel",
+      "axis": "x",
+      "radius": 0.56,
+      "twin": true
+    },
+    {
+      "name": "PART_wheel_main_r",
+      "node": "PART_wheel_main_r",
+      "pivot": [
+        -2.75,
+        0.56,
+        -1.6
+      ],
+      "parent": "PART_gear_main_r",
+      "role": "wheel",
+      "axis": "x",
+      "radius": 0.56,
+      "twin": true
+    },
+    {
+      "name": "PART_wheel_nose",
+      "node": "PART_wheel_nose",
+      "pivot": [
+        0.0,
+        0.42,
+        13.6
+      ],
+      "parent": "PART_gear_nose",
+      "role": "wheel",
+      "axis": "x",
+      "radius": 0.42,
+      "twin": true
+    }
+  ],
+  "meta": {
+    "chapter": "asia",
+    "vehicle": "airplane",
+    "length": 36.0,
+    "wingspan": 34.0,
+    "height": 11.6,
+    "origin": "ground under the wing, gear down",
+    "centreline_y": 3.55,
+    "cruise_pose": "retract PART_gear_* and lift the root by 0",
+    "port": "+x (red light)",
+    "starboard": "-x (green light)"
+  },
+  "forward": "+Z (glTF / Three.js), -Y in Blender",
+  "source_hash": "a6c34d038653d16f",
+  "source": {
+    "script": "tools/world/blender/assets/vehicles/airliner.py",
+    "blend": "assets-src/world/vehicles/airliner.blend"
+  },
+  "preview": "docs/world/previews/vehicles/airliner.webp",
+  "license": "Original work for asensios.com \u2014 generated by the script in `source`. All rights reserved by the site owner.",
+  "author": "Claude (vehicle factory)",
+  "blender": "5.3.0",
+  "import_check": {
+    "objects": 45,
+    "meshes": 20,
+    "vertices": 7216
+  }
+}

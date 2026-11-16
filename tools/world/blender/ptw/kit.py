@@ -26,7 +26,9 @@ SURFACES = {
     "skin": ("#d7a27c", 0.75, 0.0),
     "window": ("#3d4a4a", 0.25, 0.0),  # engine lights these at night
     "glow": ("#fff3c4", 0.5, 0.0),  # engine renders these unlit
+    "glass": ("#9fb7b5", 0.08, 0.0),  # hero assets only: the one translucent surface
 }
+GLASS_ALPHA = 0.38
 
 
 def srgb_to_linear(c):
@@ -98,6 +100,16 @@ class Kit:
         att = nt.nodes.new("ShaderNodeVertexColor")
         att.layer_name = "Col"
         nt.links.new(att.outputs["Color"], bsdf.inputs["Base Color"])
+        if surface == "glass":
+            bsdf.inputs["Alpha"].default_value = GLASS_ALPHA
+            mat.use_backface_culling = False
+            try:
+                mat.surface_render_method = "BLENDED"
+            except Exception:
+                try:
+                    mat.blend_method = "BLEND"
+                except Exception:
+                    pass
         if surface == "glow":
             try:
                 bsdf.inputs["Emission Color"].default_value = (*hex_to_linear(hexc), 1)
@@ -196,6 +208,44 @@ class Kit:
         bm.transform(Matrix.Translation(Vector(at)))
         return self.add(bm, name, surface, **kw)
 
+    def loft(self, name, rings, surface="paint", cap=(True, True), closed=True, **kw):
+        """Skin a surface through a sequence of rings (each a list of points).
+
+        The workhorse for vehicle bodies: a fuselage, a hull or a carriage is a
+        handful of cross-sections with a smooth skin between them.
+        """
+        bm = bmesh.new()
+        vr = [[bm.verts.new(Vector(q)) for q in ring] for ring in rings]
+        n = len(rings[0])
+        for i in range(len(vr) - 1):
+            for j in range(n if closed else n - 1):
+                j2 = (j + 1) % n
+                bm.faces.new((vr[i][j], vr[i][j2], vr[i + 1][j2], vr[i + 1][j]))
+        if cap[0]:
+            bm.faces.new(vr[0][::-1])
+        if cap[1]:
+            bm.faces.new(vr[-1])
+        kw.setdefault("smooth", 42)
+        return self.add(bm, name, surface, **kw)
+
+    def bbox(self, name, size, at=(0, 0, 0), surface="paint", bevel=0.05, seg=2, rot=None, **kw):
+        """A box with rounded edges — nothing man-made has razor corners."""
+        bm = bmesh.new()
+        bmesh.ops.create_cube(bm, size=1.0)
+        for v in bm.verts:
+            v.co.x *= size[0]
+            v.co.y *= size[1]
+            v.co.z *= size[2]
+        b = min(bevel, min(size) * 0.45)
+        if b > 0:
+            bmesh.ops.bevel(bm, geom=list(bm.edges), offset=b, segments=seg, profile=0.5, affect="EDGES")
+        m = Matrix.Translation(Vector(at))
+        if rot is not None:
+            m = m @ rot
+        bm.transform(m)
+        kw.setdefault("smooth", 40)
+        return self.add(bm, name, surface, **kw)
+
     def tube(self, name, points, r, surface="metal", seg=8, r_end=None, cap=True, **kw):
         """Swept tube through a polyline of points (frames, branches, rails)."""
         pts = [Vector(p) for p in points]
@@ -274,9 +324,20 @@ class Kit:
         return _mix(hex_to_linear(a_hex), hex_to_linear(b_hex), max(0.0, min(1.0, t)))
 
     # ---------------------------------------------------------- assembly
-    def node(self, name, at=(0, 0, 0), parent=None):
-        """A named transform the engine can animate (PART_*)."""
+    def node(self, name, at=(0, 0, 0), parent=None, role=None, axis=None, **meta):
+        """A named transform the engine can animate (PART_*).
+
+        role  what it is ("wheel", "steer", "door", "rudder", …)
+        axis  game-space axis it turns or slides on: "x", "y", "z"
+        meta  anything else an integrator needs (radius, limits in degrees, travel)
+        """
         e = bpy.data.objects.new(name, None)
+        if role:
+            e["ptw_role"] = role
+        if axis:
+            e["ptw_axis"] = axis
+        for mk, mv in meta.items():
+            e[f"ptw_{mk}"] = mv
         e.empty_display_size = 0.15
         bpy.context.scene.collection.objects.link(e)
         self._child_of(e, parent or self.root)

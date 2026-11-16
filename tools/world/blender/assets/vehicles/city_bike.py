@@ -22,6 +22,7 @@ SPEC = {
     "ao_distance": 0.5,
     "preview_dir": (0.75, -1.0, 0.25),
     "params": {"frame": "#3fbf16", "wheel_r": 0.36, "wheelbase": 1.08},
+    "meta": {"chapter": "murcia", "vehicle": "bicycle", "length": 1.8, "wheelbase": 1.08, "wheel_radius": 0.36, "origin": "ground, between the wheels", "limbs": "arms and legs are drawn by the engine (two-bone IK), not part of the asset"},
 }
 
 STEEL = "#b9b3a6"
@@ -49,10 +50,10 @@ def build(k):
     head_top = (0, 0.84, 0.34)
     head_bot = (0, 0.66, 0.39)
 
-    steer = k.node("PART_steer", g(*head_top))
-    n_rear = k.node("PART_wheel_rear", g(*rear))
-    n_front = k.node("PART_wheel_front", g(*front), parent=steer)
-    crank = k.node("PART_crank", g(*bb))
+    steer = k.node("PART_steer", g(*head_top), role="steer", axis="hinge", hinge=[0, 0.9635, -0.2676], limit_deg=32)
+    n_rear = k.node("PART_wheel_rear", g(*rear), role="wheel", axis="x", radius=R)
+    n_front = k.node("PART_wheel_front", g(*front), parent=steer, role="wheel", axis="x", radius=R)
+    crank = k.node("PART_crank", g(*bb), role="crank", axis="x", crank_length=0.17, pedal_x=0.13)
 
     def tube(name, pts, r, surface, color, parent=None, seg=8, r_end=None, jitter=0.0):
         o = k.tube(name, [g(*q) for q in pts], r, surface, seg=seg, r_end=r_end, parent=parent)
@@ -183,7 +184,7 @@ def build(k):
 
     # Pedals (the engine keeps them level and puts them on the crank pins).
     for name in ("l", "r"):
-        n = k.node(f"PART_pedal_{name}", (0, 0, 0))
+        n = k.node(f"PART_pedal_{name}", (0, 0, 0), role="pedal", note="engine places it on the crank pin and keeps it level")
         o = k.box("pedal", (0.095, 0.075, 0.022), (0, 0, 0), "rubber", parent=n)
         k.paint(o, DARK, jitter=0.0, fn=lambda cc, nn, base: k.blend("#d9a441", DARK, 0.0 if abs(nn.y) > 0.9 else 1.0))
 
@@ -244,7 +245,7 @@ def build(k):
 
     # ---- Rider -------------------------------------------------------------------
     # Torso: modelled upright from the hip; the engine leans it toward the bars.
-    torso = k.node("PART_torso", (0, 0, 0))
+    torso = k.node("PART_torso", (0, 0, 0), role="rider_torso", note="origin at the hip, modelled upright; engine aims +Y at the chest")
     body = k.sphere("shirt", 1.0, g(0, 0.26, 0), "cloth", subdiv=3, scale=(0.17, 0.115, 0.31), smooth=75, parent=torso)
     for v in body.data.vertices:
         t = (v.co.z - 0.26) / 0.31
@@ -258,7 +259,7 @@ def build(k):
     for sx in (-1, 1):
         tube("strap", [(sx * 0.085, 0.47, -0.08), (sx * 0.1, 0.5, 0.03), (sx * 0.09, 0.36, 0.105), (sx * 0.085, 0.2, 0.08)], 0.012, "cloth", "#6b4a2e", parent=torso, seg=4)
 
-    head = k.node("PART_head", (0, 0, 0))
+    head = k.node("PART_head", (0, 0, 0), role="rider_head")
     skull = k.sphere("head", 1.0, g(0, 0.02, 0.005), "skin", subdiv=3, scale=(0.118, 0.13, 0.135), smooth=80, parent=head)
     k.paint(skull, "#d7a27c", jitter=0.0, per_vertex=True, fn=lambda cc, nn, base: k.blend("#b9825e", "#e3b28c", nn.z * 0.4 + 0.6))
     k.paint(k.sphere("nose", 0.022, g(0, 0.005, 0.132), "skin", subdiv=1, smooth=70, parent=head), "#cf9670", jitter=0)
@@ -286,7 +287,7 @@ def build(k):
     k.paint(k.sphere("shorts", 1.0, g(0, 0.955, -0.285), "cloth", subdiv=2, scale=(0.155, 0.125, 0.1), smooth=75), "#27512f", jitter=0.02, per_vertex=True)
 
     for name in ("l", "r"):
-        n = k.node(f"PART_shoe_{name}", (0, 0, 0))
+        n = k.node(f"PART_shoe_{name}", (0, 0, 0), role="rider_shoe")
         shoe = k.sphere("shoe", 1.0, g(0, 0.0, 0.03), "wood", subdiv=2, scale=(0.05, 0.125, 0.042), smooth=70, parent=n)
         k.paint(shoe, LEATHER, jitter=0, per_vertex=True, fn=lambda cc, nn, base: k.blend("#efe6d2", "#6b4a2e", 0.0 if nn.z < -0.55 else 1.0))
 
