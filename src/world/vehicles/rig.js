@@ -46,4 +46,3 @@ export function vehicleModel(assets, key) {
     dispose() {},
   };
 }
-

@@ -2,16 +2,18 @@
 // dependency in this repo). To run: `npm run build && npm run preview`, then
 // with Playwright available: `node tests/world/desktop.mjs <screenshot-prefix>`.
 // Waits are measured in game time, so slow software rendering does not flake.
+/* global window */
+import process from 'node:process';
 import { chromium, devices } from 'playwright';
 export { devices };
 export async function open({ viewport = { width: 1280, height: 720 }, theme = 'light', query = '', device = null, reduced = false, quality = 3, start = true } = {}) {
-  const b = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+  const b = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHROMIUM_CHANNEL || undefined, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const ctx = await b.newContext(device ? { ...devices[device], colorScheme: theme, reducedMotion: reduced ? 'reduce' : 'no-preference' } : { viewport, deviceScaleFactor: 1, colorScheme: theme, reducedMotion: reduced ? 'reduce' : 'no-preference' });
   const p = await ctx.newPage();
   const errs = [];
   p.on('console', (m) => { if (m.type() === 'error') errs.push('console: ' + m.text()); });
   p.on('pageerror', (e) => errs.push('PAGEERROR ' + e.message));
-  await p.goto('http://localhost:4173/world/' + query, { waitUntil: 'load' });
+  await p.goto((process.env.WORLD_TEST_URL || 'http://localhost:4173/world/') + query, { waitUntil: 'load' });
   if (start) {
     await p.waitForFunction(() => window.__pw, null, { timeout: 90000 });
     if (quality != null) await p.evaluate((q) => window.__pw.game.setQuality(q), quality);

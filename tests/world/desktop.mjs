@@ -23,7 +23,7 @@ ok('story: caption shows verified title', (await p.textContent('[data-cap-title]
 await p.keyboard.press('Enter'); await p.waitForTimeout(600);
 ok('card: opens with Enter', await p.isVisible('.pw-card'));
 ok('card: has photo + title', (await p.getAttribute('[data-card-img]', 'src')) === '/media/beemoney-byg-stage.webp');
-await p.screenshot({ path: `${out}-card.png` });
+if (out) await p.screenshot({ path: `${out}-card.png` });
 await p.keyboard.press('Escape'); await p.waitForTimeout(400);
 ok('card: closes with Escape', !(await p.isVisible('.pw-card')));
 // --- explore
@@ -36,7 +36,7 @@ ok('explore: W accelerates', m.speed > 3, `speed ${m.speed}`);
 await p.keyboard.down('KeyA'); await wait(1.2); await p.keyboard.up('KeyA');
 const m2 = await st();
 ok('explore: A steers left (yaw increases)', m2.yaw > m.yaw + 0.3, `yaw ${m.yaw} -> ${m2.yaw}`);
-await p.screenshot({ path: `${out}-explore.png` });
+if (out) await p.screenshot({ path: `${out}-explore.png` });
 await p.keyboard.press('Space'); await wait(0.2);
 ok('explore: Space hops', (await st()).air === true);
 await p.keyboard.up('KeyW'); await wait(1);
@@ -55,7 +55,7 @@ await wait(1.5);
 const lem = await p.evaluate(() => { const g = window.__pw.game; const s = g.state; let found = null; g.world.group.traverse((o) => { if (o.visible && o.isMesh && o.geometry.parameters && o.geometry.parameters.radius === 0.16 && !found) found = [o.position.x, o.position.z]; }); if (found) { s.x = found[0] - 2; s.z = found[1]; s.yaw = Math.PI / 2; s.speed = 0; } return found; });
 ok('secret: bumping a lemon tree drops a lemon', !!lem);
 if (lem) { await p.keyboard.down('KeyW'); await wait(1.6); await p.keyboard.up('KeyW'); ok('secret: lemon collected into basket', (await st()).lemons >= 1, `lemons ${(await st()).lemons}`); }
-await p.screenshot({ path: `${out}-lemon.png` });
+if (out) await p.screenshot({ path: `${out}-lemon.png` });
 // water -> respawn
 await p.evaluate(() => { const g = window.__pw.game, s = g.state; s.x = 30; s.z = g.world.river(30) + 9; s.yaw = Math.PI; s.speed = 0; s.y = g.world.groundAt(s.x, s.z).y; });
 await p.keyboard.down('KeyW'); await wait(4); await p.keyboard.up('KeyW'); await wait(1.5);
@@ -66,11 +66,11 @@ ok('recovery: riding into the river respawns on the road', onRoad < 2.5, `routeD
 await p.evaluate(() => window.__pw.game.travel('mwy')); await wait(2);
 const nr = await st();
 ok('explore: fast travel + proximity prompt near MWY', nr.near === 'mwy' || nr.near === 'playroom', JSON.stringify(nr));
-await p.screenshot({ path: `${out}-plaza.png` });
+if (out) await p.screenshot({ path: `${out}-plaza.png` });
 // menu
 await p.keyboard.press('KeyM'); await p.waitForTimeout(700);
 ok('menu: opens with M', await p.isVisible('.pw-menu'));
-await p.screenshot({ path: `${out}-menu.png` });
+if (out) await p.screenshot({ path: `${out}-menu.png` });
 await p.click('.pw-travel li:nth-child(6) button'); await wait(2);
 ok('menu: fast travel to EU office', Math.abs((await st()).t - 0.8) < 0.03, JSON.stringify(await st()));
 // return to route + back to story
@@ -83,3 +83,4 @@ await p.click('[data-lang-toggle]');
 ok('no console/page errors', errs.length === 0, errs.join(' | '));
 console.log(R.join('\n'));
 await b.close();
+if (R.some((result) => result.startsWith('FAIL'))) process.exitCode = 1;

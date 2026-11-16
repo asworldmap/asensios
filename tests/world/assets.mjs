@@ -49,7 +49,7 @@ await wait(3);
 await p.keyboard.up('KeyW');
 const run = await p.evaluate(() => ({ speed: window.__pw.game.state.speed, d: window.__pw.game.world.nearest(window.__pw.game.state.x, window.__pw.game.state.z).d }));
 ok('train accelerates and stays on its route', run.speed > 2 && run.d < 0.05, JSON.stringify(run));
-await p.screenshot({ path: `${process.argv[2] || 'assets'}-lab.png` });
+if (process.argv[2]) await p.screenshot({ path: `${process.argv[2]}-lab.png` });
 await p.evaluate(() => window.__pw.game.loadChapter('murcia'));
 await p.waitForFunction(() => window.__pw.game.chapter === 'murcia' && window.__pw.game.world, null, { timeout: 120000 });
 await wait(2);
@@ -58,3 +58,4 @@ ok('returning to Murcia does not leak geometries or textures', after.geometries 
 ok('no console or page errors', errs.length === 0, errs.join(' | '));
 console.log(R.join('\n'));
 await b.close();
+if (R.some((result) => result.startsWith('FAIL'))) process.exitCode = 1;
