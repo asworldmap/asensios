@@ -1031,6 +1031,48 @@
       "blender": "5.3.0"
     },
     {
+      "ref": "journey/cloud_bank",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": null,
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 1040,
+      "bytes": 25012,
+      "materials": 1,
+      "parts": 0,
+      "colliders": 0,
+      "anchors": 1,
+      "import_check": {
+        "objects": 3,
+        "meshes": 1,
+        "vertices": 540
+      },
+      "blender": "5.3.0"
+    },
+    {
+      "ref": "journey/cloud_sea",
+      "status": "skipped",
+      "seconds": 0,
+      "contract": null,
+      "errors": [],
+      "warnings": [],
+      "class": "batched",
+      "triangles": 2888,
+      "bytes": 67392,
+      "materials": 1,
+      "parts": 0,
+      "colliders": 0,
+      "anchors": 2,
+      "import_check": {
+        "objects": 4,
+        "meshes": 1,
+        "vertices": 1521
+      },
+      "blender": "5.3.0"
+    },
+    {
       "ref": "maritime/cargo_crate",
       "status": "skipped",
       "seconds": 0,

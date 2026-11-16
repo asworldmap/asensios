@@ -1,0 +1,1949 @@
+{
+ "version": 1,
+ "generated_by": "tools/world/blender/scenes/journey.py",
+ "space": "game axes: x left, y up, z forward, metres; yaw in radians about +y; fov = vertical degrees (three.js)",
+ "camera_spaces": {
+  "vehicle": "local to the root of the asset named in relative_to (the player's vehicle unless stated)",
+  "asset": "local to the stamped asset named in relative_to",
+  "layout": "the space of public/world/layouts/<relative_to>.json — add the offset and yaw the chapter stamps that layout with",
+  "set": "local to this transition's own set (see set.anchor)"
+ },
+ "order": [
+  {
+   "stage": 1,
+   "chapter": "murcia",
+   "vehicle": "bicycle"
+  },
+  {
+   "stage": 2,
+   "chapter": "europe",
+   "vehicle": "train"
+  },
+  {
+   "stage": 3,
+   "chapter": "europe-bus",
+   "vehicle": "bus"
+  },
+  {
+   "stage": 4,
+   "chapter": "japan",
+   "vehicle": "ship",
+   "change": "was order 5"
+  },
+  {
+   "stage": 5,
+   "chapter": "asia",
+   "vehicle": "airplane",
+   "change": "was order 4; now reads as the departure toward Chile"
+  },
+  {
+   "stage": 6,
+   "chapter": "chile",
+   "vehicle": "bicycle"
+  }
+ ],
+ "stage_tense": {
+  "note": "Which stages are memories and which are plans is the owner's to state; the director only reserves the visual treatment.",
+  "japan": "future / aspiration per the owner's brief — never caption it as something that happened. Treatment: the t03 route line is dashed over the jump, and the stage opens in first light.",
+  "others": "to be confirmed in the narrative review before any caption uses the past tense"
+ },
+ "grammar": {
+  "letterbox": "use the engine's existing cine bars (emit('cine', true)) for the whole of every transition; input locked (st.lock)",
+  "one_idea": "each transition is one shape handed from one vehicle to the next: circle, doorway, horizon, light, white",
+  "camera": "one continuous move per side, eased in and out (sine); never more than 2 m/s of camera travel near people, never a roll; hold at least 1 s on the matched frame before and after a splice",
+  "splice": "always on a frame the engine can hold as a still (held-frame overlay) — that still is the loading screen",
+  "colour": "fog colour = horizon colour of the sky on both sides; bridge by lerping fog, sun colour and sun elevation, never by a black fade (t02's dark hall is motivated darkness, not a fade)",
+  "signage": "labels use the palette already in the assets: cream #f1ede2 on navy #27405a or station green #27512f; signal red #b8432f only for one accent per frame",
+  "people": "the engine's people stand where anchors of kind 'boarding', 'seat' and 'poi' are: getting off the train, waiting by the bus door, on the pier, at the lookout. Hospitality is shown by who is waiting, not by text.",
+  "duration": "9–16 s each, skippable after 1.5 s (skip = jump to the last key and hand over)"
+ },
+ "sound_palette": {
+  "note": "Proposals for WebAudio synthesis in the style of game.js tone(); no audio files exist or are implied. Replace any of them with original or licensed recordings.",
+  "bus": "one master gain; every loop cue has its own gain node so fades and ducks are ramps (linearRampToValueAtTime), never starts/stops",
+  "cues": {
+   "bike_bell": "existing fx.sound('bell') (1560 Hz, two strikes)",
+   "bike_roll": "band-passed noise 700–1100 Hz, gain ∝ speed; plus bike_freewheel",
+   "bike_freewheel": "clicks (2 ms noise bursts, high-pass 3 kHz) at 14 Hz × speed/5",
+   "station_amb": "low-passed noise 300 Hz at low gain + sparse footsteps",
+   "station_chime": "two sine notes 660 → 880 Hz, 0.5 s each, soft attack",
+   "train_roll": "low-passed noise 220 Hz, gain ∝ speed; double thump (60 Hz sine, 40 ms, twice 90 ms apart) every 25 m of travel",
+   "train_brake": "band-passed noise sweeping 3 kHz → 1.2 kHz over 1.8 s, Q 12",
+   "train_brake_release": "white noise, high-pass 2 kHz, 0.35 s decay",
+   "door_hiss": "white noise, high-pass 2 kHz, 0.5 s, fast attack",
+   "footsteps": "30 ms low-passed noise thumps at 1.9 Hz, alternate ±10% pitch",
+   "bus_idle": "sawtooth 46 Hz through low-pass 220 Hz with 11 Hz tremolo",
+   "bus_engine": "same voice, 55–95 Hz ∝ speed, low-pass 320 Hz",
+   "wind": "noise band-pass 400–1200 Hz, centre drifting on a 0.1 Hz LFO",
+   "route_tick": "1 ms click through a 2 kHz resonator, very quiet",
+   "sea_wash": "low-passed noise 500 Hz, gain on a 0.12 Hz LFO (swell), a second layer at 0.31 Hz for the hull slap",
+   "ship_engine": "sine 38 Hz + 76 Hz, slow 2 Hz throb",
+   "ship_horn": "two triangle notes 110 + 138 Hz together, 2.2 s, slow attack; (the engine's 'horn' at 311 Hz is the bus/train horn)",
+   "harbour_amb": "sea_wash at half gain + random metallic ticks (4 kHz, 20 ms) every 1–3 s",
+   "apron_amb": "noise band-pass 1.8 kHz, very low gain, wide",
+   "cabin_chime": "two sine notes 880 → 660 Hz, 0.4 s each",
+   "jet_idle": "noise band-pass 1.6 kHz Q 2 + sine 120 Hz",
+   "jet_cruise": "noise low-pass 900 Hz + sine 140 Hz; 'pitch_down' = both fall 15%",
+   "chile_amb": "wind at low gain with a slower LFO; leaf rustle = noise high-pass 3 kHz in 0.4 s swells"
+  }
+ },
+ "new_assets": [
+  "journey/cloud_bank",
+  "journey/cloud_sea"
+ ],
+ "sequences": [
+  {
+   "id": "t01_bicycle_to_train",
+   "title": "The wheel",
+   "from": {
+    "chapter": "murcia",
+    "vehicle": "bicycle"
+   },
+   "to": {
+    "chapter": "europe",
+    "vehicle": "train"
+   },
+   "idea": "The lane ends beside a country halt. The camera comes down to where the bicycle wheel meets the ground; behind it, on the same axis, a steel wheel rests on its rail. The small wheel leaves, the big one starts to turn.",
+   "constraint": "The existing train carries its wheels inside the bogie frame: only the lower half of each wheel shows. The match is therefore the contact point (rubber on earth → steel on rail), not a full circle.",
+   "duration_s": 9.0,
+   "assets": [
+    "common/street_lamp",
+    "europe/rail_platform",
+    "europe/rail_track_straight",
+    "europe/station_shelter",
+    "murcia/lemon_tree",
+    "murcia/palm_tree",
+    "murcia/stone_wall",
+    "murcia_v2/olive_tree",
+    "murcia_v2/orange_tree",
+    "murcia_v2/prickly_pear",
+    "murcia_v2/sierra_backdrop",
+    "vehicles/city_bike",
+    "vehicles/train_cab",
+    "vehicles/train_coach"
+   ],
+   "references": {
+    "layouts": [
+     "murcia_arrival",
+     "europe_railway"
+    ],
+    "frames": [
+     "t01_a1_bike_wheel",
+     "t01_a2_train_wheel",
+     "t01_b0_train_wheel_europe"
+    ]
+   },
+   "set": {
+    "anchor": "end of the Murcia route; track = local z, lane at x = -4.5, platform on +x. World position to be chosen in chapters/murcia.js.",
+    "placements": [
+     {
+      "asset": "europe/rail_track_straight",
+      "position": [
+       0,
+       0,
+       -40
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "europe/rail_track_straight",
+      "position": [
+       0,
+       0,
+       -30
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "europe/rail_track_straight",
+      "position": [
+       0,
+       0,
+       -20
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "europe/rail_track_straight",
+      "position": [
+       0,
+       0,
+       -10
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "europe/rail_track_straight",
+      "position": [
+       0,
+       0,
+       0
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "europe/rail_track_straight",
+      "position": [
+       0,
+       0,
+       10
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "europe/rail_track_straight",
+      "position": [
+       0,
+       0,
+       20
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "europe/rail_track_straight",
+      "position": [
+       0,
+       0,
+       30
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "europe/rail_track_straight",
+      "position": [
+       0,
+       0,
+       40
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "europe/rail_platform",
+      "position": [
+       0,
+       0,
+       -10
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "europe/rail_platform",
+      "position": [
+       0,
+       0,
+       0
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "europe/rail_platform",
+      "position": [
+       0,
+       0,
+       10
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "europe/station_shelter",
+      "position": [
+       4.6,
+       0.92,
+       0
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "common/street_lamp",
+      "position": [
+       5.2,
+       0.92,
+       -9
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "vehicles/train_cab",
+      "position": [
+       0,
+       0,
+       -6
+      ],
+      "yaw": 3.1416,
+      "scale": 1
+     },
+     {
+      "asset": "vehicles/train_coach",
+      "position": [
+       0,
+       0,
+       12.1
+      ],
+      "yaw": 3.1416,
+      "scale": 1
+     },
+     {
+      "asset": "murcia/stone_wall",
+      "position": [
+       -7.2,
+       0,
+       -14
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "murcia/stone_wall",
+      "position": [
+       -7.2,
+       0,
+       -4
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "murcia/stone_wall",
+      "position": [
+       -7.2,
+       0,
+       8
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "murcia/palm_tree",
+      "position": [
+       9.5,
+       0,
+       -7
+      ],
+      "yaw": 1.0,
+      "scale": 1.1
+     },
+     {
+      "asset": "murcia/palm_tree",
+      "position": [
+       10.5,
+       0,
+       9
+      ],
+      "yaw": 4.0,
+      "scale": 1.2
+     },
+     {
+      "asset": "murcia_v2/orange_tree",
+      "position": [
+       -9.5,
+       0,
+       3
+      ],
+      "yaw": 2.0,
+      "scale": 1.0
+     },
+     {
+      "asset": "murcia/lemon_tree",
+      "position": [
+       -11,
+       0,
+       -9
+      ],
+      "yaw": 0.5,
+      "scale": 1.0
+     },
+     {
+      "asset": "murcia_v2/olive_tree",
+      "position": [
+       13,
+       0,
+       -16
+      ],
+      "yaw": 3.0,
+      "scale": 1.1
+     },
+     {
+      "asset": "murcia_v2/prickly_pear",
+      "position": [
+       -8.3,
+       0,
+       -20
+      ],
+      "yaw": 1.0,
+      "scale": 1.0
+     },
+     {
+      "asset": "murcia_v2/sierra_backdrop",
+      "position": [
+       190,
+       -2,
+       -20
+      ],
+      "yaw": -1.4137,
+      "scale": 1.8
+     },
+     {
+      "asset": "murcia_v2/sierra_backdrop",
+      "position": [
+       170,
+       -2,
+       120
+      ],
+      "yaw": -1.885,
+      "scale": 1.8
+     }
+    ],
+    "player_stop": {
+     "position": [
+      -4.5,
+      0,
+      -9.79
+     ],
+     "yaw": 3.1416,
+     "note": "rear hub lines up with the cab's leading wheel"
+    }
+   },
+   "camera": [
+    {
+     "t": 0.0,
+     "space": "vehicle",
+     "position": [
+      1.6,
+      1.3,
+      -4.2
+     ],
+     "look_at": [
+      0,
+      0.7,
+      1.5
+     ],
+     "fov": 46,
+     "ease": "inOutSine",
+     "note": "bicycle chase eases low and to the lane side as the rider coasts the last 12 m"
+    },
+    {
+     "t": 3.2,
+     "space": "set",
+     "position": [
+      -8.45,
+      0.3,
+      -9.25
+     ],
+     "look_at": [
+      0,
+      0.3,
+      -9.25
+     ],
+     "fov": 15,
+     "ease": "inOutSine",
+     "verified_frame": "docs/world/journey/t01_a1_bike_wheel.webp",
+     "note": "rear wheel fills 70% of frame height, hub on the vertical axis, ground line at 30% from the bottom; the bogie and its wheel sit directly behind; rider brakes to a stop"
+    },
+    {
+     "t": 4.6,
+     "space": "set",
+     "position": [
+      -8.45,
+      0.3,
+      -9.25
+     ],
+     "look_at": [
+      0,
+      0.3,
+      -9.25
+     ],
+     "fov": 15,
+     "ease": "linear",
+     "note": "hold: the wheel ticks to rest (freewheel), bell once"
+    },
+    {
+     "t": 6.0,
+     "space": "set",
+     "position": [
+      -5.77,
+      0.3,
+      -9.25
+     ],
+     "look_at": [
+      0,
+      0.3,
+      -9.25
+     ],
+     "fov": 15,
+     "ease": "inOutSine",
+     "verified_frame": "docs/world/journey/t01_a2_train_wheel.webp",
+     "note": "push in 3.4 m; the bicycle is wheeled out of frame toward the platform; the steel wheel sits where the rubber one was, rail on the same line as the ground"
+    },
+    {
+     "t": 6.0,
+     "space": "vehicle",
+     "position": [
+      5.77,
+      0.3,
+      3.25
+     ],
+     "look_at": [
+      0,
+      0.3,
+      3.25
+     ],
+     "fov": 15,
+     "ease": "cut",
+     "relative_to": "vehicles/train_cab",
+     "verified_frame": "docs/world/journey/t01_b0_train_wheel_europe.webp",
+     "note": "SPLICE: identical framing on the playable train (camera on the side away from the platform)"
+    },
+    {
+     "t": 7.2,
+     "space": "vehicle",
+     "position": [
+      5.77,
+      0.3,
+      3.25
+     ],
+     "look_at": [
+      0,
+      0.3,
+      3.25
+     ],
+     "fov": 15,
+     "ease": "linear",
+     "note": "the wheel starts to turn; track the hub"
+    },
+    {
+     "t": 9.0,
+     "space": "vehicle",
+     "position": [
+      7.5,
+      3.4,
+      -9.0
+     ],
+     "look_at": [
+      0,
+      2.0,
+      5.0
+     ],
+     "fov": 46,
+     "ease": "inOutSine",
+     "note": "pull back and rise into the train's own chase camera; hand over"
+    }
+   ],
+   "splice": {
+    "type": "match_cut_held_frame",
+    "at_s": 6.0,
+    "match": "wheel on the vertical axis, contact line 30% from the bottom, wheel diameter ~70% of frame height on both sides",
+    "load": "preload europe assets from t=0; at 6.0 hold the last rendered frame as an overlay, loadChapter('europe'), place camera on the B key, cross-fade overlay out over 0.6 s"
+   },
+   "light": {
+    "out": "murcia golden hour",
+    "in": "europe clear afternoon",
+    "bridge": "lerp sun colour and fog over the 0.6 s cross-fade; both keys are side-lit close-ups so only the warmth changes"
+   },
+   "sound": [
+    {
+     "at": 0.0,
+     "cue": "bike_roll",
+     "action": "continue",
+     "note": "gain follows speed down to 0 by 3.4"
+    },
+    {
+     "at": 2.6,
+     "cue": "station_amb",
+     "action": "fade_in",
+     "fade": 2.0
+    },
+    {
+     "at": 3.4,
+     "cue": "bike_freewheel",
+     "action": "oneshot",
+     "note": "ticks slowing over 1.2 s"
+    },
+    {
+     "at": 4.4,
+     "cue": "bike_bell",
+     "action": "oneshot"
+    },
+    {
+     "at": 6.0,
+     "cue": "train_brake_release",
+     "action": "oneshot",
+     "note": "short air hiss on the cut"
+    },
+    {
+     "at": 7.2,
+     "cue": "train_roll",
+     "action": "fade_in",
+     "fade": 1.6,
+     "note": "first rail joint 'clack-clack' lands at 8.0"
+    },
+    {
+     "at": 8.0,
+     "cue": "station_amb",
+     "action": "fade_out",
+     "fade": 1.5
+    }
+   ],
+   "next": {
+    "chapter": "europe",
+    "start": "route t = 0, train stationary then accelerating; story mode"
+   },
+   "reduced_motion": "No camera travel: cut from the bicycle chase to key 3.2, 0.4 s cross-fade to the B key at 7.2, then the normal chapter intro. Sounds: bell and one rail clack only.",
+   "no_webgl": "Text bridge in the existing fallback list between stages 1 and 2 (i18n key suggested: world.bridge.t01)."
+  },
+  {
+   "id": "t02_train_to_bus",
+   "title": "Through the station",
+   "from": {
+    "chapter": "europe",
+    "vehicle": "train"
+   },
+   "to": {
+    "chapter": "europe-bus",
+    "vehicle": "bus"
+   },
+   "idea": "The train stops. We get off with everyone else, cross the platform, walk through the station — in by the platform door, out by the street door — and the coach is waiting. One building, two faces, one clock.",
+   "duration_s": 12.0,
+   "assets": [
+    "europe_v2/station_building",
+    "europe_v2/station_canopy",
+    "europe_v2/platform_paving",
+    "europe/rail_platform",
+    "vehicles/train_cab",
+    "vehicles/train_coach",
+    "vehicles/coach_bus",
+    "common/park_bench",
+    "common/street_lamp"
+   ],
+   "references": {
+    "layouts": [
+     "europe_railway"
+    ],
+    "frames": [
+     "t02_a1_seat_to_platform",
+     "t02_a2_station_door",
+     "t02_b0_street_door_bus",
+     "t02_b1_bus_window_clock"
+    ]
+   },
+   "set": {
+    "anchor": "europe_v2/station_building. OUT side: stamped at the end of the rail route as in layouts/europe_railway.json. IN side: the same building stamped at the start of the bus route, street face (-z local) toward the road.",
+    "bus_start_station_local": {
+     "position": [
+      -3.0,
+      -0.3,
+      -17.5
+     ],
+     "yaw_relative": 1.5708,
+     "note": "bus door faces the station; 13 m forecourt"
+    }
+   },
+   "camera": [
+    {
+     "t": 0.0,
+     "space": "vehicle",
+     "position": [
+      0,
+      2.55,
+      0
+     ],
+     "look_at": [
+      -9,
+      2.3,
+      4
+     ],
+     "fov": 50,
+     "ease": "inOutSine",
+     "relative_to": "vehicles/train_coach",
+     "note": "inside the coach (seat_view) as the platform slides in; train brakes to 0 by 2.5. Interior view not verified in Blender (the body is closed there) — if the engine cannot see out from seat_view, start on the 3.0 key instead"
+    },
+    {
+     "t": 3.0,
+     "space": "vehicle",
+     "position": [
+      -1.75,
+      2.7,
+      1.5
+     ],
+     "look_at": [
+      -9.0,
+      2.3,
+      0.2
+     ],
+     "fov": 50,
+     "ease": "inOutSine",
+     "relative_to": "vehicles/train_coach",
+     "verified_frame": "docs/world/journey/t02_a1_seat_to_platform.webp",
+     "note": "stopped: the camera slips out through the window line to the platform side; station door and name board under the canopy; doors open (PART_door_*)"
+    },
+    {
+     "t": 5.0,
+     "space": "asset",
+     "position": [
+      0,
+      1.58,
+      6.6
+     ],
+     "look_at": [
+      0,
+      1.25,
+      3.6
+     ],
+     "fov": 40,
+     "ease": "inOutSine",
+     "relative_to": "europe_v2/station_building",
+     "note": "walking pace across the platform, head height 1.6 m, slight bob (2 cm)"
+    },
+    {
+     "t": 6.2,
+     "space": "asset",
+     "position": [
+      0,
+      1.58,
+      4.0
+     ],
+     "look_at": [
+      0,
+      1.3,
+      0
+     ],
+     "fov": 40,
+     "ease": "inOutSine",
+     "relative_to": "europe_v2/station_building",
+     "verified_frame": "docs/world/journey/t02_a2_station_door.webp",
+     "note": "the doorway fills the frame: natural dark"
+    },
+    {
+     "t": 6.2,
+     "space": "asset",
+     "position": [
+      0,
+      1.58,
+      -3.9
+     ],
+     "look_at": [
+      -1.2,
+      1.3,
+      -17.5
+     ],
+     "fov": 40,
+     "ease": "cut",
+     "relative_to": "europe_v2/station_building",
+     "note": "SPLICE inside the dark of the hall"
+    },
+    {
+     "t": 7.6,
+     "space": "asset",
+     "position": [
+      0,
+      1.58,
+      -4.6
+     ],
+     "look_at": [
+      -1.6,
+      1.3,
+      -17.5
+     ],
+     "fov": 40,
+     "ease": "inOutSine",
+     "relative_to": "europe_v2/station_building",
+     "verified_frame": "docs/world/journey/t02_b0_street_door_bus.webp",
+     "note": "out of the street door: the coach framed in the opening, door open, people boarding"
+    },
+    {
+     "t": 9.6,
+     "space": "vehicle",
+     "position": [
+      -2.6,
+      1.7,
+      4.6
+     ],
+     "look_at": [
+      -0.9,
+      2.2,
+      1.0
+     ],
+     "fov": 46,
+     "ease": "inOutSine",
+     "relative_to": "vehicles/coach_bus",
+     "note": "up the step"
+    },
+    {
+     "t": 11.0,
+     "space": "vehicle",
+     "position": [
+      -0.94,
+      2.42,
+      0.5
+     ],
+     "look_at": [
+      -12,
+      5.0,
+      3.0
+     ],
+     "fov": 50,
+     "ease": "inOutSine",
+     "relative_to": "vehicles/coach_bus",
+     "verified_frame": "docs/world/journey/t02_b1_bus_window_clock.webp",
+     "note": "seated (passenger_view): the station and its clock in the window as the bus pulls out"
+    },
+    {
+     "t": 12.0,
+     "space": "vehicle",
+     "position": [
+      0,
+      4.2,
+      -12.5
+     ],
+     "look_at": [
+      0,
+      2.0,
+      6.0
+     ],
+     "fov": 46,
+     "ease": "inOutSine",
+     "relative_to": "vehicles/coach_bus",
+     "note": "hand over to the bus chase camera"
+    }
+   ],
+   "splice": {
+    "type": "dark_doorway",
+    "at_s": 6.2,
+    "match": "the station doorway at frame centre; black for 0.5–1.4 s is motivated by the interior",
+    "load": "preload europe-bus assets from t=0; at 6.2 the screen is the dark hall: loadChapter('europe-bus') here; fade up to key 7.6. If loading runs long, hold the black with station_amb playing."
+   },
+   "light": {
+    "out": "europe clear afternoon",
+    "in": "same sun, same sky",
+    "bridge": "none needed — keep the europe atmosphere for the first 20 s of the bus chapter, then drift to its own"
+   },
+   "sound": [
+    {
+     "at": 0.0,
+     "cue": "train_roll",
+     "action": "continue",
+     "note": "pitch and gain fall with speed"
+    },
+    {
+     "at": 1.0,
+     "cue": "train_brake",
+     "action": "oneshot",
+     "note": "1.8 s squeal ending exactly at standstill (2.5)"
+    },
+    {
+     "at": 2.2,
+     "cue": "station_amb",
+     "action": "fade_in",
+     "fade": 1.0
+    },
+    {
+     "at": 3.0,
+     "cue": "door_hiss",
+     "action": "oneshot"
+    },
+    {
+     "at": 3.4,
+     "cue": "station_chime",
+     "action": "oneshot"
+    },
+    {
+     "at": 5.0,
+     "cue": "footsteps",
+     "action": "loop",
+     "note": "4 steps on stone, then 3 on timber floor inside (duller)"
+    },
+    {
+     "at": 6.2,
+     "cue": "station_amb",
+     "action": "duck",
+     "note": "low-pass to 600 Hz while indoors, open again at 7.6"
+    },
+    {
+     "at": 7.2,
+     "cue": "bus_idle",
+     "action": "fade_in",
+     "fade": 1.2
+    },
+    {
+     "at": 9.8,
+     "cue": "door_hiss",
+     "action": "oneshot"
+    },
+    {
+     "at": 10.4,
+     "cue": "bus_engine",
+     "action": "crossfade_from",
+     "from": "bus_idle",
+     "fade": 0.8
+    },
+    {
+     "at": 10.6,
+     "cue": "station_amb",
+     "action": "fade_out",
+     "fade": 1.4
+    }
+   ],
+   "next": {
+    "chapter": "europe-bus",
+    "start": "route t = 0 at the station forecourt; story mode"
+   },
+   "reduced_motion": "Three stills, 0.4 s cross-fades: key 3.0 → key 7.6 → key 12.0. No walk, no head bob.",
+   "no_webgl": "Text bridge between stages 2 and 3 (world.bridge.t02)."
+  },
+  {
+   "id": "t03_bus_to_ship",
+   "title": "The horizon",
+   "from": {
+    "chapter": "europe-bus",
+    "vehicle": "bus"
+   },
+   "to": {
+    "chapter": "japan",
+    "vehicle": "ship"
+   },
+   "idea": "The road runs to the horizon and the camera lets the bus go, rising until only the line between land and sky is left. A thin route line crosses the frame — a jump in the story, drawn as one. When the picture returns the line is the sea, and the road down the middle of the frame is a ship's deck.",
+   "honesty": "This is an ellipsis, not a route: the bus does not drive to Japan. The overlay must say so in its own way (a broken line, a date gap). The sea stage is an aspiration, not a memory — see `stage_tense`.",
+   "duration_s": 11.0,
+   "assets": [
+    "europe/conifer",
+    "europe/road_guardrail",
+    "europe/road_sign",
+    "europe_v2/alps_backdrop",
+    "europe_v2/broadleaf_tree",
+    "europe_v2/meadow_hill",
+    "maritime_v2/deck_bench",
+    "maritime_v2/deck_vent",
+    "maritime_v2/horizon_islands",
+    "vehicles/coach_bus",
+    "vehicles/passenger_ship"
+   ],
+   "references": {
+    "layouts": [
+     "europe_railway",
+     "port_departure"
+    ],
+    "frames": [
+     "t03_a1_road_to_horizon",
+     "t03_b0_ship_to_horizon"
+    ]
+   },
+   "set": {
+    "anchor": "OUT: the last straight of the bus route (needs >= 300 m of clear view ahead and no backdrop inside +-12 deg of the road axis; use the chapter's own road). IN: open water, the ship at the origin heading +z.",
+    "in_placements": [
+     {
+      "asset": "maritime_v2/deck_bench",
+      "position": [
+       -3.2,
+       4.4,
+       14
+      ],
+      "yaw": 1.5708,
+      "scale": 1
+     },
+     {
+      "asset": "maritime_v2/deck_vent",
+      "position": [
+       0,
+       9.8,
+       -8
+      ],
+      "yaw": 0,
+      "scale": 1
+     },
+     {
+      "asset": "maritime_v2/horizon_islands",
+      "position": [
+       -260,
+       0,
+       760
+      ],
+      "yaw": 3.3416,
+      "scale": 6.5
+     },
+     {
+      "asset": "maritime_v2/horizon_islands",
+      "position": [
+       330,
+       0,
+       820
+      ],
+      "yaw": 2.8916,
+      "scale": 7.0
+     }
+    ]
+   },
+   "camera": [
+    {
+     "t": 0.0,
+     "space": "vehicle",
+     "position": [
+      0,
+      4.2,
+      -12.5
+     ],
+     "look_at": [
+      0,
+      2.0,
+      6.0
+     ],
+     "fov": 46,
+     "ease": "inOutSine",
+     "relative_to": "vehicles/coach_bus",
+     "note": "bus chase"
+    },
+    {
+     "t": 2.0,
+     "space": "vehicle",
+     "position": [
+      1.75,
+      6.0,
+      -20
+     ],
+     "look_at": [
+      1.75,
+      2.0,
+      40
+     ],
+     "fov": 42,
+     "ease": "inOutSine",
+     "relative_to": "vehicles/coach_bus",
+     "note": "drift to the road's centre line and stop following: from here the camera is fixed in the world and the bus drives away"
+    },
+    {
+     "t": 5.0,
+     "space": "set",
+     "position": [
+      0,
+      15.0,
+      6
+     ],
+     "look_at": [
+      0,
+      3.0,
+      306
+     ],
+     "fov": 40,
+     "ease": "inOutSine",
+     "verified_frame": "docs/world/journey/t03_a1_road_to_horizon.webp",
+     "note": "crane to 15 m; pitch -2.3 deg puts the horizon at 44% of frame height; road centre line on the vertical axis; bus is a dot"
+    },
+    {
+     "t": 5.0,
+     "space": "set",
+     "position": [
+      0,
+      15.0,
+      6
+     ],
+     "look_at": [
+      0,
+      3.0,
+      306
+     ],
+     "fov": 40,
+     "ease": "linear",
+     "note": "HOLD 3.0 s under the route overlay (see overlay)"
+    },
+    {
+     "t": 8.0,
+     "space": "set",
+     "position": [
+      0,
+      21.0,
+      -58
+     ],
+     "look_at": [
+      0,
+      9.0,
+      242
+     ],
+     "fov": 40,
+     "ease": "cut",
+     "verified_frame": "docs/world/journey/t03_b0_ship_to_horizon.webp",
+     "note": "SPLICE: same pitch, same horizon height; the keel line replaces the road"
+    },
+    {
+     "t": 9.2,
+     "space": "set",
+     "position": [
+      0,
+      21.0,
+      -58
+     ],
+     "look_at": [
+      0,
+      9.0,
+      242
+     ],
+     "fov": 40,
+     "ease": "linear",
+     "note": "hold; the ship's horn answers"
+    },
+    {
+     "t": 11.0,
+     "space": "vehicle",
+     "position": [
+      0,
+      6.3,
+      16.0
+     ],
+     "look_at": [
+      0,
+      5.6,
+      60
+     ],
+     "fov": 46,
+     "ease": "inOutSine",
+     "relative_to": "vehicles/passenger_ship",
+     "note": "descend to the fore deck (deck_spawn + eye height) and hand over"
+    }
+   ],
+   "overlay": {
+    "at_s": 5.4,
+    "duration_s": 2.4,
+    "what": "one hairline (2 px, cream #f1ede2, 80% opacity) drawn left to right along the horizon across the full width, broken into dashes over its middle third; two small labels in the game's signage type at its ends. No map, no globe, no country outlines.",
+    "labels": "left: the stage just left; right: the stage to come, marked as future. Copy comes from the narrative review (keys suggested: world.bridge.t03.from / .to)."
+   },
+   "splice": {
+    "type": "horizon_hold",
+    "at_s": 8.0,
+    "match": "horizon at 44% of frame height on both sides; vanishing point at frame centre",
+    "load": "preload japan assets from t=2; at 5.0 hold the frame as an overlay (the route line animates on top of it) and loadChapter('japan') underneath; reveal with a 0.8 s cross-fade at 8.0"
+   },
+   "light": {
+    "out": "europe afternoon, cool haze",
+    "in": "sea, early morning, warm haze",
+    "bridge": "during the hold tint the held frame toward #f1e2d2 (the sea's horizon colour) so the two skies meet at the line"
+   },
+   "sound": [
+    {
+     "at": 0.0,
+     "cue": "bus_engine",
+     "action": "continue"
+    },
+    {
+     "at": 2.0,
+     "cue": "bus_engine",
+     "action": "fade_out",
+     "fade": 3.5,
+     "note": "with a slow pitch fall (doppler of something leaving)"
+    },
+    {
+     "at": 3.0,
+     "cue": "wind",
+     "action": "fade_in",
+     "fade": 2.5
+    },
+    {
+     "at": 5.4,
+     "cue": "route_tick",
+     "action": "oneshot",
+     "note": "a soft tick per dash of the route line; nothing melodic"
+    },
+    {
+     "at": 7.2,
+     "cue": "sea_wash",
+     "action": "fade_in",
+     "fade": 1.6,
+     "note": "the water arrives before the picture"
+    },
+    {
+     "at": 8.4,
+     "cue": "ship_horn",
+     "action": "oneshot"
+    },
+    {
+     "at": 9.0,
+     "cue": "ship_engine",
+     "action": "fade_in",
+     "fade": 2.0
+    }
+   ],
+   "next": {
+    "chapter": "japan",
+    "start": "at sea on the fore deck or the bridge, whichever the chapter opens on; story mode"
+   },
+   "reduced_motion": "No crane: cut to key 5.0, show the route line fully drawn (no animation) for 2 s, cross-fade to key 9.2.",
+   "no_webgl": "Text bridge between stages 3 and 4 that states the jump and the future tense (world.bridge.t03)."
+  },
+  {
+   "id": "t04_ship_to_plane",
+   "title": "Two lights",
+   "from": {
+    "chapter": "japan",
+    "vehicle": "ship"
+   },
+   "to": {
+    "chapter": "asia",
+    "vehicle": "airplane"
+   },
+   "idea": "The ship is alongside. From her rail the camera turns away from the quay to the lighthouse and the sea's horizon; the lamp turns, the day goes. When the light comes round again it is a control tower's beacon, the horizon is a runway's, and an aircraft is waiting nose-on.",
+   "honesty": "Port and airport are not neighbours: the cut carries a night. Do not show both in one frame.",
+   "duration_s": 10.0,
+   "assets": [
+    "maritime_v2/lighthouse",
+    "maritime_v2/breakwater",
+    "maritime_v2/pier_head",
+    "maritime_v2/pier_section",
+    "vehicles/passenger_ship",
+    "asia_v2/control_tower",
+    "asia_v2/terminal_hall",
+    "asia_v2/apron_tile",
+    "asia_v2/pushback_tug",
+    "vehicles/airliner"
+   ],
+   "references": {
+    "layouts": [
+     "port_departure",
+     "asia_arrival"
+    ],
+    "frames": [
+     "t04_a1_lighthouse",
+     "t04_b0_control_tower"
+    ]
+   },
+   "set": {
+    "anchor": "OUT: layouts/port_departure.json as stamped in the sea chapter, the ship berthed at its layout pose (camera on her fore deck). IN: layouts/asia_arrival.json (aircraft at the layout origin, nose +z).",
+    "rule": "the tower camera stands 170 m from the tower and the deck camera 97 m from the lighthouse — the ratio of the two lamp heights (32.5 / 18.55) — so both towers have the same size on screen; camera heights 9.0 m and 6.1 m put both lamps within 0.6 deg of each other"
+   },
+   "camera": [
+    {
+     "t": 0.0,
+     "space": "vehicle",
+     "position": [
+      0,
+      11.4,
+      8.6
+     ],
+     "look_at": [
+      -6,
+      6.0,
+      60
+     ],
+     "fov": 46,
+     "ease": "inOutSine",
+     "relative_to": "vehicles/passenger_ship",
+     "note": "from the bridge as she comes alongside (bridge_view); engines to stop"
+    },
+    {
+     "t": 2.0,
+     "space": "vehicle",
+     "position": [
+      -5.0,
+      6.1,
+      18.0
+     ],
+     "look_at": [
+      -40,
+      8.0,
+      -20
+     ],
+     "fov": 40,
+     "ease": "inOutSine",
+     "relative_to": "vehicles/passenger_ship",
+     "note": "down to the fore-deck rail on the seaward side, turning away from the quay"
+    },
+    {
+     "t": 4.0,
+     "space": "layout",
+     "position": [
+      -12.0,
+      6.1,
+      14.0
+     ],
+     "look_at": [
+      -81.65,
+      20.1,
+      -173.48
+     ],
+     "fov": 30,
+     "ease": "inOutSine",
+     "relative_to": "port_departure",
+     "verified_frame": "docs/world/journey/t04_a1_lighthouse.webp",
+     "note": "ship berthed as in the layout (x = -7, bow +z): lighthouse 12 deg left of axis, lamp 3.3 deg above it, horizon at 63% from the top"
+    },
+    {
+     "t": 6.0,
+     "space": "layout",
+     "position": [
+      -12.0,
+      6.1,
+      14.0
+     ],
+     "look_at": [
+      -81.65,
+      20.1,
+      -173.48
+     ],
+     "fov": 30,
+     "ease": "linear",
+     "relative_to": "port_departure",
+     "note": "HOLD while the light falls to dusk and the lamp sweeps once (flash at 5.6)"
+    },
+    {
+     "t": 6.0,
+     "space": "layout",
+     "position": [
+      15.33,
+      9.0,
+      71.07
+     ],
+     "look_at": [
+      -21.4,
+      23.0,
+      -125.53
+     ],
+     "fov": 30,
+     "ease": "cut",
+     "relative_to": "asia_arrival",
+     "verified_frame": "docs/world/journey/t04_b0_control_tower.webp",
+     "note": "SPLICE on the lamp flash: beacon on the same pixel, horizon on the same line; aircraft nose-on at centre"
+    },
+    {
+     "t": 8.0,
+     "space": "layout",
+     "position": [
+      15.33,
+      9.0,
+      71.07
+     ],
+     "look_at": [
+      -21.4,
+      23.0,
+      -125.53
+     ],
+     "fov": 30,
+     "ease": "linear",
+     "relative_to": "asia_arrival",
+     "note": "dawn comes up; apron lights go out one by one"
+    },
+    {
+     "t": 10.0,
+     "space": "layout",
+     "position": [
+      21.0,
+      1.7,
+      38.0
+     ],
+     "look_at": [
+      -1.0,
+      6.5,
+      0.0
+     ],
+     "fov": 46,
+     "ease": "inOutSine",
+     "relative_to": "asia_arrival",
+     "note": "crane down from 9 m to the asia_arrival layout camera, then hand over to the chapter"
+    }
+   ],
+   "splice": {
+    "type": "light_flash_match",
+    "at_s": 6.0,
+    "match": "lamp/beacon position, horizon height, vertical tower silhouette",
+    "load": "preload asia assets from t=0; at 5.6 the lamp flash blooms to a warm white overlay (#fff2c8, 0.25 s up) — hold it, loadChapter('asia'), 0.5 s down onto key B. The flash is the loading mask."
+   },
+   "light": {
+    "out": "port morning → dusk in 2 s (sun elevation 15° → 2°, sky to #6c7fa6 / horizon #f1b98c)",
+    "in": "asia dawn (same horizon colour, sun returning)",
+    "bridge": "the shared horizon colour #f1b98c on both sides of the flash"
+   },
+   "sound": [
+    {
+     "at": 0.0,
+     "cue": "sea_wash",
+     "action": "continue"
+    },
+    {
+     "at": 0.0,
+     "cue": "ship_engine",
+     "action": "fade_out",
+     "fade": 2.5
+    },
+    {
+     "at": 1.5,
+     "cue": "harbour_amb",
+     "action": "fade_in",
+     "fade": 1.5,
+     "note": "rigging taps, a mooring creak"
+    },
+    {
+     "at": 4.2,
+     "cue": "ship_horn",
+     "action": "oneshot",
+     "note": "one long farewell note, far away"
+    },
+    {
+     "at": 5.6,
+     "cue": "sea_wash",
+     "action": "fade_out",
+     "fade": 1.2,
+     "note": "into near silence on the flash"
+    },
+    {
+     "at": 6.4,
+     "cue": "apron_amb",
+     "action": "fade_in",
+     "fade": 1.5,
+     "note": "wide, quiet air; a distant APU whine"
+    },
+    {
+     "at": 8.6,
+     "cue": "cabin_chime",
+     "action": "oneshot"
+    },
+    {
+     "at": 9.0,
+     "cue": "jet_idle",
+     "action": "fade_in",
+     "fade": 1.5
+    }
+   ],
+   "next": {
+    "chapter": "asia",
+    "start": "aircraft at the stand; story mode. This stage is now the departure toward Chile (order 5)."
+   },
+   "reduced_motion": "Two stills: key 4.0 and key 8.0, 0.6 s cross-fade, no flash (use a plain fade through #f1b98c).",
+   "no_webgl": "Text bridge between stages 4 and 5 (world.bridge.t04)."
+  },
+  {
+   "id": "t05_plane_to_chile",
+   "title": "Through the cloud",
+   "from": {
+    "chapter": "asia",
+    "vehicle": "airplane"
+   },
+   "to": {
+    "chapter": "chile",
+    "vehicle": "bicycle"
+   },
+   "idea": "Above a floor of cloud the aircraft sinks until the white takes the frame. It opens on the wall of the Andes in evening light. The camera leaves the aircraft, comes down across the valley to a roadside lookout — and a bicycle is leaning there, the same one. The bell rings once. The rider is home in the world.",
+   "duration_s": 16.0,
+   "assets": [
+    "vehicles/airliner",
+    "journey/cloud_sea",
+    "journey/cloud_bank",
+    "chile_v2/cordillera_backdrop",
+    "chile_v2/foothill_ridge",
+    "chile_v2/city_basin_backdrop",
+    "chile_v2/vineyard_rows",
+    "chile_v2/poplar_row",
+    "chile_v2/adobe_house",
+    "chile_v2/lookout_terrace",
+    "vehicles/city_bike"
+   ],
+   "references": {
+    "layouts": [
+     "asia_arrival",
+     "chile_arrival"
+    ],
+    "frames": [
+     "t05_a1_above_the_cloud",
+     "t05_b0_the_andes_appear",
+     "t05_b1_lookout_bicycle"
+    ]
+   },
+   "set": {
+    "anchor": "OUT: cloudscape relative to the aircraft (end of the flight chapter, any altitude). IN: layouts/chile_arrival.json; the lookout is its origin, the view is +z.",
+    "out_placements_vehicle_relative": [
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       -1040,
+       -95,
+       -220
+      ],
+      "yaw": -4.71,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       -1040,
+       -95,
+       300
+      ],
+      "yaw": -3.14,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       -1040,
+       -95,
+       820
+      ],
+      "yaw": -1.57,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       -1040,
+       -95,
+       1340
+      ],
+      "yaw": 0.0,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       -520,
+       -95,
+       -220
+      ],
+      "yaw": -3.14,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       -520,
+       -95,
+       300
+      ],
+      "yaw": -1.57,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       -520,
+       -95,
+       820
+      ],
+      "yaw": 0.0,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       -520,
+       -95,
+       1340
+      ],
+      "yaw": 1.57,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       0,
+       -95,
+       -220
+      ],
+      "yaw": -1.57,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       0,
+       -95,
+       300
+      ],
+      "yaw": 0.0,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       0,
+       -95,
+       820
+      ],
+      "yaw": 1.57,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       0,
+       -95,
+       1340
+      ],
+      "yaw": 3.14,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       520,
+       -95,
+       -220
+      ],
+      "yaw": 0.0,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       520,
+       -95,
+       300
+      ],
+      "yaw": 1.57,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       520,
+       -95,
+       820
+      ],
+      "yaw": 3.14,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       520,
+       -95,
+       1340
+      ],
+      "yaw": 4.71,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       1040,
+       -95,
+       -220
+      ],
+      "yaw": 1.57,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       1040,
+       -95,
+       300
+      ],
+      "yaw": 3.14,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       1040,
+       -95,
+       820
+      ],
+      "yaw": 4.71,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_sea",
+      "position": [
+       1040,
+       -95,
+       1340
+      ],
+      "yaw": 6.28,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_bank",
+      "position": [
+       -70,
+       -30,
+       120
+      ],
+      "yaw": 0.4,
+      "scale": 4.0
+     },
+     {
+      "asset": "journey/cloud_bank",
+      "position": [
+       110,
+       -18,
+       260
+      ],
+      "yaw": 2.0,
+      "scale": 5.5
+     },
+     {
+      "asset": "journey/cloud_bank",
+      "position": [
+       -180,
+       5,
+       420
+      ],
+      "yaw": 1.0,
+      "scale": 7.0
+     },
+     {
+      "asset": "journey/cloud_bank",
+      "position": [
+       30,
+       -55,
+       60
+      ],
+      "yaw": 3.0,
+      "scale": 3.0
+     },
+     {
+      "asset": "journey/cloud_bank",
+      "position": [
+       240,
+       20,
+       600
+      ],
+      "yaw": 5.0,
+      "scale": 8.0
+     },
+     {
+      "asset": "journey/cloud_bank",
+      "position": [
+       -320,
+       -10,
+       700
+      ],
+      "yaw": 4.0,
+      "scale": 8.0
+     }
+    ],
+    "bicycle_at_lookout": {
+     "position": [
+      2.3,
+      0.0,
+      1.3
+     ],
+     "yaw": -0.25,
+     "note": "this is the player's bicycle: the chile chapter (vehicle 'bicycle') starts here, standing still"
+    }
+   },
+   "camera": [
+    {
+     "t": 0.0,
+     "space": "vehicle",
+     "position": [
+      0,
+      9.55,
+      -34
+     ],
+     "look_at": [
+      0,
+      3.0,
+      10
+     ],
+     "fov": 46,
+     "ease": "inOutSine",
+     "relative_to": "vehicles/airliner",
+     "note": "the aircraft's chase anchor, level flight over the cloud floor"
+    },
+    {
+     "t": 3.0,
+     "space": "vehicle",
+     "position": [
+      9.0,
+      7.5,
+      -30.0
+     ],
+     "look_at": [
+      0,
+      2.5,
+      8.0
+     ],
+     "fov": 46,
+     "ease": "inOutSine",
+     "relative_to": "vehicles/airliner",
+     "verified_frame": "docs/world/journey/t05_a1_above_the_cloud.webp",
+     "note": "ease off the wing; the aircraft starts down (2 m/s) toward the deck"
+    },
+    {
+     "t": 6.0,
+     "space": "vehicle",
+     "position": [
+      9.0,
+      5.0,
+      -26.0
+     ],
+     "look_at": [
+      0,
+      2.5,
+      8.0
+     ],
+     "fov": 46,
+     "ease": "inOutSine",
+     "relative_to": "vehicles/airliner",
+     "note": "cloud tops rise through frame; white-out complete at 6.0"
+    },
+    {
+     "t": 6.0,
+     "space": "layout",
+     "position": [
+      -40,
+      250,
+      -640
+     ],
+     "look_at": [
+      20,
+      90,
+      900
+     ],
+     "fov": 46,
+     "ease": "cut",
+     "relative_to": "chile_arrival",
+     "note": "SPLICE inside the white"
+    },
+    {
+     "t": 8.0,
+     "space": "layout",
+     "position": [
+      -40,
+      250,
+      -640
+     ],
+     "look_at": [
+      20,
+      90,
+      900
+     ],
+     "fov": 46,
+     "ease": "linear",
+     "relative_to": "chile_arrival",
+     "verified_frame": "docs/world/journey/t05_b0_the_andes_appear.webp",
+     "note": "the white thins: the snow wall first, then the valley; the aircraft small ahead, continuing its descent out of frame right"
+    },
+    {
+     "t": 13.0,
+     "space": "layout",
+     "position": [
+      -8.0,
+      14.0,
+      -30.0
+     ],
+     "look_at": [
+      2.0,
+      2.0,
+      120
+     ],
+     "fov": 44,
+     "ease": "inOutCubic",
+     "relative_to": "chile_arrival",
+     "note": "one long descending glide across the valley edge to the road behind the lookout — the camera lets the aircraft go"
+    },
+    {
+     "t": 15.0,
+     "space": "layout",
+     "position": [
+      3.4,
+      2.0,
+      -7.0
+     ],
+     "look_at": [
+      0.5,
+      0.0,
+      300
+     ],
+     "fov": 42,
+     "ease": "inOutSine",
+     "relative_to": "chile_arrival",
+     "verified_frame": "docs/world/journey/t05_b1_lookout_bicycle.webp",
+     "note": "settle behind the bicycle at the parapet: the first image of the game, seen again"
+    },
+    {
+     "t": 16.0,
+     "space": "layout",
+     "position": [
+      3.4,
+      2.0,
+      -7.0
+     ],
+     "look_at": [
+      0.5,
+      0.0,
+      300
+     ],
+     "fov": 42,
+     "ease": "linear",
+     "relative_to": "chile_arrival",
+     "note": "hold one second in stillness; bell; hand over to the bicycle chase camera"
+    }
+   ],
+   "splice": {
+    "type": "white_out",
+    "at_s": 6.0,
+    "match": "full-frame cloud white (#f4f6f8) on both sides",
+    "load": "preload chile assets from t=0; the white overlay is the loading mask: loadChapter('chile') at 6.0, thin the overlay over 2 s from 6.6. Scene fog colour = the overlay colour while it thins."
+   },
+   "light": {
+    "out": "high daylight above cloud (cool, hard)",
+    "in": "chile evening (warm, long)",
+    "bridge": "warm the white overlay from #f4f6f8 to #f6e6d2 while it thins, so the Andes are born already in evening light"
+   },
+   "sound": [
+    {
+     "at": 0.0,
+     "cue": "jet_cruise",
+     "action": "continue"
+    },
+    {
+     "at": 3.0,
+     "cue": "cabin_chime",
+     "action": "oneshot"
+    },
+    {
+     "at": 3.2,
+     "cue": "jet_cruise",
+     "action": "pitch_down",
+     "note": "engines back to descent power over 2 s"
+    },
+    {
+     "at": 5.4,
+     "cue": "jet_cruise",
+     "action": "duck",
+     "note": "muffle (low-pass 500 Hz) inside the cloud"
+    },
+    {
+     "at": 7.0,
+     "cue": "wind",
+     "action": "fade_in",
+     "fade": 2.0
+    },
+    {
+     "at": 8.0,
+     "cue": "jet_cruise",
+     "action": "fade_out",
+     "fade": 5.0,
+     "note": "the aircraft leaves; do not cut it"
+    },
+    {
+     "at": 12.0,
+     "cue": "chile_amb",
+     "action": "fade_in",
+     "fade": 3.0,
+     "note": "dry wind in poplars, far below a dog, nothing else"
+    },
+    {
+     "at": 15.4,
+     "cue": "bike_bell",
+     "action": "oneshot",
+     "note": "the same bell as stage 1, once, unanswered"
+    }
+   ],
+   "next": {
+    "chapter": "chile",
+    "start": "bicycle standing at the lookout; first input starts the ride. The closing card of the journey belongs to the end of this chapter, not to the transition."
+   },
+   "reduced_motion": "Three stills with 0.6 s cross-fades: key 3.0 → key 8.0 → key 15.0. Bell kept.",
+   "no_webgl": "Text bridge between stages 5 and 6 (world.bridge.t05); the fallback's last line may echo the first stage's."
+  }
+ ]
+}
