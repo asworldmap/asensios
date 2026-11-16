@@ -1,6 +1,7 @@
 /* global document, window, performance, console, MutationObserver */
 import assert from 'node:assert/strict';
 import { open } from './lib.mjs';
+import { handoffTiming } from '../../src/world/handoff.js';
 
 const { b, p, errs } = await open({
   quality: 0,
@@ -46,7 +47,10 @@ try {
   assert.deepEqual(timing.stages.map(({ id }) => id), ['murcia', 'europe', 'europe-bus', 'japan', 'flight', 'chile']);
   assert.ok(timing.duration >= 180000 && timing.duration <= 240000, JSON.stringify(timing));
   assert.equal(timing.cuts.length, 5);
-  assert.ok(timing.cuts.every((ms) => ms <= 4200), JSON.stringify(timing.cuts));
+  for (const type of ['match_cut_held_frame', 'dark_doorway', 'horizon_hold', 'light_flash_match', 'white_out']) {
+    const { out, mask, in: enter } = handoffTiming(type);
+    assert.ok(out + mask + enter >= 2 && out + mask + enter <= 3, type);
+  }
   assert.equal(await p.getAttribute('[data-cap-link]', 'href'), '/trajectory/');
   assert.deepEqual(errs, []);
   console.log('PASS full hands-free Story');

@@ -78,6 +78,14 @@ export function matchShot(sequence, incoming, { world, vehicle, state }) {
   }
 }
 
+export function handoffTiming(type) {
+  return {
+    out: type === 'white_out' ? 0.78 : 0.88,
+    mask: type === 'horizon_hold' ? 0.28 : 0.22,
+    in: type === 'white_out' ? 1.20 : 0.91,
+  };
+}
+
 export function playShot(from, to, seconds, set, skipped) {
   const a = copy(from);
   const b = copy(to);
