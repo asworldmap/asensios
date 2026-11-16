@@ -58,6 +58,18 @@ export const CHAPTERS = {
     ],
     load: () => import('./europe-bus.js'),
   },
+  "asia": {
+    id: 'asia', order: 4, vehicle: 'airplane', status: 'playable',
+    label: 'world.leg.asia.label', title: 'world.leg.asia.label',
+    assets: [
+      'asia/runway_light',
+      'asia/terminal_bay',
+      'asia/jet_bridge',
+      'asia/baggage_cart',
+      'asia/bamboo_clump',
+    ],
+    load: () => import('./asia.js'),
+  },
   // Technical test track for vehicles. Not part of the story and never linked
   // from the public interface: reachable only with ?chapter=lab-rail.
   'lab-rail': {

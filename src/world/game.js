@@ -127,6 +127,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   // Services a vehicle or chapter may ask the engine for.
   const fx = {
     respawn,
+    feedback(id) { emit('secret', id); },
     splash(x, z) {
       splash.position.set(x, world.waterY + 0.04, z);
       splashT = 0;
@@ -173,7 +174,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
 
   function updateStory(dt) {
     const hold = input.up - input.down + input.adv + (Math.abs(input.joyY) > 0.2 ? input.joyY : 0);
-    st.tTarget = clamp(st.tTarget + (hold * 0.06 * dt * 230) / world.route.length + input.wheel, 0, 1);
+    st.tTarget = clamp(st.tTarget + (hold * 0.06 * dt * 230 * (world.storyRate || 1)) / world.route.length + input.wheel, 0, 1);
     input.wheel = 0;
     const prev = st.t;
     st.t = damp(st.t, st.tTarget, 3.4, dt);

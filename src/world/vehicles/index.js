@@ -34,7 +34,9 @@ import { train } from './train.js';
 
 import { bus } from './bus.js';
 
-export const VEHICLES = { bus, bicycle, train };
+import { airplane } from './airplane.js';
+
+export const VEHICLES = { airplane, bus, bicycle, train };
 
 /** Planned vehicles: named so chapters can reference them, not built yet. */
 export const PLANNED = ['bus', 'airplane', 'ship'];
