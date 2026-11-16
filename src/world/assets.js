@@ -79,6 +79,15 @@ export function createAssets() {
           surface === 'glow'
             ? new THREE.MeshBasicMaterial({ color: m.emissive?.getHex() ? m.emissive : m.color, name: m.name })
             : new THREE.MeshLambertMaterial({ color: m.color, map: m.map || null, vertexColors: !!o.geometry.attributes.color, name: m.name });
+        if (surface === 'glass') {
+          // The one translucent surface in the contract: vehicle glazing.
+          lm.transparent = true;
+          lm.opacity = m.opacity < 1 ? m.opacity : 0.38;
+          lm.depthWrite = false;
+          lm.side = THREE.DoubleSide;
+          o.castShadow = false;
+          o.renderOrder = 3;
+        } else if (m.side === THREE.DoubleSide) lm.side = THREE.DoubleSide;
         o.material = lm;
         m.dispose();
         o.userData.surface = surface;

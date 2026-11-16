@@ -12,6 +12,9 @@ const R = []; const ok = (n, c, x = '') => R.push(`${c ? 'PASS' : 'FAIL'}  ${n} 
   await wait(3);
   const s1 = await st();
   ok('mobile story: drag up advances', s1.t > s0.t + 0.05, `${s0.t} -> ${s1.t}`);
+  // Start the next step from a known place: how far one drag travels depends on the route length.
+  await p.evaluate(() => { const s = window.__pw.game.state; s.t = s.tTarget = 0.3; });
+  await wait(0.5);
   await p.tap('[data-next]'); await wait(5);
   await p.screenshot({ path: `${out}-m-beat.png` });
   await p.tap('[data-open]'); await p.waitForTimeout(700);
