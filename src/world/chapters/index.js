@@ -70,6 +70,17 @@ export const CHAPTERS = {
     ],
     load: () => import('./asia.js'),
   },
+  "japan": {
+    id: 'japan', order: 5, vehicle: 'ship', status: 'playable',
+    label: 'world.leg.japan.label', title: 'world.leg.japan.label',
+    assets: [
+      'maritime/quay_section',
+      'maritime/harbour_light',
+      'maritime/cargo_crate',
+      'maritime/mooring_buoy',
+    ],
+    load: () => import('./japan.js'),
+  },
   // Technical test track for vehicles. Not part of the story and never linked
   // from the public interface: reachable only with ?chapter=lab-rail.
   'lab-rail': {

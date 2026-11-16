@@ -128,6 +128,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   const fx = {
     respawn,
     feedback(id) { emit('secret', id); },
+    snapCamera() { cam.ready = false; },
     splash(x, z) {
       splash.position.set(x, world.waterY + 0.04, z);
       splashT = 0;
@@ -223,6 +224,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
 
   // --------------------------------------------------------------- Explore
   function placeOnRoute(t) {
+    vehicle.reset?.();
     const p = world.pointAt(t, rp);
     st.x = p.x;
     st.z = p.z;
@@ -303,7 +305,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     focus.set(st.x, st.y + vehicle.focusHeight, st.z);
     if (!calm) shared.uTime.value = st.time;
     shared.uFocus.value.copy(focus);
-    shared.uSee.value = damp(shared.uSee.value, st.started && st.mode === 'explore' && !vehicle.onRails ? 1 : 0, 5, dt);
+    shared.uSee.value = damp(shared.uSee.value, st.started && st.mode === 'explore' && !vehicle.onRails && !vehicle.walking ? 1 : 0, 5, dt);
 
     const evs = world.update({ dt, time: st.time, x: st.x, z: st.z, speed: st.speed, vx: Math.sin(st.yaw) * st.speed, vz: Math.cos(st.yaw) * st.speed, calm, canCollect: st.started && st.mode === 'explore' });
     for (const e of evs) {
@@ -560,6 +562,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
   function setMode(mode) {
     if (mode === st.mode || !st.started || loading) return;
     st.mode = mode;
+    vehicle.reset?.();
     clearInput();
     if (st.cine) emit('cine', (st.cine = false));
     if (mode === 'story') {

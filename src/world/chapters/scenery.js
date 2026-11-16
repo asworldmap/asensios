@@ -40,7 +40,9 @@ export function scenery({ scene, assets, shared }, spec) {
   function tile(key, x, z, count, opts) {
     for (let i = 0; i < count; i++) {
       const next = stamp(key, x, z, opts).find((a) => a.name === 'next');
-      ({ x, z } = next);
+      // Blender places the marker at the forward seam of a centred tile.
+      x += 2 * (next.x - x);
+      z += 2 * (next.z - z);
     }
   }
 
