@@ -172,7 +172,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     const end = transfer?.t ?? 1;
     const nudge = (hold * 0.06 * dt * 230 * (world.storyRate || 1)) / world.route.length + input.wheel;
     if (nudge) storyWait = 4.5;
-    else if (Math.abs(st.t - st.tTarget) < 0.002) storyWait = Math.max(0, storyWait - dt);
+    else if (Math.abs(st.t - st.tTarget) < 0.002) storyWait = Math.max(0, storyWait - (calm ? dt : elapsed));
     const autoplay = seconds && !calm && !stayHere && !storyWait;
     const pace = autoplay ? elapsed : dt;
     st.tTarget = clamp(st.tTarget + nudge + (autoplay ? end * elapsed / seconds : 0), 0, end);
@@ -322,13 +322,15 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
     raf = requestAnimationFrame(frame);
     const real = (now - last) / 1000 || 0.016;
     const dt = Math.min(0.05, real);
+    // Story uses wall time. Physics still runs on its bounded gameplay step.
+    const storyElapsed = Math.min(4, real);
     last = now;
     if (!world || loading) return;
     st.time += dt;
     st.lock = Math.max(0, st.lock - dt);
 
     if (st.started && !st.paused) {
-      if (st.mode === 'story') updateStory(dt, Math.min(1, real));
+      if (st.mode === 'story') updateStory(dt, storyElapsed);
       else updateExplore(dt);
     } else {
       storyShot(st.t, want);
@@ -369,7 +371,7 @@ export async function createGame({ canvas, tier, reduced, dark, onProgress, emit
       want.fov = handoffCamera.fov;
       cam.ready = false;
     } else if (st.started && st.intro < 1) {
-      st.intro = Math.min(1, st.intro + dt / introSeconds);
+      st.intro = Math.min(1, st.intro + (st.mode === 'story' ? storyElapsed : dt) / introSeconds);
       const e = st.intro < 0.5 ? 4 * st.intro ** 3 : 1 - (-2 * st.intro + 2) ** 3 / 2;
       want.pos.lerpVectors(introFrom, want.pos, e);
       want.fov = lerp(40, want.fov, e);
